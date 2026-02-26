@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure Authentication Deep Dive — From First Principles</title>
+<style>
+  @page { margin: 0.75in; size: letter; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; color: #1a1a2e; line-height: 1.65; max-width: 840px; margin: 0 auto; padding: 40px 24px; background: #fff; }
+  h1 { font-size: 28px; font-weight: 700; color: #0f0f23; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: #666; margin-bottom: 32px; border-bottom: 3px solid #0078d4; padding-bottom: 14px; }
+  h2 { font-size: 20px; font-weight: 700; color: #1e3a5f; margin-top: 38px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+  h3 { font-size: 16px; font-weight: 600; color: #0078d4; margin-top: 22px; margin-bottom: 8px; }
+  h4 { font-size: 14.5px; font-weight: 600; color: #374151; margin-top: 16px; margin-bottom: 6px; }
+  p { margin-bottom: 12px; font-size: 14.5px; }
+  ul, ol { margin-bottom: 12px; padding-left: 24px; }
+  li { margin-bottom: 6px; font-size: 14.5px; }
+  strong { color: #0f0f23; }
+  em { color: #555; }
+  code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', 'Fira Code', monospace; }
+  .arch-box { background: #0f172a; color: #e2e8f0; padding: 20px 24px; border-radius: 10px; margin: 14px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12.5px; line-height: 1.7; white-space: pre; overflow-x: auto; }
+  .callout { background: #eff6ff; border-left: 4px solid #0078d4; padding: 14px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 14px; }
+  .callout.green { background: #f0fdf4; border-left-color: #10b981; }
+  .callout.amber { background: #fffbeb; border-left-color: #f59e0b; }
+  .callout.red { background: #fef2f2; border-left-color: #ef4444; }
+  .callout p { margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13.5px; }
+  th { background: #1e3a5f; color: white; text-align: left; padding: 10px 14px; font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .concept-box { background: #fafbfd; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 22px; margin: 16px 0; }
+  .concept-box h3 { margin-top: 0; }
+  .step { display: flex; gap: 14px; margin: 14px 0; align-items: flex-start; }
+  .step-num { background: #0078d4; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .step-content { flex: 1; padding-top: 4px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+  .flow-diagram { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; margin: 16px 0; }
+  .flow-diagram h4 { margin-top: 0; color: #0078d4; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+  pre { background: #0f172a; color: #e2e8f0; padding: 18px 22px; border-radius: 10px; margin: 14px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; white-space: pre; }
+</style>
+</head>
+<body>
+
+<h1>Azure Authentication Deep Dive</h1>
+<div class="subtitle">Understanding Identity, Sessions, and Auth Handoffs — From First Principles</div>
+
+<div class="callout">
+  <p><strong>Why this doc exists:</strong> Auth in Azure feels opaque because Microsoft wraps it in layers of abstraction. This guide strips it back to the raw HTTP flows — who talks to whom, what gets passed, and where the trust lives. Every diagram shows the actual requests happening between browser, Azure, and your app.</p>
+</div>
+
+<!-- ============================================ -->
+<h2>Part 1: What You Already Know (Traditional Auth)</h2>
+
+<p>Let's start from what you understand — a standard web app with login:</p>
+
+<div class="arch-box">
+TRADITIONAL WEB APP AUTH
+═══════════════════════════════════════════════════════════════
+
+  Browser                    Your Server                 Your Database
+    │                            │                            │
+    │── GET /login ─────────────►│                            │
+    │◄── Login form HTML ────────│                            │
+    │                            │                            │
+    │── POST /login ────────────►│                            │
+    │   {email, password}        │── Check password ─────────►│
+    │                            │◄── User found, match ──────│
+    │                            │                            │
+    │                            │── Create session ──────────►│
+    │                            │   session_id = "abc123"    │
+    │                            │   user_id = 42             │
+    │                            │                            │
+    │◄── Set-Cookie: session=abc123                           │
+    │                            │                            │
+    │── GET /dashboard ─────────►│                            │
+    │   Cookie: session=abc123   │── Lookup session ─────────►│
+    │                            │◄── user_id=42 ─────────────│
+    │◄── Dashboard HTML ─────────│   (Blake Thomson)          │
+    │                            │                            │
+
+YOU OWN EVERYTHING:
+  ✓ The login form
+  ✓ The password check
+  ✓ The session store
+  ✓ The user database
+  ✓ Session cookie management
+</div>
+
+<p><strong>This works fine.</strong> You control the entire chain. But it means you're responsible for:</p>
+<ul>
+  <li>Storing passwords securely (hashing, salting)</li>
+  <li>Session management (expiry, invalidation, storage)</li>
+  <li>Password reset flows</li>
+  <li>Multi-factor authentication</li>
+  <li>Preventing brute force attacks</li>
+  <li>Managing user accounts (create, disable, delete)</li>
+</ul>
+
+<p>In Azure, <strong>Microsoft handles all of that.</strong> The trade-off: you lose visibility into the mechanics, which is why it feels opaque.</p>
+
+<!-- ============================================ -->
+<h2>Part 2: How Azure Auth Actually Works (The Raw Flow)</h2>
+
+<p>Azure uses <strong>OAuth 2.0 + OpenID Connect</strong> — the same standard that "Sign in with Google" uses. The key difference from traditional auth: <strong>your app never sees the user's password.</strong> Microsoft handles login entirely, and sends your app a signed token proving who the user is.</p>
+
+<h3>The Actors</h3>
+
+<table>
+  <tr><th>Actor</th><th>What it is</th><th>Analogy</th></tr>
+  <tr><td><strong>User</strong></td><td>Person in the browser</td><td>The customer</td></tr>
+  <tr><td><strong>Your App</strong></td><td>Container App (FastAPI, Next.js, etc.)</td><td>Your store</td></tr>
+  <tr><td><strong>Entra ID (Azure AD)</strong></td><td>Microsoft's identity service</td><td>A trusted bouncer who checks IDs</td></tr>
+  <tr><td><strong>App Registration</strong></td><td>Your app's identity card in Entra</td><td>Your store's license on file with the bouncer</td></tr>
+</table>
+
+<h3>The Complete Flow — Step by Step</h3>
+
+<div class="arch-box">
+THE OAUTH 2.0 AUTHORIZATION CODE FLOW
+═══════════════════════════════════════════════════════════════
+
+  Browser                Your Container App           Microsoft Entra ID
+    │                         │                            │
+    │                         │                            │
+    │  ① USER HITS YOUR APP                                │
+    │── GET /dashboard ──────►│                            │
+    │                         │                            │
+    │                         │  ② APP CHECKS: "Is this    │
+    │                         │     request authenticated?" │
+    │                         │     No cookie/token found.  │
+    │                         │                            │
+    │  ③ APP REDIRECTS TO MICROSOFT                        │
+    │◄── 302 Redirect ────────│                            │
+    │    Location: https://login.microsoftonline.com/      │
+    │    {tenant}/oauth2/v2.0/authorize?                   │
+    │    client_id=YOUR_APP_ID                             │
+    │    &redirect_uri=https://yourapp.com/callback        │
+    │    &response_type=code                               │
+    │    &scope=openid profile email                       │
+    │                         │                            │
+    │  ④ BROWSER GOES TO MICROSOFT LOGIN                   │
+    │── GET /authorize ───────────────────────────────────►│
+    │                         │                            │
+    │◄── Microsoft Login Page ─────────────────────────────│
+    │    (email + password form)                           │
+    │                         │                            │
+    │  ⑤ USER ENTERS CREDENTIALS (TO MICROSOFT, NOT YOU)   │
+    │── POST credentials ─────────────────────────────────►│
+    │                         │              Microsoft     │
+    │                         │              checks pwd,   │
+    │                         │              runs MFA,     │
+    │                         │              checks if     │
+    │                         │              user is in    │
+    │                         │              this tenant   │
+    │                         │                            │
+    │  ⑥ MICROSOFT REDIRECTS BACK TO YOUR APP              │
+    │◄── 302 Redirect ────────────────────────────────────│
+    │    Location: https://yourapp.com/callback?           │
+    │    code=AUTHORIZATION_CODE_HERE                      │
+    │    &state=random_value                               │
+    │                         │                            │
+    │  ⑦ BROWSER FOLLOWS REDIRECT TO YOUR APP              │
+    │── GET /callback?code=AUTHCODE ►│                     │
+    │                         │                            │
+    │                         │  ⑧ YOUR APP EXCHANGES CODE │
+    │                         │     FOR TOKENS (server-to- │
+    │                         │     server, user can't see │
+    │                         │     this)                  │
+    │                         │                            │
+    │                         │── POST /oauth2/v2.0/token─►│
+    │                         │   {code, client_id,        │
+    │                         │    client_secret,          │
+    │                         │    redirect_uri}           │
+    │                         │                            │
+    │                         │◄── {                       │
+    │                         │      access_token: "eyJ.." │
+    │                         │      id_token: "eyJ..."    │
+    │                         │      refresh_token: "..."  │
+    │                         │    } ──────────────────────│
+    │                         │                            │
+    │                         │  ⑨ APP CREATES SESSION     │
+    │                         │  Extracts user info from   │
+    │                         │  id_token (JWT):           │
+    │                         │    name: "Blake Thomson"   │
+    │                         │    email: "blake@csmns.org"│
+    │                         │    oid: "abc-123-..."      │
+    │                         │  Stores in session/cookie  │
+    │                         │                            │
+    │  ⑩ USER IS AUTHENTICATED                             │
+    │◄── Set-Cookie: session=xyz │                         │
+    │    + 302 Redirect to /dashboard                      │
+    │                         │                            │
+    │── GET /dashboard ──────►│                            │
+    │   Cookie: session=xyz   │                            │
+    │                         │  (looks up session, finds  │
+    │                         │   blake@csmns.org)         │
+    │◄── Dashboard HTML ──────│                            │
+</div>
+
+<div class="callout green">
+  <p><strong>The key insight:</strong> Your app never sees the password. Microsoft handles login (step ⑤), your app just receives a signed token (step ⑧) that proves "this person is blake@csmns.org and they work at Cedars-Sinai." From there, you create a session just like you normally would.</p>
+</div>
+
+<h3>What's Inside the Tokens</h3>
+
+<p>The <code>id_token</code> Microsoft sends back is a <strong>JWT (JSON Web Token)</strong> — a Base64-encoded JSON string signed by Microsoft. Your app can decode it and trust the contents because Microsoft signed it with their private key.</p>
+
+<pre>
+# The id_token decodes to something like this:
+{
+  "aud": "YOUR_APP_CLIENT_ID",           # This token is for YOUR app
+  "iss": "https://login.microsoftonline.com/{tenant}/v2.0",
+  "iat": 1740000000,                      # Issued at (timestamp)
+  "exp": 1740003600,                      # Expires (1 hour later)
+  
+  # THE USER INFO:
+  "sub": "abc-123-def-456",               # Unique user ID in this tenant
+  "oid": "abc-123-def-456",               # Object ID (same in all apps)
+  "name": "Blake Thomson",                # Display name
+  "preferred_username": "blake.thomson@csmns.org",
+  "email": "blake.thomson@csmns.org",
+  "tid": "YOUR_TENANT_ID",                # Which organization
+  
+  # ROLES (if configured):
+  "roles": ["Admin", "DataAnalyst"]
+}
+</pre>
+
+<p><strong>This is your user object.</strong> You don't need a users table with passwords. You get all this from the token.</p>
+
+<!-- ============================================ -->
+<h2>Part 3: The Three Ways to Do Auth in Azure</h2>
+
+<p>Azure gives you three approaches, from easiest to most control:</p>
+
+<div class="concept-box">
+  <h3>Approach 1: Easy Auth (Zero Code)</h3>
+  <p><strong>What:</strong> Azure runs an auth sidecar container alongside your app. All that OAuth flow above? Azure does it for you. Your app just reads HTTP headers.</p>
+  <p><strong>How:</strong> Toggle "Authentication" on your Container App in the portal. Select Microsoft Entra ID. Done.</p>
+  <p><strong>Best for:</strong> Internal dashboards, prototypes, apps where you just need "only @csmns.org people can access this."</p>
+</div>
+
+<div class="arch-box">
+EASY AUTH — WHAT YOUR APP SEES
+═══════════════════════════════════════════════════════════════
+
+  Browser              Azure Sidecar            Your App
+    │                      │                       │
+    │── GET /dashboard ───►│                       │
+    │                      │  "Not authenticated"  │
+    │◄── 302 to Microsoft──│                       │
+    │                      │                       │
+    │  ... Microsoft login flow happens ...        │
+    │                      │                       │
+    │── GET /dashboard ───►│                       │
+    │   (with auth cookie) │  "Valid! Inject       │
+    │                      │   headers and forward"│
+    │                      │                       │
+    │                      │── GET /dashboard ────►│
+    │                      │   X-MS-CLIENT-PRINCIPAL-NAME: blake.thomson@csmns.org
+    │                      │   X-MS-CLIENT-PRINCIPAL-ID: abc-123-def-456
+    │                      │   X-MS-TOKEN-AAD-ID-TOKEN: eyJ...
+    │                      │                       │
+    │                      │◄── Dashboard HTML ────│
+    │◄── Dashboard HTML ───│                       │
+
+YOUR CODE:
+  # That's it. Read the header.
+  user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME")
+  user_id = request.headers.get("X-MS-CLIENT-PRINCIPAL-ID")
+</pre>
+</div>
+
+<pre>
+# FastAPI with Easy Auth — your entire auth code:
+from fastapi import Request
+
+@app.get("/dashboard")
+async def dashboard(request: Request):
+    user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME")
+    user_id = request.headers.get("X-MS-CLIENT-PRINCIPAL-ID")
+    
+    if not user_email:
+        return {"error": "Not authenticated"}  # shouldn't happen if Easy Auth is on
+    
+    # user_email = "blake.thomson@csmns.org"
+    # user_id = "abc-123-def-456"
+    
+    # Now use this to personalize, check permissions, log activity, etc.
+    return {"message": f"Welcome {user_email}", "data": get_dashboard_data(user_id)}
+</pre>
+
+<div class="concept-box">
+  <h3>Approach 2: MSAL Library (Your Code Handles Auth)</h3>
+  <p><strong>What:</strong> You implement the OAuth flow yourself using Microsoft's MSAL library. Same flow as the diagram above, but your code handles the redirects, token exchange, and session management.</p>
+  <p><strong>How:</strong> Install <code>msal</code> Python library, configure with your App Registration credentials, handle login/callback routes.</p>
+  <p><strong>Best for:</strong> Apps where you need fine control — custom login pages, role-based access, token caching, calling other APIs on behalf of the user.</p>
+</div>
+
+<pre>
+# FastAPI with MSAL — you control the flow
+from msal import ConfidentialClientApplication
+import os
+
+msal_app = ConfidentialClientApplication(
+    client_id=os.environ["AZURE_CLIENT_ID"],
+    client_credential=os.environ["AZURE_CLIENT_SECRET"],
+    authority=f"https://login.microsoftonline.com/{os.environ['AZURE_TENANT_ID']}"
+)
+
+@app.get("/login")
+async def login():
+    """Step ③ — Redirect user to Microsoft login"""
+    auth_url = msal_app.get_authorization_request_url(
+        scopes=["User.Read"],
+        redirect_uri="https://yourapp.com/callback"
+    )
+    return RedirectResponse(auth_url)
+
+@app.get("/callback")
+async def callback(request: Request):
+    """Step ⑦⑧ — Exchange code for tokens"""
+    code = request.query_params.get("code")
+    
+    result = msal_app.acquire_token_by_authorization_code(
+        code=code,
+        scopes=["User.Read"],
+        redirect_uri="https://yourapp.com/callback"
+    )
+    
+    if "error" in result:
+        return {"error": result["error_description"]}
+    
+    # Step ⑨ — Extract user info from the id_token
+    user = result.get("id_token_claims")
+    # user = {
+    #   "name": "Blake Thomson",
+    #   "preferred_username": "blake.thomson@csmns.org", 
+    #   "oid": "abc-123-def-456",
+    #   "tid": "your-tenant-id"
+    # }
+    
+    # Create YOUR session (just like traditional auth)
+    session_id = create_session(user)
+    response = RedirectResponse("/dashboard")
+    response.set_cookie("session", session_id)
+    return response
+
+@app.get("/dashboard")
+async def dashboard(request: Request):
+    """Step ⑩ — Normal session-based access"""
+    session = get_session(request.cookies.get("session"))
+    if not session:
+        return RedirectResponse("/login")
+    
+    return {"message": f"Welcome {session['name']}", "data": get_data(session['oid'])}
+</pre>
+
+<div class="concept-box">
+  <h3>Approach 3: Bot Framework Auth (Teams Bots)</h3>
+  <p><strong>What:</strong> Teams bots get user identity automatically from the Bot Framework. The JWT is validated by the SDK — you just read the activity object.</p>
+  <p><strong>How:</strong> The Bot Framework SDK handles everything. The user's identity comes from their Teams login — no extra auth flow needed.</p>
+  <p><strong>Best for:</strong> Teams bots (obviously). The user is already logged into Teams with their @csmns.org account.</p>
+</div>
+
+<div class="arch-box">
+TEAMS BOT AUTH FLOW
+═══════════════════════════════════════════════════════════════
+
+  User (Teams)           Microsoft Bot Service      Your Container App
+    │                         │                          │
+    │  User is ALREADY        │                          │
+    │  logged into Teams      │                          │
+    │  (blake@csmns.org)      │                          │
+    │                         │                          │
+    │── "Show me Q4 data" ───►│                          │
+    │                         │  Bot Service adds        │
+    │                         │  Microsoft-signed JWT    │
+    │                         │  to the request          │
+    │                         │                          │
+    │                         │── POST /api/messages ───►│
+    │                         │   Authorization: Bearer  │
+    │                         │   eyJ... (signed JWT)    │
+    │                         │                          │
+    │                         │   Body: {                │
+    │                         │     type: "message",     │
+    │                         │     text: "Show me Q4",  │
+    │                         │     from: {              │
+    │                         │       id: "29:...",      │
+    │                         │       name: "Blake",     │
+    │                         │       aadObjectId:       │
+    │                         │        "abc-123-..."     │  ◄── SAME ID as Easy Auth!
+    │                         │     }                    │
+    │                         │   }                      │
+    │                         │                          │
+    │                         │   Bot Framework SDK      │
+    │                         │   automatically validates│
+    │                         │   the JWT signature      │
+    │                         │                          │
+    │                         │◄── Response ─────────────│
+    │◄── Bot reply ───────────│                          │
+
+YOUR CODE:
+  user_name = turn_context.activity.from_property.name        # "Blake Thomson"
+  user_aad_id = turn_context.activity.from_property.aad_object_id  # "abc-123-..."
+  # SAME oid as what you'd get from Easy Auth or MSAL
+</pre>
+</div>
+
+<div class="callout green">
+  <p><strong>The magic:</strong> <code>aadObjectId</code> is the same across ALL three approaches. Whether a user hits your dashboard (Easy Auth), calls your API (MSAL), or chats with your bot (Bot Framework) — the <code>oid</code> / <code>aadObjectId</code> is always <code>abc-123-def-456</code>. This is how identity carries across apps.</p>
+</div>
+
+<!-- ============================================ -->
+<h2>Part 4: Restricting Access — "Only My Team"</h2>
+
+<p>You asked: "How do I make a Teams bot only accessible by my team?" There are multiple layers of restriction:</p>
+
+<h3>Layer 1: Tenant Restriction (Org-Wide)</h3>
+
+<p>When you create an App Registration as <strong>Single Tenant</strong>, only users in your Azure AD tenant (e.g., <code>@csmns.org</code>) can authenticate. Anyone with a <code>@gmail.com</code> or <code>@otherhospital.org</code> account is blocked automatically.</p>
+
+<pre>
+# In your bot's BotFrameworkAdapterSettings:
+_settings = BotFrameworkAdapterSettings(
+    app_id=os.environ["MICROSOFT_APP_ID"],
+    app_password=os.environ["MICROSOFT_APP_PASSWORD"],
+    channel_auth_tenant=os.environ["MICROSOFT_APP_TENANT_ID"],  # ← THIS LINE
+    # Only users from THIS tenant can talk to the bot
+)
+</pre>
+
+<p><strong>This is the minimum.</strong> Every internal tool should use Single Tenant.</p>
+
+<h3>Layer 2: User Assignment (Specific People)</h3>
+
+<p>To restrict beyond "everyone in our org" to "only these specific people":</p>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-content">Go to <strong>Entra ID → Enterprise Applications</strong> → find your app</div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-content">Properties → set <strong>"User assignment required"</strong> to <strong>Yes</strong></div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-content"><strong>Users and groups → Add user/group</strong> → add only your team members</div>
+</div>
+
+<p>Now only those specific people can access the app. Everyone else in the org gets an "AADSTS50105: Your administrator has not given you access" error.</p>
+
+<h3>Layer 3: App Roles (Permissions Within Your App)</h3>
+
+<p>For role-based access (Admin vs. Viewer vs. Editor):</p>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-content"><strong>App Registration → App roles → Create app role</strong>
+    <br>Example: <code>DataAnalyst</code>, <code>Admin</code>, <code>Viewer</code></div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-content"><strong>Enterprise Application → Users and groups</strong> → assign roles to users</div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-content">Roles appear in the JWT token → your code checks them</div>
+</div>
+
+<pre>
+# The token now includes roles:
+{
+  "name": "Blake Thomson",
+  "preferred_username": "blake.thomson@csmns.org",
+  "roles": ["Admin", "DataAnalyst"]    # ← These come from Entra
+}
+
+# In your FastAPI app:
+@app.get("/admin/settings")
+async def admin_settings(request: Request):
+    token = decode_token(request)
+    if "Admin" not in token.get("roles", []):
+        raise HTTPException(403, "Admin access required")
+    return get_admin_settings()
+</pre>
+
+<h3>Layer 4: Teams-Specific Controls</h3>
+
+<p>For Teams bots specifically, you have additional levers:</p>
+
+<table>
+  <tr><th>Control</th><th>How</th><th>Effect</th></tr>
+  <tr><td><strong>Sideloading only</strong></td><td>Upload manifest manually to specific chats</td><td>Only people in that chat/channel can use it</td></tr>
+  <tr><td><strong>App catalog</strong></td><td>Publish to org app store (Teams Admin Center)</td><td>Available to org, IT controls who sees it</td></tr>
+  <tr><td><strong>Permission policies</strong></td><td>Teams Admin → App permission policies</td><td>Block/allow specific apps for specific user groups</td></tr>
+  <tr><td><strong>In-code check</strong></td><td>Check <code>aadObjectId</code> against allowed list</td><td>Reject messages from unauthorized users</td></tr>
+</table>
+
+<pre>
+# In-code restriction for Teams bot:
+ALLOWED_USERS = {
+    "abc-123-...",  # Blake Thomson
+    "def-456-...",  # Devon
+    "ghi-789-...",  # Team member
+}
+
+async def on_turn(turn_context: TurnContext):
+    user_id = turn_context.activity.from_property.aad_object_id
+    
+    if user_id not in ALLOWED_USERS:
+        await turn_context.send_activity("Sorry, you don't have access to this bot.")
+        return
+    
+    # ... handle the message
+</pre>
+
+<!-- ============================================ -->
+<h2>Part 5: Building a CRUD App with User Sessions</h2>
+
+<p>Now the practical question: "How do I build an app where users log in, have sessions, and their edits are tracked?"</p>
+
+<h3>The Architecture</h3>
+
+<div class="arch-box">
+CRUD APP WITH AZURE AUTH
+═══════════════════════════════════════════════════════════════
+
+  Browser                Easy Auth Sidecar       Your FastAPI App        PostgreSQL
+    │                         │                      │                      │
+    │── GET /providers ──────►│                      │                      │
+    │                         │  [validates token]   │                      │
+    │                         │── GET /providers ───►│                      │
+    │                         │   X-MS-CLIENT-...:   │                      │
+    │                         │   blake@csmns.org    │                      │
+    │                         │                      │── SELECT * FROM ────►│
+    │                         │                      │   providers WHERE ..│
+    │                         │                      │◄── rows ────────────│
+    │◄── Provider list HTML ──│◄─────────────────────│                      │
+    │                         │                      │                      │
+    │── POST /providers/123/edit                     │                      │
+    │   {specialty: "Cardio"} │                      │                      │
+    │                         │── POST /providers/──►│                      │
+    │                         │   X-MS-CLIENT-...:   │                      │
+    │                         │   blake@csmns.org    │                      │
+    │                         │                      │── INSERT INTO ──────►│
+    │                         │                      │   providers.edits    │
+    │                         │                      │   (npi, field, value,│
+    │                         │                      │    edited_by:        │
+    │                         │                      │    'blake@csmns.org',│
+    │                         │                      │    edited_at: NOW()) │
+    │                         │                      │◄── OK ──────────────│
+    │◄── 200 OK ──────────────│◄─────────────────────│                      │
+</div>
+
+<pre>
+# Your CRUD endpoints — auth is handled by the sidecar
+from fastapi import Request, HTTPException
+from datetime import datetime
+
+@app.post("/api/providers/{npi}/edit")
+async def edit_provider(npi: str, request: Request):
+    # Auth already done by Easy Auth sidecar
+    user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME")
+    user_id = request.headers.get("X-MS-CLIENT-PRINCIPAL-ID")
+    
+    if not user_email:
+        raise HTTPException(401, "Not authenticated")
+    
+    body = await request.json()
+    
+    # Write the edit with full audit trail
+    db.execute("""
+        INSERT INTO providers.edits (npi, field_name, new_value, edited_by, edited_at)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (npi, body["field"], body["value"], user_email, datetime.utcnow()))
+    
+    return {"status": "saved", "edited_by": user_email}
+
+@app.get("/api/providers/{npi}/history")
+async def edit_history(npi: str, request: Request):
+    """See who edited what and when"""
+    user_email = request.headers.get("X-MS-CLIENT-PRINCIPAL-NAME")
+    
+    rows = db.execute("""
+        SELECT field_name, new_value, edited_by, edited_at
+        FROM providers.edits
+        WHERE npi = %s
+        ORDER BY edited_at DESC
+    """, (npi,))
+    
+    return {"npi": npi, "edits": rows, "requested_by": user_email}
+</pre>
+
+<div class="callout">
+  <p><strong>Notice what you DON'T need:</strong> No users table. No password hashing. No session store. No login page. No "forgot password" flow. Entra ID handles all of that. Your database only stores <em>what users did</em> (edits, activities), not <em>who users are</em>.</p>
+</div>
+
+<h3>If You Need More Session State</h3>
+
+<p>Easy Auth handles login/logout, but what if you need to store per-user state (preferences, current filters, draft edits in progress)?</p>
+
+<pre>
+# Option 1: Server-side session store (PostgreSQL)
+@app.post("/api/session/preferences")
+async def save_preferences(request: Request):
+    user_id = request.headers.get("X-MS-CLIENT-PRINCIPAL-ID")
+    body = await request.json()
+    
+    db.execute("""
+        INSERT INTO user_preferences (user_id, preferences, updated_at)
+        VALUES (%s, %s, NOW())
+        ON CONFLICT (user_id) DO UPDATE SET preferences = %s, updated_at = NOW()
+    """, (user_id, json.dumps(body), json.dumps(body)))
+
+# Option 2: Client-side (localStorage in the browser)
+# Just store preferences in the browser. They're tied to the user
+# because the user is logged in on that browser. Simple and free.
+
+# Option 3: Signed cookie (for small data)
+# FastAPI's SessionMiddleware can store small amounts of data
+# in an encrypted cookie. No database needed.
+</pre>
+
+<!-- ============================================ -->
+<h2>Part 6: Cross-App Identity — How It All Connects</h2>
+
+<p>This is the part that makes Azure's model powerful. One user identity works everywhere:</p>
+
+<div class="arch-box">
+ONE USER, MULTIPLE APPS — SAME IDENTITY
+═══════════════════════════════════════════════════════════════
+
+                    Microsoft Entra ID (Azure AD)
+                    ┌───────────────────────────────────┐
+                    │  Tenant: Cedars-Sinai              │
+                    │                                   │
+                    │  User: Blake Thomson               │
+                    │  oid: abc-123-def-456              │
+                    │  email: blake.thomson@csmns.org    │
+                    │  roles: [Admin, DataAnalyst]       │
+                    │                                   │
+                    │  App Registrations:                │
+                    │  ├── mn-bd-platform (dashboard)    │
+                    │  ├── bd-teams-bot (Teams bot)      │
+                    │  └── bd-api-service (REST API)     │
+                    └──────────┬────────────────────────┘
+                               │
+          ┌────────────────────┼────────────────────┐
+          │                    │                    │
+          ▼                    ▼                    ▼
+  ┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+  │  Dashboard    │  │  Teams Bot    │  │  API Service  │
+  │  (Easy Auth)  │  │  (Bot FW)     │  │  (MSAL/JWT)   │
+  │               │  │               │  │               │
+  │  Reads header:│  │  Reads:       │  │  Validates:   │
+  │  X-MS-CLIENT- │  │  activity     │  │  Bearer token │
+  │  PRINCIPAL-ID │  │  .from        │  │  in header    │
+  │  = abc-123    │  │  .aadObjectId │  │               │
+  │               │  │  = abc-123    │  │  oid=abc-123  │
+  └───────┬───────┘  └───────┬───────┘  └───────┬───────┘
+          │                  │                   │
+          └──────────────────┼───────────────────┘
+                             │
+                             ▼
+                    ┌───────────────────┐
+                    │  PostgreSQL       │
+                    │                   │
+                    │  All apps write:  │
+                    │  edited_by =      │
+                    │  "abc-123-..."    │
+                    │  OR               │
+                    │  "blake@csmns.org"│
+                    │                   │
+                    │  ONE user ID      │
+                    │  across ALL apps  │
+                    └───────────────────┘
+
+RESULT:
+  - Dashboard edit at 2pm → edited_by: blake@csmns.org
+  - Bot query at 3pm → queried_by: abc-123-def-456 (same person)
+  - API call at 4pm → caller: abc-123-def-456 (same person)
+  - Full audit trail across all surfaces, ONE identity
+</div>
+
+<h3>App-to-App Calls (On Behalf Of)</h3>
+
+<p>What if your dashboard needs to call your API service — not as itself, but as the logged-in user?</p>
+
+<div class="arch-box">
+DASHBOARD CALLING API ON BEHALF OF USER
+═══════════════════════════════════════════════════════════════
+
+  Browser          Dashboard App              API Service
+    │                   │                        │
+    │── GET /analytics─►│                        │
+    │   (authenticated  │                        │
+    │    as Blake)      │                        │
+    │                   │  Dashboard has Blake's  │
+    │                   │  access_token from      │
+    │                   │  Easy Auth:             │
+    │                   │  X-MS-TOKEN-AAD-ACCESS- │
+    │                   │  TOKEN: eyJ...          │
+    │                   │                        │
+    │                   │── GET /api/analytics──►│
+    │                   │   Authorization: Bearer │
+    │                   │   eyJ... (Blake's token)│
+    │                   │                        │
+    │                   │   API validates token: │
+    │                   │   "This is Blake, from │
+    │                   │    the dashboard app,  │
+    │                   │    requesting analytics"│
+    │                   │                        │
+    │                   │◄── analytics data ─────│
+    │◄── rendered page──│                        │
+</div>
+
+<pre>
+# Dashboard forwarding user's token to the API:
+import httpx
+
+@app.get("/analytics")
+async def analytics(request: Request):
+    # Easy Auth gives us the user's access token
+    user_token = request.headers.get("X-MS-TOKEN-AAD-ACCESS-TOKEN")
+    
+    # Forward it to the API service
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://bd-api-service.azurecontainerapps.io/api/analytics",
+            headers={"Authorization": f"Bearer {user_token}"}
+        )
+    
+    return response.json()
+
+# API service validates the forwarded token:
+@app.get("/api/analytics")
+async def get_analytics(request: Request):
+    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    claims = validate_jwt(token)  # Verify signature against Entra
+    
+    user_id = claims["oid"]  # abc-123-def-456 — same Blake
+    return query_analytics(user_id)
+</pre>
+
+<!-- ============================================ -->
+<h2>Part 7: The App Registration — What It Actually Is</h2>
+
+<p>This is the piece that confuses people the most. An App Registration is <strong>your app's identity card</strong> in Azure. Let's make it concrete:</p>
+
+<div class="concept-box">
+  <h3>Think of it like this:</h3>
+  <p>You (a person) have an ID card (driver's license). You show it to prove who you are.</p>
+  <p>Your app also needs an ID card. The App Registration IS that ID card. It tells Microsoft: "This application exists, it belongs to this organization, and here's what it's allowed to do."</p>
+</div>
+
+<h3>What's Inside an App Registration</h3>
+
+<table>
+  <tr><th>Field</th><th>What it is</th><th>Analogy</th></tr>
+  <tr><td><strong>Application (client) ID</strong></td><td>Unique identifier for your app</td><td>Your app's Social Security Number</td></tr>
+  <tr><td><strong>Directory (tenant) ID</strong></td><td>Which organization it belongs to</td><td>Which state issued your license</td></tr>
+  <tr><td><strong>Client secret</strong></td><td>A password your app uses to prove it's really your app</td><td>The PIN on your debit card</td></tr>
+  <tr><td><strong>Redirect URIs</strong></td><td>Where Microsoft sends users back after login</td><td>Your return address</td></tr>
+  <tr><td><strong>API permissions</strong></td><td>What your app is allowed to access</td><td>What rooms your keycard opens</td></tr>
+  <tr><td><strong>App roles</strong></td><td>Permission levels you define</td><td>VIP vs. General Admission</td></tr>
+  <tr><td><strong>Supported account types</strong></td><td>Single Tenant vs. Multi Tenant</td><td>Employees-only vs. open to public</td></tr>
+</table>
+
+<h3>When You Need One vs. When You Don't</h3>
+
+<table>
+  <tr><th>Scenario</th><th>App Registration?</th><th>Who Creates It</th></tr>
+  <tr><td>Easy Auth on Container App</td><td>Yes — auto-created</td><td>Azure creates it when you enable auth</td></tr>
+  <tr><td>Teams bot</td><td>Yes — auto-created</td><td>Azure creates it when you create Bot resource</td></tr>
+  <tr><td>Web app with Microsoft login (MSAL)</td><td>Yes — you create it</td><td>You register in Entra portal</td></tr>
+  <tr><td>API that validates JWT tokens</td><td>Depends — can reuse dashboard's</td><td>May not need a new one</td></tr>
+  <tr><td>Container App with no auth</td><td>No</td><td>N/A</td></tr>
+  <tr><td>PostgreSQL connection</td><td>No (use password or managed identity)</td><td>N/A</td></tr>
+  <tr><td>Azure OpenAI call</td><td>No (use API key)</td><td>N/A</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>Part 8: Quick Reference — Mapping Old World to New World</h2>
+
+<table>
+  <tr><th>Traditional (What You Know)</th><th>Azure (What's Different)</th></tr>
+  <tr><td>Users table with email + hashed password</td><td>No users table. Entra ID IS the user directory.</td></tr>
+  <tr><td>Login form in your app</td><td>Microsoft's login page (you never see passwords)</td></tr>
+  <tr><td>bcrypt.compare(password, hash)</td><td>Microsoft does this. You get a signed token.</td></tr>
+  <tr><td>session_id in cookie → lookup in DB</td><td>JWT token (self-contained, signed, no DB lookup needed)</td></tr>
+  <tr><td>req.session.user_id</td><td><code>request.headers["X-MS-CLIENT-PRINCIPAL-ID"]</code> (Easy Auth)<br>or decode the JWT yourself (MSAL)</td></tr>
+  <tr><td>User.find_by_id(session.user_id)</td><td>Not needed — user info IS in the token (name, email, roles)</td></tr>
+  <tr><td>Forgot password / reset flow</td><td>Microsoft handles this. You never implement it.</td></tr>
+  <tr><td>MFA / 2FA implementation</td><td>Microsoft handles this. Configurable in Entra.</td></tr>
+  <tr><td>is_admin column in users table</td><td>App Roles in Entra → <code>roles</code> claim in JWT</td></tr>
+  <tr><td>CORS + CSRF tokens</td><td>Easy Auth sidecar handles this. MSAL requires standard CORS.</td></tr>
+  <tr><td>Session expiry / refresh</td><td>Token expiry (1 hour) + refresh token (auto-handled)</td></tr>
+  <tr><td>Shared session store (Redis)</td><td>Not needed — tokens are self-contained. Each app validates independently.</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>Part 9: Decision Tree — Which Approach to Use</h2>
+
+<div class="arch-box">
+START HERE
+    │
+    ├─► "I just need to block unauthorized access"
+    │       └─► Easy Auth (zero code, toggle in portal)
+    │
+    ├─► "I need to know WHO the user is for audit/personalization"
+    │       └─► Easy Auth + read X-MS-CLIENT-PRINCIPAL headers
+    │
+    ├─► "I need role-based access (admin vs viewer)"
+    │       └─► Easy Auth + App Roles in Entra + check roles in code
+    │
+    ├─► "I need custom login flow or UI"
+    │       └─► MSAL library (you control the OAuth flow)
+    │
+    ├─► "I'm building a Teams bot"
+    │       └─► Bot Framework SDK (auth is automatic)
+    │           └─► Restrict with: Single Tenant + User Assignment + in-code checks
+    │
+    ├─► "My dashboard needs to call my API as the user"
+    │       └─► Forward the access token (on-behalf-of flow)
+    │
+    └─► "I need to restrict to specific people, not just the org"
+            └─► Enterprise Application → User Assignment Required = Yes
+                → Add specific users/groups
+</div>
+
+<hr>
+
+<div class="callout green">
+  <p><strong>The bottom line:</strong> Azure auth feels complex because Microsoft abstracted away the parts you used to own (passwords, sessions, user DB). But the trade is good — you get enterprise-grade auth (MFA, SSO, conditional access, audit logs) for free. Your job shrinks to: (1) register your app, (2) choose Easy Auth or MSAL, (3) read the user identity from headers/tokens, (4) use that identity in your business logic.</p>
+</div>
+
+<p style="text-align: center; color: #888; font-size: 13px; margin-top: 32px;">Azure Authentication Deep Dive — February 2026<br><em>Research document for Blake Thomson's personal website</em></p>
+
+</body>
+</html>

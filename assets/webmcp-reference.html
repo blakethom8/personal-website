@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebMCP: Making Websites AI-Native</title>
+<style>
+  @page { margin: 0.75in; size: letter; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; color: #1a1a2e; line-height: 1.7; max-width: 840px; margin: 0 auto; padding: 40px 24px; background: #fff; }
+  h1 { font-size: 30px; font-weight: 700; color: #0f0f23; margin-bottom: 6px; }
+  .subtitle { font-size: 15px; color: #666; margin-bottom: 32px; border-bottom: 3px solid #10b981; padding-bottom: 14px; }
+  h2 { font-size: 21px; font-weight: 700; color: #1e3a5f; margin-top: 38px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+  h3 { font-size: 16px; font-weight: 600; color: #10b981; margin-top: 22px; margin-bottom: 8px; }
+  h4 { font-size: 14.5px; font-weight: 600; color: #374151; margin-top: 16px; margin-bottom: 6px; }
+  p { margin-bottom: 12px; font-size: 14.5px; }
+  ul, ol { margin-bottom: 12px; padding-left: 24px; }
+  li { margin-bottom: 6px; font-size: 14.5px; }
+  strong { color: #0f0f23; }
+  em { color: #555; }
+  code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13.5px; font-family: 'SF Mono', 'Fira Code', monospace; }
+  pre { background: #0f172a; color: #e2e8f0; padding: 18px 22px; border-radius: 10px; margin: 14px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; white-space: pre; }
+  pre .comment { color: #64748b; }
+  pre .keyword { color: #7dd3fc; }
+  pre .string { color: #86efac; }
+  pre .fn { color: #c4b5fd; }
+  .callout { background: #f0fdf4; border-left: 4px solid #10b981; padding: 14px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 14px; }
+  .callout.blue { background: #eff6ff; border-left-color: #3b82f6; }
+  .callout.amber { background: #fffbeb; border-left-color: #f59e0b; }
+  .callout p { margin-bottom: 0; }
+  .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .compare-card { background: #fafbfd; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; }
+  .compare-card h4 { margin-top: 0; color: #1e3a5f; }
+  .compare-card.highlight { border-color: #10b981; background: #f0fdf4; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th { background: #1e3a5f; color: white; text-align: left; padding: 10px 14px; font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .scenario { background: #fafbfd; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 22px; margin: 16px 0; }
+  .scenario h4 { margin-top: 0; }
+  .flow { background: #f8fafc; border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 2; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .tag.green { background: #d1fae5; color: #065f46; }
+  .tag.blue { background: #dbeafe; color: #1e40af; }
+  .tag.purple { background: #ede9fe; color: #5b21b6; }
+  .section-num { color: #10b981; font-weight: 700; margin-right: 6px; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+  .prompt-block { background: #1e1b4b; color: #e0e7ff; padding: 20px 24px; border-radius: 10px; margin: 16px 0; font-size: 14px; line-height: 1.7; }
+  .prompt-block strong { color: #a5b4fc; }
+  .prompt-block code { background: #312e81; color: #c7d2fe; }
+  @media print { body { padding: 0; } pre, .scenario, .compare-card { break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<h1>WebMCP: Making Websites AI-Native</h1>
+<div class="subtitle">Technical Overview &amp; Implementation Guide — February 2026</div>
+
+<div class="callout">
+  <p><strong>What this document covers:</strong> WebMCP is a browser API proposal (backed by Google &amp; Microsoft) that lets websites expose their functionality as MCP tools directly to AI agents in the browser. This guide explains what it is, how it differs from standard MCP, the use cases it enables, and how to implement it — written as both a technical reference and an agent-ready prompt for building WebMCP into web applications.</p>
+</div>
+
+<!-- ============================================ -->
+<h2><span class="section-num">01</span> The Problem WebMCP Solves</h2>
+
+<p>Today, when an AI agent needs to interact with a website, it has two options — both bad:</p>
+
+<div class="comparison">
+  <div class="compare-card">
+    <h4>🤖 Browser Automation (Playwright, Puppeteer)</h4>
+    <p>The agent takes screenshots, parses HTML, clicks buttons, fills forms — trying to use the site like a human would.</p>
+    <ul>
+      <li>Token-expensive (full HTML/screenshots in context)</li>
+      <li>Non-deterministic (page layouts change, elements move)</li>
+      <li>Fragile (breaks when UI updates)</li>
+      <li>Slow (render → screenshot → parse → decide → act)</li>
+    </ul>
+  </div>
+  <div class="compare-card">
+    <h4>🔌 Separate MCP Server</h4>
+    <p>The developer builds a standalone MCP server that exposes API endpoints. The AI calls the API directly, bypassing the website entirely.</p>
+    <ul>
+      <li>Requires building &amp; maintaining a separate system</li>
+      <li>Disconnected from the UI (AI can't see what user sees)</li>
+      <li>Every website would need its own MCP server</li>
+      <li>Doesn't scale to millions of websites</li>
+    </ul>
+  </div>
+</div>
+
+<p><strong>The core tension:</strong> Websites are built for humans. AI agents struggle to use them. Building a separate MCP server for every site doesn't scale. Browser automation is unreliable and expensive.</p>
+
+<div class="callout highlight">
+  <p><strong>WebMCP's answer:</strong> Let the website itself declare what an AI agent can do with it. The website becomes its own MCP server — tools are registered per page, contextually, with strict schemas. No screenshots, no HTML parsing, no guesswork.</p>
+</div>
+
+<!-- ============================================ -->
+<h2><span class="section-num">02</span> What WebMCP Actually Is</h2>
+
+<p>WebMCP is a <strong>browser-native API</strong> (currently in Chrome Canary behind a flag) that adds a new capability to the browser: <code>navigator.modelContext</code>. This API allows web page JavaScript to:</p>
+
+<ol>
+  <li><strong>Register tools</strong> that AI agents can discover and call</li>
+  <li><strong>Unregister tools</strong> when navigating away from a page or unmounting a component</li>
+  <li><strong>Define input/output schemas</strong> so the AI knows exactly what parameters to pass</li>
+  <li><strong>Execute JavaScript functions</strong> when a tool is called — updating React state, making API calls, navigating, whatever you need</li>
+</ol>
+
+<p>The tools are <strong>contextual per page</strong>. When the user navigates from a search page to a detail page, the available tools change automatically. This is the key innovation — the AI's capabilities adapt to what the user is currently looking at.</p>
+
+<h3>Two Modes of Declaration</h3>
+
+<div class="comparison">
+  <div class="compare-card highlight">
+    <h4>📝 Declarative (HTML Attributes)</h4>
+    <p>For simple form-filling use cases. Add attributes directly to HTML form elements:</p>
+    <ul>
+      <li><code>tool-name</code> — Names the tool</li>
+      <li><code>tool-description</code> — Tells the AI when to use it</li>
+      <li><code>tool-param-description</code> — Describes each input field</li>
+    </ul>
+    <p>The browser automatically converts the form into an MCP tool. <strong>Zero JavaScript required.</strong></p>
+    <p><em>Best for: static sites, contact forms, booking forms, simple interactions</em></p>
+  </div>
+  <div class="compare-card highlight">
+    <h4>⚡ Imperative (JavaScript API)</h4>
+    <p>For dynamic applications. Register tools programmatically via <code>navigator.modelContext.registerTool()</code>:</p>
+    <ul>
+      <li>Full control over tool definition</li>
+      <li>Execute arbitrary JavaScript on tool call</li>
+      <li>Access React/Vue/Svelte state</li>
+      <li>Register/unregister on component mount/unmount</li>
+    </ul>
+    <p><em>Best for: SPAs, React apps, dynamic dashboards, any complex interaction</em></p>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<h2><span class="section-num">03</span> WebMCP vs. Standard MCP vs. Tambo</h2>
+
+<p>These three technologies serve different purposes and are <strong>complementary, not competing</strong>:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Dimension</th>
+      <th>WebMCP (Browser API)</th>
+      <th>Standard MCP Server</th>
+      <th>Tambo (Generative UI)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Where it runs</strong></td>
+      <td>In the browser, on the web page</td>
+      <td>Backend server (local or remote)</td>
+      <td>React app with hosted/self-hosted backend</td>
+    </tr>
+    <tr>
+      <td><strong>What the AI interacts with</strong></td>
+      <td>The live website UI &amp; state</td>
+      <td>APIs, databases, services</td>
+      <td>Component library with streaming props</td>
+    </tr>
+    <tr>
+      <td><strong>Who provides the AI?</strong></td>
+      <td>Browser-native (Gemini in Chrome, Copilot in Edge) or extensions</td>
+      <td>External client (Claude Desktop, ChatGPT, etc.)</td>
+      <td>Built-in agent loop (your API key)</td>
+    </tr>
+    <tr>
+      <td><strong>Tools are...</strong></td>
+      <td>Contextual per page — change as user navigates</td>
+      <td>Static — all tools available at connection time</td>
+      <td>Component schemas — AI picks which to render</td>
+    </tr>
+    <tr>
+      <td><strong>Best for</strong></td>
+      <td>AI operating your existing website</td>
+      <td>AI accessing your data from anywhere</td>
+      <td>AI generating UI inside a chat</td>
+    </tr>
+    <tr>
+      <td><strong>User experience</strong></td>
+      <td>User stays on your site, AI helps navigate &amp; act</td>
+      <td>User is in the AI's interface, data comes from your backend</td>
+      <td>User is in a chat, components render inline</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout blue">
+  <p><strong>The insight:</strong> WebMCP makes your website AI-accessible. Standard MCP makes your data AI-accessible. Tambo makes your UI AI-generatable. A complete platform might use all three — WebMCP on the dashboard, standard MCP for headless access, Tambo for chat-embedded experiences.</p>
+</div>
+
+<!-- ============================================ -->
+<h2><span class="section-num">04</span> The Contextual Tool Pattern</h2>
+
+<p>This is the most powerful concept in WebMCP and the thing that distinguishes it from every other approach.</p>
+
+<p>In standard MCP, when an AI connects to your server, it gets <em>all</em> your tools at once. 50 tools? All in context. Most irrelevant to the current task. Token-expensive and noisy.</p>
+
+<p>In WebMCP, <strong>tools exist only in the context where they make sense</strong>. They register when a component mounts and unregister when it unmounts:</p>
+
+<pre><span class="comment">// Search Page Component</span>
+<span class="keyword">useEffect</span>(() => {
+  <span class="keyword">const</span> tool = navigator.modelContext.<span class="fn">registerTool</span>({
+    name: <span class="string">"search_providers"</span>,
+    description: <span class="string">"Search healthcare providers by specialty and location"</span>,
+    inputSchema: { specialty: { type: <span class="string">"string"</span> }, location: { type: <span class="string">"string"</span> } },
+    execute: (params) => {
+      setFilters(params);    <span class="comment">// Update React state</span>
+      navigateToResults();   <span class="comment">// Trigger navigation</span>
+    }
+  });
+  <span class="keyword">return</span> () => tool.<span class="fn">unregister</span>();  <span class="comment">// Clean up on unmount</span>
+}, []);
+
+<span class="comment">// Results Page Component — DIFFERENT tools available</span>
+<span class="keyword">useEffect</span>(() => {
+  <span class="keyword">const</span> tools = [
+    navigator.modelContext.<span class="fn">registerTool</span>({
+      name: <span class="string">"list_results"</span>,
+      description: <span class="string">"Get all providers currently shown with details"</span>,
+      execute: () => providers  <span class="comment">// Returns current React state as JSON</span>
+    }),
+    navigator.modelContext.<span class="fn">registerTool</span>({
+      name: <span class="string">"set_filter"</span>,
+      description: <span class="string">"Filter current results by criteria"</span>,
+      inputSchema: { insurance: { type: <span class="string">"string"</span> }, maxDistance: { type: <span class="string">"number"</span> } },
+      execute: (params) => applyFilters(params)
+    }),
+    navigator.modelContext.<span class="fn">registerTool</span>({
+      name: <span class="string">"log_outreach"</span>,
+      description: <span class="string">"Log an outreach call to a provider"</span>,
+      inputSchema: { npi: { type: <span class="string">"string"</span> }, outcome: { type: <span class="string">"string"</span> }, notes: { type: <span class="string">"string"</span> } },
+      execute: (params) => { api.logCall(params); refreshCard(params.npi); }
+    })
+  ];
+  <span class="keyword">return</span> () => tools.<span class="fn">forEach</span>(t => t.<span class="fn">unregister</span>());
+}, [providers]);</pre>
+
+<p>The AI's available tools <strong>adapt in real-time</strong> as the user navigates. On the search page: search tools. On the results page: filter and action tools. On a provider profile: detail and CRM tools. The context window stays lean and relevant.</p>
+
+<!-- ============================================ -->
+<h2><span class="section-num">05</span> Use Cases: Healthcare Data Platform</h2>
+
+<p>Here's how WebMCP applies to a bespoke healthcare analytics platform deployed in a client's Azure environment:</p>
+
+<div class="scenario">
+  <h4>🔍 Scenario 1: AI-Assisted Provider Search</h4>
+  <p>A physician liaison opens the provider dashboard in Chrome. They ask the browser's AI:</p>
+  <p><em>"Find cardiologists in West LA who accept Medicare with high referral volume"</em></p>
+  <div class="flow">
+    User speaks to browser AI<br>
+    → AI discovers <code>search_providers</code> tool on current page<br>
+    → AI calls tool with {specialty: "cardiology", location: "West LA", insurance: "Medicare"}<br>
+    → Your React app updates state → page re-renders with filtered results<br>
+    → AI discovers new tools: <code>list_results</code>, <code>sort_by</code>, <code>set_filter</code><br>
+    → AI calls <code>list_results</code> → reads structured provider data from React state<br>
+    → AI recommends top providers based on volume data<br>
+    <strong>Result: Dashboard navigated, filtered, and analyzed — no screenshots, no HTML parsing</strong>
+  </div>
+</div>
+
+<div class="scenario">
+  <h4>📞 Scenario 2: CRM Updates From the Dashboard</h4>
+  <p>The liaison just finished a call. While looking at Dr. Smith's profile on the dashboard:</p>
+  <p><em>"Log an outreach call — connected with Dr. Smith, she's interested in joining the network. Schedule a follow-up for next Thursday."</em></p>
+  <div class="flow">
+    User is on provider profile page<br>
+    → Available tools: <code>log_outreach</code>, <code>get_provider_details</code>, <code>schedule_followup</code><br>
+    → AI calls <code>log_outreach</code> with {npi: "1234567890", outcome: "connected", notes: "Interested in joining network"}<br>
+    → Your app writes to CRM database, updates the activity timeline on screen<br>
+    → AI calls <code>schedule_followup</code> with {npi: "1234567890", date: "2026-03-05"}<br>
+    → Calendar event created, follow-up badge appears on provider card<br>
+    <strong>Result: CRM updated, follow-up scheduled, UI reflects changes — all from natural language</strong>
+  </div>
+</div>
+
+<div class="scenario">
+  <h4>📊 Scenario 3: AI Reads the Dashboard for You</h4>
+  <p>An executive opens the analytics dashboard and asks:</p>
+  <p><em>"Summarize what I'm looking at and create a PowerPoint for my board meeting"</em></p>
+  <div class="flow">
+    User is on analytics overview page<br>
+    → Available tools: <code>get_dashboard_data</code>, <code>get_chart_data</code>, <code>get_kpi_summary</code><br>
+    → AI calls <code>get_dashboard_data</code> → receives clean JSON of all metrics, charts, KPIs<br>
+    → AI uses its OWN capabilities (Claude's deck generation, Gemini's formatting) to build the presentation<br>
+    → AI has perfect structured data — not a screenshot interpretation<br>
+    <strong>Result: The AI leverages your data + its own strengths. You provide the intelligence, it provides the output format.</strong>
+  </div>
+</div>
+
+<div class="scenario">
+  <h4>🌐 Scenario 4: Multi-Page Workflow</h4>
+  <p>A data analyst needs to compare two markets:</p>
+  <p><em>"Compare our cardiology market share in West LA vs. San Fernando Valley, then show me the top 5 providers we're losing referrals to in each area"</em></p>
+  <div class="flow">
+    AI calls <code>search_providers</code> with West LA params → page navigates<br>
+    → AI calls <code>get_market_share</code> → reads West LA metrics from page state<br>
+    → AI calls <code>search_providers</code> with San Fernando params → page navigates again<br>
+    → AI calls <code>get_market_share</code> → reads SFV metrics<br>
+    → AI calls <code>get_referral_leakage</code> → structured competitor data<br>
+    → AI compiles comparison, presents findings in natural language<br>
+    <strong>Result: Multi-step analysis across pages, all deterministic, all using your tools</strong>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<h2><span class="section-num">06</span> Architecture: Where WebMCP Fits in a Bespoke Platform</h2>
+
+<pre><span class="comment">Client's Azure Tenant</span>
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│  <span class="keyword">Azure Container App: Web Dashboard (React)</span>             │
+│  ├── Page-level WebMCP tool registration                │
+│  │   ├── Search page → search, filter tools             │
+│  │   ├── Results page → list, sort, action tools        │
+│  │   ├── Profile page → detail, CRM, outreach tools     │
+│  │   ├── Analytics page → data export, KPI tools        │
+│  │   └── Admin page → config, user management tools     │
+│  ├── WebSocket connection to backend (live updates)     │
+│  └── Standard UI for human users (works without AI)     │
+│                                                         │
+│  <span class="keyword">Azure Container App: Backend API (FastAPI)</span>              │
+│  ├── Standard MCP Server (HTTP transport)               │
+│  │   └── For headless access: Claude Desktop, Teams,    │
+│  │       Copilot, any external AI client                │
+│  ├── REST API (for dashboard data fetching)             │
+│  ├── WebSocket hub (push updates to dashboards)         │
+│  └── Business logic, match engine, data pipelines       │
+│                                                         │
+│  <span class="keyword">Azure OpenAI Service</span> (client's key, client's data)     │
+│  <span class="keyword">Azure SQL / Cosmos DB</span> (client's data stays here)       │
+│  <span class="keyword">Azure AD</span> (authentication &amp; access control)             │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+
+<span class="comment">Optional: External Intelligence (Managed Service)</span>
+┌─────────────────────────────────────────────────────────┐
+│  CMS data pipelines │ Web crawl │ Third-party data      │
+│  → Scheduled pushes to client's data layer              │
+└─────────────────────────────────────────────────────────┘</pre>
+
+<p><strong>Key architectural principle:</strong> The WebMCP tools on the frontend call the same backend API that the standard MCP server exposes. One source of truth, two access patterns — browser-based (WebMCP) and headless (standard MCP).</p>
+
+<!-- ============================================ -->
+<h2><span class="section-num">07</span> Implementation Guide</h2>
+
+<h3>Step 1: Feature Detection</h3>
+
+<pre><span class="comment">// Check if WebMCP is available in the browser</span>
+<span class="keyword">const</span> hasWebMCP = <span class="string">'modelContext'</span> <span class="keyword">in</span> navigator;
+
+<span class="comment">// Your app works for humans regardless — WebMCP is progressive enhancement</span>
+<span class="keyword">if</span> (hasWebMCP) {
+  registerPageTools();
+}</pre>
+
+<h3>Step 2: Create a React Hook for Tool Registration</h3>
+
+<pre><span class="comment">// hooks/useWebMCPTool.ts</span>
+<span class="keyword">import</span> { useEffect } <span class="keyword">from</span> <span class="string">'react'</span>;
+
+<span class="keyword">interface</span> WebMCPToolDef {
+  name: string;
+  description: string;
+  inputSchema?: Record&lt;string, any&gt;;
+  execute: (params: any) =&gt; any;
+}
+
+<span class="keyword">export function</span> <span class="fn">useWebMCPTool</span>(tool: WebMCPToolDef, deps: any[] = []) {
+  useEffect(() => {
+    <span class="keyword">if</span> (!(<span class="string">'modelContext'</span> <span class="keyword">in</span> navigator)) <span class="keyword">return</span>;
+
+    <span class="keyword">const</span> registered = (navigator <span class="keyword">as</span> any).modelContext.<span class="fn">registerTool</span>({
+      name: tool.name,
+      description: tool.description,
+      inputSchema: tool.inputSchema,
+      execute: tool.execute,
+    });
+
+    <span class="keyword">return</span> () => registered.<span class="fn">unregister</span>();
+  }, deps);
+}
+
+<span class="comment">// hooks/useWebMCPTools.ts — register multiple tools at once</span>
+<span class="keyword">export function</span> <span class="fn">useWebMCPTools</span>(tools: WebMCPToolDef[], deps: any[] = []) {
+  useEffect(() => {
+    <span class="keyword">if</span> (!(<span class="string">'modelContext'</span> <span class="keyword">in</span> navigator)) <span class="keyword">return</span>;
+
+    <span class="keyword">const</span> registered = tools.<span class="fn">map</span>(t =>
+      (navigator <span class="keyword">as</span> any).modelContext.<span class="fn">registerTool</span>(t)
+    );
+
+    <span class="keyword">return</span> () => registered.<span class="fn">forEach</span>(r => r.<span class="fn">unregister</span>());
+  }, deps);
+}</pre>
+
+<h3>Step 3: Register Tools Per Page/Component</h3>
+
+<pre><span class="comment">// pages/ProviderSearch.tsx</span>
+<span class="keyword">function</span> <span class="fn">ProviderSearch</span>() {
+  <span class="keyword">const</span> [results, setResults] = useState([]);
+  <span class="keyword">const</span> [filters, setFilters] = useState({});
+
+  <span class="fn">useWebMCPTool</span>({
+    name: <span class="string">"search_providers"</span>,
+    description: <span class="string">"Search for healthcare providers. Returns matching providers "</span>
+      + <span class="string">"with name, NPI, specialty, location, and contact info."</span>,
+    inputSchema: {
+      specialty: { type: <span class="string">"string"</span>, description: <span class="string">"Medical specialty (e.g. cardiology, orthopedics)"</span> },
+      location: { type: <span class="string">"string"</span>, description: <span class="string">"City, zip code, or region name"</span> },
+      insurance: { type: <span class="string">"string"</span>, description: <span class="string">"Insurance type accepted (optional)"</span> },
+    },
+    execute: <span class="keyword">async</span> (params) => {
+      <span class="keyword">const</span> data = <span class="keyword">await</span> api.<span class="fn">searchProviders</span>(params);
+      <span class="fn">setResults</span>(data.providers);
+      <span class="fn">setFilters</span>(params);
+      <span class="keyword">return</span> { count: data.providers.length, providers: data.providers };
+    }
+  }, []);
+
+  <span class="fn">useWebMCPTool</span>({
+    name: <span class="string">"list_current_results"</span>,
+    description: <span class="string">"Get all providers currently displayed on screen with full details"</span>,
+    execute: () => ({
+      filters: filters,
+      count: results.length,
+      providers: results.<span class="fn">map</span>(p => ({
+        name: p.name, npi: p.npi, specialty: p.specialty,
+        address: p.address, phone: p.phone,
+        medicare_volume: p.claims_count, quality_score: p.quality
+      }))
+    })
+  }, [results, filters]);
+
+  <span class="comment">// ... normal React rendering for human users</span>
+}</pre>
+
+<h3>Step 4: Declarative Mode for Simple Forms</h3>
+
+<pre><span class="comment">&lt;!-- No JavaScript needed — browser auto-converts to MCP tool --&gt;</span>
+&lt;<span class="keyword">form</span>
+  <span class="fn">tool-name</span>=<span class="string">"log_outreach_call"</span>
+  <span class="fn">tool-description</span>=<span class="string">"Log a phone call or outreach attempt to a healthcare provider"</span>
+&gt;
+  &lt;<span class="keyword">input</span> name=<span class="string">"provider_name"</span>
+    <span class="fn">tool-param-description</span>=<span class="string">"Full name of the provider contacted"</span> /&gt;
+
+  &lt;<span class="keyword">select</span> name=<span class="string">"outcome"</span>
+    <span class="fn">tool-param-description</span>=<span class="string">"Call outcome: connected, voicemail, no_answer, wrong_number"</span>&gt;
+    &lt;option value=<span class="string">"connected"</span>&gt;Connected&lt;/option&gt;
+    &lt;option value=<span class="string">"voicemail"</span>&gt;Voicemail&lt;/option&gt;
+    &lt;option value=<span class="string">"no_answer"</span>&gt;No Answer&lt;/option&gt;
+  &lt;/<span class="keyword">select</span>&gt;
+
+  &lt;<span class="keyword">textarea</span> name=<span class="string">"notes"</span>
+    <span class="fn">tool-param-description</span>=<span class="string">"Call notes and follow-up items"</span>&gt;&lt;/<span class="keyword">textarea</span>&gt;
+
+  &lt;<span class="keyword">button</span> type=<span class="string">"submit"</span>&gt;Log Call&lt;/<span class="keyword">button</span>&gt;
+&lt;/<span class="keyword">form</span>&gt;</pre>
+
+<!-- ============================================ -->
+<h2><span class="section-num">08</span> Strategic Implications</h2>
+
+<h3>For Developers Building Bespoke Applications</h3>
+
+<ul>
+  <li><strong>Build one app that serves two audiences.</strong> The same React dashboard works for humans clicking buttons AND for AI agents calling tools. No separate bot or integration needed.</li>
+  <li><strong>Don't compete with foundation models.</strong> Claude, Gemini, and GPT are spending billions on reasoning capabilities. Your value is the data, domain expertise, and tool definitions. Let them be the brain.</li>
+  <li><strong>Progressive enhancement.</strong> WebMCP is additive. Your app works perfectly for humans without it. When the browser supports it, AI capabilities appear automatically.</li>
+  <li><strong>Future-proof against AI churn.</strong> Today it's Gemini in Chrome. Tomorrow it might be something else. WebMCP is a standard — your tool definitions work with any compliant AI.</li>
+</ul>
+
+<h3>For the Business Model</h3>
+
+<ul>
+  <li><strong>WebMCP-enabled apps are inherently more valuable</strong> — they're accessible to both humans and AI agents, multiplying the utility of every feature you build.</li>
+  <li><strong>Reduced support burden.</strong> Instead of building help docs and training materials, the AI can guide users through the app using the tool definitions you've already written.</li>
+  <li><strong>Compounding intelligence.</strong> As browser AIs improve (better reasoning, longer context, multimodal understanding), your WebMCP-enabled tools automatically benefit. Your app gets smarter without you shipping updates.</li>
+  <li><strong>Lock-in through tooling, not data.</strong> The client's data stays in their environment. Your value is the tool architecture, domain schemas, and data enrichment — things they can't easily replicate.</li>
+</ul>
+
+<!-- ============================================ -->
+<h2><span class="section-num">09</span> Current Status &amp; Limitations</h2>
+
+<div class="callout amber">
+  <p><strong>As of February 2026:</strong> WebMCP is a proposal, not a shipped standard. It's available in Chrome Canary behind the <code>chrome://flags/#web-mcp</code> flag. There's also a Chrome extension (MCPB) that polyfills the API for current browsers.</p>
+</div>
+
+<h4>What Works Today</h4>
+<ul>
+  <li>Chrome Canary with flag enabled</li>
+  <li>Both declarative (HTML attributes) and imperative (JavaScript API) modes</li>
+  <li>Tool registration, unregistration, and execution</li>
+  <li>Input schemas with type validation</li>
+  <li>MCPB Chrome extension for polyfill support</li>
+</ul>
+
+<h4>Limitations &amp; Open Questions</h4>
+<ul>
+  <li><strong>Security:</strong> Poisoned tool descriptions could mislead AI agents. How much control should a page have over the AI's behavior?</li>
+  <li><strong>Browser support:</strong> Currently Chrome-only. Adoption depends on other browsers implementing the standard.</li>
+  <li><strong>AI integration:</strong> The browser-native AI (Gemini, Copilot) needs to be the one consuming these tools. Third-party AI apps (Claude Desktop) would need browser extension bridges.</li>
+  <li><strong>Auth &amp; permissions:</strong> How do tools handle authenticated actions? The current model assumes the browser session handles auth.</li>
+  <li><strong>Trust model:</strong> Should the AI auto-execute tools, or always confirm with the user? Chrome's current approach includes a confirmation UI.</li>
+</ul>
+
+<!-- ============================================ -->
+<h2><span class="section-num">10</span> Agent Prompt: Building WebMCP Into a Web Application</h2>
+
+<p>The following prompt can be used to guide a coding agent (Claude Code, Cursor, etc.) when adding WebMCP support to an existing React application:</p>
+
+<div class="prompt-block">
+<strong>TASK:</strong> Add WebMCP (browser Model Context Protocol) support to this React application. WebMCP lets the web page register MCP tools that browser-based AI agents can discover and call.<br><br>
+
+<strong>WHAT WEBMCP IS:</strong><br>
+- A browser API accessed via <code>navigator.modelContext.registerTool()</code><br>
+- Tools are registered per page/component and unregistered on unmount<br>
+- Each tool has: name, description, inputSchema (optional), execute function<br>
+- The execute function runs client-side JavaScript — it can update React state, call APIs, navigate, etc.<br>
+- Tools are contextual: different pages expose different tools<br><br>
+
+<strong>IMPLEMENTATION RULES:</strong><br>
+1. Create a <code>useWebMCPTool(toolDef, deps)</code> hook that feature-detects <code>navigator.modelContext</code> and handles register/unregister on mount/unmount<br>
+2. Create a <code>useWebMCPTools(toolDefs[], deps)</code> hook for registering multiple tools<br>
+3. WebMCP is progressive enhancement — the app MUST work without it. Always check for feature support.<br>
+4. Register tools at the PAGE level, not the app level. Each route/page should register only the tools relevant to what the user is currently viewing.<br>
+5. Tool descriptions should be clear, specific, and include what the tool returns — the AI uses these to decide when/how to call tools.<br>
+6. Input schemas should use descriptive field descriptions with examples where helpful.<br>
+7. Execute functions should return structured data (JSON) that's useful for the AI, not raw React state.<br>
+8. For forms that should be AI-fillable, use declarative mode: add <code>tool-name</code>, <code>tool-description</code>, and <code>tool-param-description</code> attributes to form/input elements.<br><br>
+
+<strong>TOOL CATEGORIES TO CONSIDER PER PAGE:</strong><br>
+- <strong>Read tools:</strong> Get current page data in structured format (e.g., <code>list_results</code>, <code>get_dashboard_data</code>)<br>
+- <strong>Navigate tools:</strong> Search, filter, sort, paginate (e.g., <code>search_providers</code>, <code>set_filter</code>)<br>
+- <strong>Action tools:</strong> Create/update records, trigger workflows (e.g., <code>log_call</code>, <code>schedule_followup</code>)<br>
+- <strong>Export tools:</strong> Get data in formats the AI can use for external tasks (e.g., <code>export_chart_data</code>)<br><br>
+
+<strong>EXAMPLE TOOL REGISTRATION:</strong><br>
+<code>useWebMCPTool({ name: "search_items", description: "Search for items by keyword and category. Returns array of {id, name, price, category}.", inputSchema: { query: { type: "string", description: "Search keyword" }, category: { type: "string", description: "Category filter (optional)" } }, execute: async (params) => { const results = await api.search(params); setResults(results); return { count: results.length, items: results }; } }, []);</code>
+</div>
+
+<hr>
+
+<p style="text-align: center; color: #888; font-size: 13px; margin-top: 24px;">
+  WebMCP Technical Overview — February 2026<br>
+  <em>The future of the web is built for both humans and AI agents.</em>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure for Vibe Coders: A Practical Guide to Deploying AI Apps in Microsoft's Cloud</title>
+<style>
+  @page { margin: 0.75in; size: letter; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; color: #1a1a2e; line-height: 1.65; max-width: 840px; margin: 0 auto; padding: 40px 24px; background: #fff; }
+  h1 { font-size: 30px; font-weight: 700; color: #0f0f23; margin-bottom: 6px; }
+  .subtitle { font-size: 15px; color: #666; margin-bottom: 32px; border-bottom: 3px solid #0078d4; padding-bottom: 14px; }
+  h2 { font-size: 21px; font-weight: 700; color: #1e3a5f; margin-top: 38px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid #e2e8f0; }
+  h3 { font-size: 16px; font-weight: 600; color: #0078d4; margin-top: 22px; margin-bottom: 8px; }
+  h4 { font-size: 14.5px; font-weight: 600; color: #374151; margin-top: 16px; margin-bottom: 6px; }
+  p { margin-bottom: 12px; font-size: 14.5px; }
+  ul, ol { margin-bottom: 12px; padding-left: 24px; }
+  li { margin-bottom: 6px; font-size: 14.5px; }
+  strong { color: #0f0f23; }
+  em { color: #555; }
+  code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'SF Mono', 'Fira Code', monospace; }
+  pre { background: #0f172a; color: #e2e8f0; padding: 18px 22px; border-radius: 10px; margin: 14px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; white-space: pre; }
+  .callout { background: #eff6ff; border-left: 4px solid #0078d4; padding: 14px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 14px; }
+  .callout.green { background: #f0fdf4; border-left-color: #10b981; }
+  .callout.amber { background: #fffbeb; border-left-color: #f59e0b; }
+  .callout.red { background: #fef2f2; border-left-color: #ef4444; }
+  .callout p { margin-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th { background: #1e3a5f; color: white; text-align: left; padding: 10px 14px; font-weight: 600; }
+  td { padding: 10px 14px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .arch-box { background: #0f172a; color: #e2e8f0; padding: 20px 24px; border-radius: 10px; margin: 16px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.7; white-space: pre; overflow-x: auto; }
+  .concept-box { background: #fafbfd; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px 22px; margin: 16px 0; }
+  .concept-box h3 { margin-top: 0; }
+  .step { display: flex; gap: 14px; margin: 14px 0; align-items: flex-start; }
+  .step-num { background: #0078d4; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .step-content { flex: 1; padding-top: 4px; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .tag.blue { background: #dbeafe; color: #1e40af; }
+  .tag.green { background: #d1fae5; color: #065f46; }
+  .tag.purple { background: #ede9fe; color: #5b21b6; }
+  .tag.orange { background: #ffedd5; color: #9a3412; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+  .closing { margin-top: 32px; padding-top: 16px; border-top: 2px solid #e2e8f0; font-style: italic; color: #555; font-size: 14px; }
+  @media print { body { padding: 0; } .arch-box, .concept-box { break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<h1>Azure for Vibe Coders</h1>
+<div class="subtitle">A Practical Guide to Deploying AI Applications in Microsoft's Cloud — February 2026</div>
+
+<div class="callout">
+  <p><strong>Who this is for:</strong> You can build an AI app in a weekend. You understand APIs, Docker, and Python. But Azure's portal makes your eyes glaze over — subscriptions, resource groups, app registrations, managed identities... what actually matters? This guide cuts through the abstraction layers and maps Azure's concepts to what you actually need: containers running your code, databases holding your data, and LLMs powering your AI.</p>
+</div>
+
+<!-- ============================================ -->
+<h2>The Mental Model: Azure in 60 Seconds</h2>
+
+<p>Azure has hundreds of services. You need about six of them. Here's the hierarchy that actually matters:</p>
+
+<div class="arch-box">Azure Account (you)
+└── Subscription (billing boundary — "who pays")
+    └── Resource Group (logical folder — "this project's stuff")
+        ├── Container App         ← your code runs here
+        ├── Container Registry    ← your Docker images live here
+        ├── PostgreSQL            ← your structured data
+        ├── Blob Storage          ← your big files (parquets, CSVs)
+        ├── OpenAI Service        ← your LLM (GPT-4o, embeddings)
+        └── Bot Service           ← Teams bot routing (if needed)</div>
+
+<p>That's it. Everything else is supporting infrastructure (logging, monitoring, networking) that Azure either handles automatically or that you add later.</p>
+
+<div class="callout green">
+  <p><strong>The vibe coder translation:</strong> A <strong>Subscription</strong> is your credit card. A <strong>Resource Group</strong> is a project folder. <strong>Resources</strong> are the actual things that do stuff. Delete the resource group and everything in it disappears. Simple.</p>
+</div>
+
+<!-- ============================================ -->
+<h2>The Six Resources You Actually Need</h2>
+
+<h3>1. Container App — Where Your Code Runs</h3>
+
+<p>An Azure Container App is just a Docker container running in the cloud. You push an image, tell Azure the port, and it handles TLS, scaling, health checks, and DNS. It's the simplest way to get a web app or API live.</p>
+
+<table>
+  <tr><th>What</th><th>Details</th></tr>
+  <tr><td><strong>What it runs</strong></td><td>Any Docker container — FastAPI, Next.js, Flask, whatever</td></tr>
+  <tr><td><strong>How you deploy</strong></td><td>Push image to Container Registry → update Container App</td></tr>
+  <tr><td><strong>Networking</strong></td><td>Public ingress (HTTPS) or private (internal only)</td></tr>
+  <tr><td><strong>Scaling</strong></td><td>0 to N replicas. Set min to 0 and it scales to zero when idle.</td></tr>
+  <tr><td><strong>Cost</strong></td><td>~$15-30/month for a light app (pay per vCPU-second)</td></tr>
+</table>
+
+<div class="callout">
+  <p><strong>Key concept:</strong> Container Apps run inside a <strong>Container Apps Environment</strong>. Think of the environment as the shared networking/logging layer. Multiple apps can share one environment (e.g., your web app + your bot + your API all in one environment). Create the environment once, deploy multiple apps into it.</p>
+</div>
+
+<h3>2. Container Registry (ACR) — Where Your Images Live</h3>
+
+<p>Azure Container Registry is just a private Docker Hub. You build your image locally, push it to ACR, and your Container App pulls from it.</p>
+
+<pre>
+# Build locally
+docker build -t myregistry.azurecr.io/my-app:latest -f Dockerfile .
+
+# Push to ACR
+az acr login --name myregistry
+docker push myregistry.azurecr.io/my-app:latest
+
+# Container App pulls it automatically on next revision
+</pre>
+
+<p><strong>SKU:</strong> Basic ($5/month) is fine for most projects. You only need Premium if you're doing geo-replication.</p>
+
+<h3>3. PostgreSQL Flexible Server — Your Structured Data</h3>
+
+<p>Managed PostgreSQL. Azure handles patching, backups, and availability. You get a connection string and write SQL.</p>
+
+<table>
+  <tr><th>What</th><th>Details</th></tr>
+  <tr><td><strong>Use for</strong></td><td>User data, CRM records, reference tables, provider rosters, edit history</td></tr>
+  <tr><td><strong>Access pattern</strong></td><td>Search, filter, paginate, write. Low-latency (&lt;50ms).</td></tr>
+  <tr><td><strong>Security</strong></td><td>SSL required. Firewall rules control who can connect.</td></tr>
+  <tr><td><strong>Cost</strong></td><td>~$13/month for Burstable B1ms (1 vCore, 2GB RAM, 32GB storage)</td></tr>
+</table>
+
+<div class="callout amber">
+  <p><strong>Gotcha:</strong> By default, no one can connect to your PostgreSQL server. You need to add firewall rules — at minimum, your developer IP and "Allow Azure services" (so your Container App can reach it). SSL is required (use <code>sslmode=require</code> in your connection string).</p>
+</div>
+
+<h3>4. Blob Storage — Your Big Files</h3>
+
+<p>For anything too large for PostgreSQL — parquet files, CSVs, PDFs, images. Blob Storage is essentially a file system in the cloud with an API.</p>
+
+<table>
+  <tr><th>What</th><th>Details</th></tr>
+  <tr><td><strong>Use for</strong></td><td>Large analytical datasets (parquets), file uploads, static assets</td></tr>
+  <tr><td><strong>Access pattern</strong></td><td>Read large files, often with DuckDB for analytics. 3-10s per query.</td></tr>
+  <tr><td><strong>Organization</strong></td><td>Storage Account → Container → Blobs (like: bucket → folder → files)</td></tr>
+  <tr><td><strong>Cost</strong></td><td>~$0.02/GB/month. 2GB of parquets costs about $0.04/month.</td></tr>
+</table>
+
+<p><strong>Pro pattern for analytics:</strong> Store parquets sorted by your primary query key (e.g., provider ID). DuckDB reads row group statistics and skips 99%+ of the data when filtering — a 13M row, 369MB file returns results in under a second when querying a single provider.</p>
+
+<h3>5. Azure OpenAI Service — Your LLM</h3>
+
+<p>This is where Azure gets interesting for AI applications. Azure OpenAI gives you the same models (GPT-4o, GPT-4, embeddings) as OpenAI's API, but running inside Azure's infrastructure under your organization's data governance.</p>
+
+<div class="concept-box">
+  <h3>Why Azure OpenAI Instead of api.openai.com?</h3>
+  <ul>
+    <li><strong>Data stays in Azure.</strong> Your prompts and completions are processed in Azure's data centers, covered by your enterprise agreements.</li>
+    <li><strong>BAA coverage.</strong> For healthcare: the Azure OpenAI endpoint is covered by Microsoft's Business Associate Agreement. The public OpenAI API is not.</li>
+    <li><strong>Same models.</strong> GPT-4o, GPT-4, text-embedding-ada-002 — identical to OpenAI's offerings.</li>
+    <li><strong>Network control.</strong> You can VNet-integrate the endpoint, restrict access by IP, use managed identities — things you can't do with the public API.</li>
+  </ul>
+</div>
+
+<h4>Getting Set Up with Azure OpenAI</h4>
+
+<p>This is the one resource that requires approval. Azure OpenAI is gated — you submit an application and Microsoft reviews it. For enterprise/healthcare accounts, this is usually approved within a few days.</p>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-content"><strong>Apply for access</strong> at <code>aka.ms/oai/access</code>. You need your subscription ID and a business justification. Healthcare + internal tooling is almost always approved.</div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-content"><strong>Create the resource</strong> in Azure Portal → Cognitive Services → Azure OpenAI. Pick your region (same as your other resources).</div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-content"><strong>Deploy a model.</strong> Inside the OpenAI resource, go to Model Deployments → Create. Pick GPT-4o (or whatever you need). Give it a deployment name — this is what you reference in your code.</div>
+</div>
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-content"><strong>Get your key and endpoint.</strong> Keys & Endpoint section → copy the endpoint URL and one of the two API keys. These go in your Container App's environment variables.</div>
+</div>
+
+<pre>
+# In your Python code — looks almost identical to the OpenAI SDK
+from openai import AzureOpenAI
+
+client = AzureOpenAI(
+    azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],   # https://your-resource.openai.azure.com/
+    api_key=os.environ["AZURE_OPENAI_API_KEY"],
+    api_version="2024-10-21"
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o",           # this is your deployment name
+    messages=[{"role": "user", "content": "Hello"}]
+)
+</pre>
+
+<div class="callout red">
+  <p><strong>Never use the public <code>api.openai.com</code> endpoint in a healthcare or enterprise application.</strong> Data sent to the public API leaves your Azure environment and is not covered by your BAA. Always use your Azure OpenAI endpoint.</p>
+</div>
+
+<h3>6. Azure Bot Service — Teams Bot Routing (Optional)</h3>
+
+<p>If you're building a Microsoft Teams bot, you need one more piece: Azure Bot Service. This is a thin routing layer — it doesn't run your code. It handles authentication between Teams and your Container App.</p>
+
+<div class="arch-box">User sends message in Teams
+        │
+        ▼
+Azure Bot Service        ← routing + auth (thin proxy, no compute)
+        │  HTTPS POST /api/messages (Microsoft-signed JWT)
+        ▼
+Your Container App       ← your actual bot code
+        │
+        ├──► Azure OpenAI     (LLM reasoning)
+        ├──► PostgreSQL        (data queries)
+        └──► Blob Storage      (analytics)</div>
+
+<p>The Bot Service handles the Microsoft authentication handshake. Your Container App receives clean HTTP POST requests with the user's message and sends responses back. The Bot Framework SDK validates the JWT automatically — you don't need to implement auth yourself.</p>
+
+<!-- ============================================ -->
+<h2>App Registrations — The Confusing Part, Demystified</h2>
+
+<p>This is where most vibe coders get lost. Azure App Registrations are identity objects — they're how Azure knows "who" is talking to "what." They're confusing because they're invisible infrastructure that you rarely interact with directly.</p>
+
+<div class="concept-box">
+  <h3>When Do You Need an App Registration?</h3>
+  <table>
+    <tr><th>Use Case</th><th>Need App Registration?</th><th>Why</th></tr>
+    <tr><td>Container App running a web dashboard</td><td>Only if you want login</td><td>Entra ID (Azure AD) auth requires an app registration to handle the OAuth flow</td></tr>
+    <tr><td>Teams bot</td><td><strong>Yes — always</strong></td><td>Bot Framework uses it to authenticate messages between Teams and your app</td></tr>
+    <tr><td>Container App calling PostgreSQL</td><td>No</td><td>Password auth or managed identity — no app registration needed</td></tr>
+    <tr><td>Container App calling Azure OpenAI</td><td>No</td><td>API key auth — just pass the key in your code</td></tr>
+    <tr><td>User login with Microsoft accounts</td><td>Yes</td><td>OAuth 2.0 flow needs a registered application to handle tokens</td></tr>
+  </table>
+</div>
+
+<h3>For Teams Bots: Let Azure Create It</h3>
+
+<p>The biggest pitfall with Teams bots is pre-creating an App Registration manually. Don't. When you create an Azure Bot resource, it auto-creates one for you. Use that one.</p>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-content">Create Azure Bot resource in the portal</div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-content">Azure auto-creates an App Registration — click <strong>"Manage"</strong> next to the greyed-out App ID to find it</div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-content">In that App Registration, go to <strong>Certificates & Secrets → New client secret</strong></div>
+</div>
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-content">Copy the App ID + secret → these become <code>MICROSOFT_APP_ID</code> and <code>MICROSOFT_APP_PASSWORD</code> in your Container App</div>
+</div>
+
+<div class="callout amber">
+  <p><strong>Single Tenant vs. Multi Tenant:</strong> For internal tools, always use <strong>Single Tenant</strong>. This restricts the bot to your organization's accounts only (e.g., <code>@yourcompany.org</code>). Multi-tenant lets anyone's Microsoft account talk to your bot — you almost never want this for business applications.</p>
+</div>
+
+<h3>For Web App Authentication (Microsoft Login)</h3>
+
+<p>If you want users to log into your dashboard with their Microsoft work accounts, you need a separate App Registration for the web app. This is Azure's OAuth implementation — Entra ID (formerly Azure AD).</p>
+
+<p>The registration defines: which users can log in, what permissions the app has, and where users are redirected after login. Once configured, unauthenticated requests to your Container App are automatically redirected to Microsoft's login page.</p>
+
+<p><strong>Admin consent may be required.</strong> Your Azure AD administrator needs to approve the app registration before users can sign in. This is a one-time action but can be a bottleneck if you don't have admin access yourself.</p>
+
+<!-- ============================================ -->
+<h2>Security: Protecting Your Application</h2>
+
+<p>Security in Azure is layered. Here's what matters at each level:</p>
+
+<h3>Network Layer</h3>
+
+<table>
+  <tr><th>Resource</th><th>Default State</th><th>What to Do</th></tr>
+  <tr><td><strong>PostgreSQL</strong></td><td>Locked down — no one can connect</td><td>Add firewall rules: your dev IP + "Allow Azure services"</td></tr>
+  <tr><td><strong>Blob Storage</strong></td><td>Open to the internet (with account key)</td><td>Add firewall rules: your dev IP + "Allow trusted Microsoft services"</td></tr>
+  <tr><td><strong>Container App</strong></td><td>Public ingress (HTTPS)</td><td>Fine for web apps. For internal-only: set to "Limited to Container Apps Environment"</td></tr>
+  <tr><td><strong>Azure OpenAI</strong></td><td>Available by API key</td><td>Add network restrictions if needed. API key is sufficient for most internal tools.</td></tr>
+</table>
+
+<h3>Credential Management</h3>
+
+<div class="grid-2">
+  <div class="concept-box">
+    <h3>Today: Environment Variables</h3>
+    <p>Store secrets as environment variables on your Container App. They're encrypted at rest and not visible in logs. Quick to set up.</p>
+    <ul>
+      <li><code>ANALYTICS_PG_PASSWORD</code></li>
+      <li><code>AZURE_STORAGE_KEY</code></li>
+      <li><code>AZURE_OPENAI_API_KEY</code></li>
+      <li><code>MICROSOFT_APP_PASSWORD</code></li>
+    </ul>
+  </div>
+  <div class="concept-box">
+    <h3>Better: Azure Key Vault</h3>
+    <p>Centralized secret management. Container Apps can reference Key Vault secrets directly. Secrets rotate without redeploying. Audit trail for every access.</p>
+    <p><em>Migrate to Key Vault when you move to production or have multiple apps sharing secrets.</em></p>
+  </div>
+</div>
+
+<h3>The Best: Managed Identity (No Secrets At All)</h3>
+
+<p>The endgame is eliminating secrets entirely. A <strong>Managed Identity</strong> is an Azure-issued identity for your Container App. Instead of storing a database password, your app says "I am this identity" and Azure checks whether that identity has permission to access the database. No keys, no passwords, no rotation.</p>
+
+<pre>
+# Instead of:
+password = os.environ["DB_PASSWORD"]
+conn = psycopg.connect(host=server, password=password)
+
+# You use:
+from azure.identity import DefaultAzureCredential
+credential = DefaultAzureCredential()
+token = credential.get_token("https://ossrdbms-aad.database.windows.net/.default")
+conn = psycopg.connect(host=server, password=token.token)
+</pre>
+
+<p>This requires RBAC role assignments — you grant your Container App's identity specific roles on each resource (e.g., "Storage Blob Data Reader" on Blob Storage, "Azure AI Developer" on OpenAI). More setup upfront, but no secrets to leak or rotate.</p>
+
+<h3>Data Classification</h3>
+
+<p>Know what you're storing and where:</p>
+
+<table>
+  <tr><th>Data Type</th><th>Examples</th><th>Where It Should Live</th><th>Extra Protection</th></tr>
+  <tr><td><strong>PHI</strong> (Protected Health Info)</td><td>MRNs, diagnosis codes, dates of service</td><td>PostgreSQL or Blob Storage with strict firewall</td><td>BAA required, VNet recommended</td></tr>
+  <tr><td><strong>PII</strong> (Personally Identifiable)</td><td>Provider names, NPIs, emails, phones</td><td>PostgreSQL with SSL required</td><td>Firewall rules, access logging</td></tr>
+  <tr><td><strong>Internal</strong></td><td>User edits, app config, audit trails</td><td>PostgreSQL</td><td>Standard controls</td></tr>
+  <tr><td><strong>Public</strong></td><td>Reference tables, CPT codes, taxonomies</td><td>Anywhere</td><td>None required</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>The Full Picture: A Real Application</h2>
+
+<p>Here's what a complete AI-powered healthcare analytics platform looks like in Azure — this is an actual production architecture, not a theoretical diagram:</p>
+
+<div class="arch-box">Resource Group: "my-project"
+│
+├── Container App Environment
+│   ├── Container App: "web-platform"        ← FastAPI dashboard + analytics
+│   │   Port 8000, public ingress, Entra auth pending
+│   │   Connects to: PostgreSQL + Blob + OpenAI
+│   │
+│   ├── Container App: "teams-bot"           ← Teams data analyst bot
+│   │   Port 3978, public ingress (Teams needs to reach it)
+│   │   Connects to: PostgreSQL + Blob + OpenAI
+│   │
+│   └── Container App: "api-service"         ← REST/MCP API for external tools
+│       Port 8080, internal or public
+│       Connects to: PostgreSQL + Blob
+│
+├── Container Registry: "myregistry"         ← all Docker images stored here
+│   (Basic SKU, ~$5/mo)
+│
+├── PostgreSQL Flexible Server               ← structured data
+│   ├── providers schema (10 tables) — roster, edits, overrides
+│   ├── reference schema (28 tables) — CPT codes, taxonomies, mappings
+│   ├── salesforce schema (5 tables) — contacts, activities
+│   └── analytics schema (2 tables) — benchmarks, wRVU production
+│   (Burstable B1ms, ~$13/mo)
+│
+├── Blob Storage Account                     ← large analytical files
+│   └── analytics/ container
+│       ├── profbilling_datamart.parquet    (16.6M rows, 1.3 GB)
+│       ├── referrals_curated.parquet      (13.2M rows, 369 MB)
+│       └── ambulatoryvisits.parquet       (5.2M rows, 132 MB)
+│   (~$0.04/mo for storage)
+│
+├── Azure OpenAI: "my-openai"               ← GPT-4o for AI features
+│   └── Deployment: "gpt-4o"
+│
+├── Azure Bot Service: "teams-bot"           ← routing for Teams
+│   └── App Registration (auto-created, Single Tenant)
+│
+└── Log Analytics Workspace                  ← container + app logs</div>
+
+<div class="callout green">
+  <p><strong>Total cost: ~$35-55/month.</strong> A complete AI-powered platform with PostgreSQL, Blob Storage, Container Apps, and Azure OpenAI — for less than a single SaaS seat on most analytics tools.</p>
+</div>
+
+<!-- ============================================ -->
+<h2>Deployment Workflow: From Code to Production</h2>
+
+<p>The deployment loop for a vibe coder looks like this:</p>
+
+<div class="step">
+  <div class="step-num">1</div>
+  <div class="step-content"><strong>Build locally.</strong> Write your code, test it, iterate fast. Use Docker Compose to run everything on your machine. <code>docker compose up --build</code></div>
+</div>
+<div class="step">
+  <div class="step-num">2</div>
+  <div class="step-content"><strong>Build the image.</strong> <code>docker build -t myregistry.azurecr.io/my-app:latest .</code> — always build from the repo root if you need to copy shared files.</div>
+</div>
+<div class="step">
+  <div class="step-num">3</div>
+  <div class="step-content"><strong>Push to ACR.</strong> <code>az acr login --name myregistry && docker push myregistry.azurecr.io/my-app:latest</code></div>
+</div>
+<div class="step">
+  <div class="step-num">4</div>
+  <div class="step-content"><strong>Update the Container App.</strong> <code>az containerapp update -n my-app -g my-rg --image myregistry.azurecr.io/my-app:latest --revision-suffix v2</code> — always increment the revision suffix to force a new image pull.</div>
+</div>
+
+<div class="callout amber">
+  <p><strong>Pitfall:</strong> If you push a new <code>:latest</code> image but don't create a new revision, the Container App keeps running the old code. Always use <code>--revision-suffix</code> to force the update.</p>
+</div>
+
+<h3>For Teams Bots Specifically</h3>
+
+<pre>
+# Build (from repo root — so Dockerfile can COPY shared files)
+docker build -t myregistry.azurecr.io/my-bot:latest -f applications/my-bot/Dockerfile .
+
+# Push
+docker push myregistry.azurecr.io/my-bot:latest
+
+# Update Container App
+az containerapp update -n my-bot -g my-rg \
+  --image myregistry.azurecr.io/my-bot:latest \
+  --revision-suffix v3
+
+# Package Teams manifest (must be flat — files at root, not in subfolder)
+cd applications/my-bot/manifest
+zip ../my-bot.zip manifest.json color.png outline.png
+
+# Sideload in Teams: Apps → Manage your apps → Upload a custom app
+</pre>
+
+<!-- ============================================ -->
+<h2>Lessons Learned (The Hard Way)</h2>
+
+<p>Real pitfalls from real deployments — save yourself the debugging hours:</p>
+
+<table>
+  <tr><th>Pitfall</th><th>What Happens</th><th>Fix</th></tr>
+  <tr><td>Pre-creating an App Registration for a bot</td><td>Azure creates a second one; you have orphaned registrations everywhere</td><td>Let Azure auto-create when you make the Bot resource. Click "Manage" to find it.</td></tr>
+  <tr><td>Missing <code>channel_auth_tenant</code> in bot code</td><td><code>AADSTS700016</code> — bot receives messages but can't reply</td><td>Always set <code>channel_auth_tenant</code> in <code>BotFrameworkAdapterSettings</code> for Single Tenant bots</td></tr>
+  <tr><td>Updating with <code>:latest</code> tag only</td><td>Old code keeps running — no new revision created</td><td>Always use <code>--revision-suffix</code> on every update</td></tr>
+  <tr><td>Loading large parquets into DuckDB at startup</td><td>3-4GB memory spike, 30+ second cold start</td><td>Use <code>read_parquet()</code> inline with WHERE filters. DuckDB skips 99% of rows.</td></tr>
+  <tr><td>Teams manifest files in a subfolder inside the zip</td><td>"App not found" when sideloading</td><td>Zip must contain files at root level, not in a subfolder</td></tr>
+  <tr><td><code>validDomains</code> in manifest with <code>https://</code></td><td>Manifest validation error</td><td>Bare domain only — no protocol, no path</td></tr>
+  <tr><td>Blob Storage firewall blocking your Container App</td><td>DuckDB queries fail with timeout</td><td>Enable "Allow trusted Microsoft services" in Blob Storage firewall</td></tr>
+  <tr><td>PostgreSQL SSL not specified in connection string</td><td>Connection refused</td><td>Always use <code>sslmode=require</code></td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>The Hybrid Data Pattern: PostgreSQL + Blob + DuckDB</h2>
+
+<p>One of the most powerful patterns for data-heavy applications is splitting your data between two backends optimized for different workloads:</p>
+
+<div class="grid-2">
+  <div class="concept-box">
+    <h3>PostgreSQL — Fast, Small, Read/Write</h3>
+    <ul>
+      <li>Provider rosters, CRM data, user edits</li>
+      <li>Search, filter, paginate — &lt;50ms</li>
+      <li>Write access (edits, overrides, audit trail)</li>
+      <li>~453K rows, 45 tables</li>
+    </ul>
+  </div>
+  <div class="concept-box">
+    <h3>Blob + DuckDB — Big, Analytical, Read-Only</h3>
+    <ul>
+      <li>Billing datamarts, referral patterns, visit volumes</li>
+      <li>Aggregate, trend, group-by — 3-10s per query</li>
+      <li>Read-only (rebuilt by data pipeline)</li>
+      <li>~35M rows, 1.8 GB in parquets</li>
+    </ul>
+  </div>
+</div>
+
+<p><strong>The trick:</strong> DuckDB reads parquets directly from Blob Storage without loading them into memory. Sort your parquets by the primary query key (provider ID, date, etc.) and DuckDB's row group statistics let it skip almost all the data:</p>
+
+<pre>
+# This reads ~2MB from a 369MB file — not the whole thing
+SELECT *
+FROM read_parquet('az://analytics/referrals_curated.parquet')
+WHERE REF_PROV_ID = '1234567890'
+LIMIT 100
+</pre>
+
+<p>You get the analytical power of a data warehouse without the cost. PostgreSQL handles the interactive, transactional workload. DuckDB + Blob handles the heavy analytics. Both are accessed from the same Container App.</p>
+
+<!-- ============================================ -->
+<h2>Local Development: Replicating Azure on Your Machine</h2>
+
+<p>You don't need an Azure account to develop. The architecture maps cleanly to local equivalents:</p>
+
+<table>
+  <tr><th>Azure Resource</th><th>Local Equivalent</th><th>How</th></tr>
+  <tr><td>Container App</td><td>Docker Compose</td><td><code>docker compose up --build</code></td></tr>
+  <tr><td>Container Registry</td><td>Local image</td><td>No push needed — Compose builds locally</td></tr>
+  <tr><td>PostgreSQL Flexible Server</td><td>PostgreSQL in Docker</td><td>Add a <code>postgres</code> service to your Compose file</td></tr>
+  <tr><td>Blob Storage</td><td>Local files</td><td>Mount a <code>./data</code> directory. DuckDB reads local parquets identically.</td></tr>
+  <tr><td>Azure OpenAI</td><td>Azure OpenAI (same endpoint)</td><td>Use the same API key — it works from anywhere</td></tr>
+  <tr><td>Bot Service</td><td>Bot Framework Emulator</td><td>Microsoft's free desktop tool for testing bots locally</td></tr>
+</table>
+
+<pre>
+# docker-compose.yml for local dev
+services:
+  app:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      - ANALYTICS_PG_SERVER=postgres
+      - ANALYTICS_PG_PASSWORD=localdev
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+    volumes:
+      - ./data:/data  # local parquets instead of Blob Storage
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: localdev
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+</pre>
+
+<p>Develop locally, push to Azure when ready. The code is identical — only the connection strings change (handled by environment variables).</p>
+
+<!-- ============================================ -->
+<h2>Cost Reality Check</h2>
+
+<p>Azure's pricing page is designed to confuse you into thinking everything is expensive. Here's what things actually cost for a small-to-medium AI application:</p>
+
+<table>
+  <tr><th>Resource</th><th>SKU</th><th>Monthly Cost</th></tr>
+  <tr><td>Container App (1 app, light usage)</td><td>Consumption (0.5 vCPU, 1GB)</td><td>~$15-30</td></tr>
+  <tr><td>Container App (scaled to zero when idle)</td><td>Min replicas = 0</td><td>~$5-15</td></tr>
+  <tr><td>PostgreSQL</td><td>Burstable B1ms</td><td>~$13</td></tr>
+  <tr><td>Blob Storage (2GB)</td><td>Standard LRS</td><td>~$0.04</td></tr>
+  <tr><td>Container Registry</td><td>Basic</td><td>~$5</td></tr>
+  <tr><td>Log Analytics</td><td>Default retention</td><td>~$2-5</td></tr>
+  <tr><td>Azure OpenAI (moderate usage)</td><td>Pay-per-token</td><td>~$10-50</td></tr>
+  <tr><td><strong>Total</strong></td><td></td><td><strong>~$50-120/month</strong></td></tr>
+</table>
+
+<p>For perspective: a single Tableau Cloud license costs $75/user/month. A Salesforce seat starts at $25/user/month. You can run an entire AI-powered analytics platform for less than what most organizations pay for one user's software subscriptions.</p>
+
+<!-- ============================================ -->
+<h2>What to Build Next</h2>
+
+<p>Once your infrastructure is running, the architecture supports rapid expansion:</p>
+
+<table>
+  <tr><th>Application</th><th>Architecture</th><th>Add to Existing Infrastructure</th></tr>
+  <tr><td><strong>Teams Data Analyst Bot</strong></td><td>Container App + Bot Service</td><td>Same PostgreSQL, Blob, OpenAI</td></tr>
+  <tr><td><strong>Web Dashboard</strong></td><td>Container App (React/Next.js)</td><td>Same PostgreSQL, Blob</td></tr>
+  <tr><td><strong>Email Agent</strong></td><td>Local app (DuckDB + Azure OpenAI)</td><td>Uses Azure OpenAI endpoint only</td></tr>
+  <tr><td><strong>MCP Server</strong></td><td>Container App (FastAPI)</td><td>Same PostgreSQL, Blob — exposes tools</td></tr>
+  <tr><td><strong>Specialty Reports</strong></td><td>Container App or scheduled job</td><td>Same Blob parquets + OpenAI</td></tr>
+</table>
+
+<p>Each new application is just another Container App in the same environment, connecting to the same data. The infrastructure cost barely changes — you're adding compute, not duplicating storage or databases.</p>
+
+<div class="closing">
+  <p>Azure is simpler than it looks. Six resources, one resource group, and a Docker image. The rest is just configuration. The hard part was never the cloud infrastructure — it's knowing what to build and having the data to power it. Azure is just where it lives.</p>
+</div>
+
+</body>
+</html>

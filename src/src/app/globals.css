@@ -1,0 +1,457 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens ─── */
+:root {
+  /* Backgrounds */
+  --bg: #F5F2ED;
+  --bg-panel: #FFFFFF;
+  --bg-panel-hover: #F7F5F2;
+
+  /* Foreground */
+  --fg: #2C2825;
+  --fg-muted: #6B665F;
+  --fg-light: #9E9890;
+
+  /* Borders */
+  --border: #DDD8D0;
+  --border-light: #EAE6E0;
+
+  /* Accent — ocean teal */
+  --accent: #2B7A6F;
+  --accent-hover: #1F5E56;
+  --accent-light: #E6F3F0;
+  --accent-muted: #8BBAB3;
+
+  /* Overlay for background images */
+  --overlay: rgba(245, 242, 237, 0.88);
+
+  /* Code blocks */
+  --code-bg: #1E1B19;
+  --code-fg: #E8E4DE;
+
+  /* Fonts */
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), 'Fira Code', monospace;
+}
+
+.dark {
+  --bg: #1A1816;
+  --bg-panel: #222020;
+  --bg-panel-hover: #2A2726;
+
+  --fg: #EDE9E3;
+  --fg-muted: #9E9890;
+  --fg-light: #6E6860;
+
+  --border: #3A3533;
+  --border-light: #2E2A28;
+
+  --accent: #4ECDC4;
+  --accent-hover: #6FD8D1;
+  --accent-light: #1A3330;
+  --accent-muted: #3A8A83;
+
+  --overlay: rgba(26, 24, 22, 0.90);
+
+  --code-bg: #141210;
+  --code-fg: #E8E4DE;
+}
+
+/* ─── Tailwind Theme ─── */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-panel-hover: var(--bg-panel-hover);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-light: var(--fg-light);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-accent-muted: var(--accent-muted);
+  --color-code-bg: var(--code-bg);
+  --color-code-fg: var(--code-fg);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+}
+
+/* ─── Base Styles ─── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 14px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection */
+::selection {
+  background: var(--accent-light);
+  color: var(--fg);
+}
+
+/* ─── Typography ─── */
+h1, h2 {
+  font-family: var(--font-serif);
+  line-height: 1.15;
+  color: var(--fg);
+}
+
+h1 {
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* ─── Panel Base ─── */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+}
+
+/* ─── Inline Code ─── */
+code:not(pre code) {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--bg-panel-hover);
+  border: 1px solid var(--border-light);
+  padding: 1px 5px;
+  border-radius: 2px;
+  color: var(--fg-muted);
+}
+
+/* ─── Section Labels (monospace) ─── */
+.label-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-light);
+}
+
+/* ─── Smooth transitions for dark mode ─── */
+body,
+.panel,
+nav,
+footer {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+/* ─── Prose-like content density ─── */
+.content-body p {
+  margin-bottom: 8px;
+}
+
+.content-body p + p {
+  margin-top: 8px;
+}
+
+.content-body ul,
+.content-body ol {
+  margin-bottom: 8px;
+  padding-left: 20px;
+}
+
+.content-body li {
+  margin-bottom: 4px;
+}
+
+.content-body h2 {
+  margin-top: 24px;
+  margin-bottom: 10px;
+  font-size: 1.25rem;
+}
+
+.content-body h3 {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-light);
+  margin-top: 20px;
+  margin-bottom: 6px;
+}
+
+/* ─── Tag pill (for tech tags) ─── */
+.tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--bg-panel-hover);
+  border: 1px solid var(--border-light);
+  padding: 2px 8px;
+  border-radius: 2px;
+  color: var(--fg-muted);
+}
+
+/* ─── File Tree ─── */
+.file-tree {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--fg-muted);
+  user-select: none;
+}
+
+.file-tree-node {
+  cursor: pointer;
+  padding: 1px 6px;
+  border-radius: 2px;
+  transition: background-color 150ms ease;
+  white-space: nowrap;
+}
+
+.file-tree-node:hover {
+  background: var(--bg-panel-hover);
+}
+
+.file-tree-node.selected {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.file-tree-line {
+  color: var(--fg-light);
+}
+
+/* ─── JSON Blocks ─── */
+.json-block {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.json-block pre {
+  margin: 0;
+}
+
+.json-line {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.json-line-number {
+  display: inline-block;
+  min-width: 24px;
+  text-align: right;
+  color: #4a4540;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.json-line-highlight {
+  background: rgba(43, 122, 111, 0.1);
+}
+
+.dark .json-line-highlight {
+  background: rgba(78, 205, 196, 0.08);
+}
+
+.json-key { color: #E8E4DE; }
+.json-string { color: #4ECDC4; }
+.json-number { color: #D4A574; }
+.json-boolean { color: #8BBAB3; }
+.json-comment { color: #6E6860; font-style: italic; }
+.json-punctuation { color: #6E6860; }
+
+/* ─── Conversation Simulator ─── */
+.sim-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.sim-tabs,
+.learn-tabs {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.sim-tabs::-webkit-scrollbar,
+.learn-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.sim-pane-header {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-panel-hover);
+}
+
+.sim-pane-content {
+  min-height: 300px;
+  max-height: 420px;
+}
+
+/* Message styles by role */
+.sim-message {
+  padding: 8px 10px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.sim-message-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+
+.sim-msg-user {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+}
+
+.sim-msg-assistant {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--accent);
+}
+
+.sim-msg-tool-call {
+  background: var(--accent-light);
+  border: 1px solid var(--accent-muted);
+  padding: 5px 10px;
+}
+
+.sim-msg-tool-result {
+  background: var(--code-bg);
+  border: 1px solid transparent;
+  padding: 5px 10px;
+}
+
+.sim-msg-thinking {
+  background: var(--bg-panel-hover);
+  border: 1px dashed var(--border);
+}
+
+/* API blocks */
+.sim-api-block {
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* Controls */
+.sim-control-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  background: transparent;
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: var(--font-mono);
+}
+
+.sim-control-btn:hover:not(:disabled) {
+  background: var(--bg-panel-hover);
+  color: var(--fg);
+}
+
+.sim-control-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.sim-control-primary {
+  background: var(--accent-light);
+  border-color: var(--accent-muted);
+  color: var(--accent);
+}
+
+.sim-control-primary:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+}
+
+/* Message enter animation */
+.sim-message-enter {
+  animation: sim-fade-in 600ms ease both;
+}
+
+@keyframes sim-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Typewriter cursor blink */
+.sim-cursor {
+  animation: sim-blink 800ms steps(1) infinite;
+  color: var(--accent);
+  font-weight: 300;
+}
+
+@keyframes sim-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Loading dots animation */
+.sim-dot {
+  animation: sim-dot-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes sim-dot-pulse {
+  0%, 80%, 100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ─── Reduce motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
