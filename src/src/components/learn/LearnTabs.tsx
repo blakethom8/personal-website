@@ -5,15 +5,13 @@ import { learnModules } from "@/lib/learn-modules";
 import { OverviewTab } from "./OverviewTab";
 import { ConversationSimulator } from "./ConversationSimulator";
 import { LearnExplorer } from "./LearnExplorer";
-import { ToolboxTab } from "./ToolboxTab";
-import { ReposTab } from "./ReposTab";
+import { DeepDivesTab } from "./DeepDivesTab";
 
 const tabs = [
   { id: "overview", label: "overview" },
-  { id: "simulator", label: "simulator" },
+  { id: "guides", label: "guides" },
   { id: "modules", label: "modules" },
-  { id: "toolbox", label: "toolbox" },
-  { id: "repos", label: "repos" },
+  { id: "deep dives", label: "deep dives" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -56,7 +54,7 @@ export function LearnTabs() {
           <OverviewTab onNavigateTab={(tab) => setActiveTab(tab as TabId)} />
         )}
 
-        {activeTab === "simulator" && (
+        {activeTab === "guides" && (
           <ConversationSimulator embedded />
         )}
 
@@ -71,9 +69,7 @@ export function LearnTabs() {
           </div>
         )}
 
-        {activeTab === "toolbox" && <ToolboxTab />}
-
-        {activeTab === "repos" && <ReposTab />}
+        {activeTab === "deep dives" && <DeepDivesTab />}
       </div>
     </div>
   );

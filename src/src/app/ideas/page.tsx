@@ -1,21 +1,17 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageBackground } from "@/components/PageBackground";
 import { Panel } from "@/components/Panel";
 import { backgrounds } from "@/lib/backgrounds";
 import { getAllPosts } from "@/lib/posts";
+import { IdeasView } from "@/components/ideas/IdeasView";
 
 export const metadata: Metadata = {
   title: "Ideas",
   description: "Writing on technology, healthcare, AI, and building.",
 };
 
-const categories = ["all", "technology", "business", "healthcare", "building", "personal"];
-
 export default function IdeasPage() {
   const posts = getAllPosts();
-  const featured = posts.find((p) => p.featured);
-  const rest = posts.filter((p) => !p.featured);
 
   return (
     <>
@@ -35,84 +31,8 @@ export default function IdeasPage() {
           </p>
         </Panel>
 
-        {/* Main content: sidebar + posts */}
-        <div className="mx-auto flex w-[calc(100%-2*16px)] max-w-[1200px] flex-col gap-4 md:w-[calc(100%-2*40px)] md:flex-row">
-          {/* Sidebar */}
-          <aside className="panel w-full shrink-0 self-start px-4 py-4 md:w-[180px]">
-            <p className="label-mono mb-2">categories</p>
-            <div className="flex flex-row flex-wrap gap-1 md:flex-col md:gap-0">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  className={`rounded px-2 py-1 text-left font-mono text-[12px] capitalize transition-colors hover:text-accent md:rounded-none md:px-0 ${
-                    cat === "all"
-                      ? "text-accent"
-                      : "text-fg-muted"
-                  }`}
-                >
-                  {cat === "all" ? "> all" : `  ${cat}`}
-                </button>
-              ))}
-            </div>
-          </aside>
-
-          {/* Post list */}
-          <div className="flex flex-1 flex-col gap-4">
-            {/* Featured post */}
-            {featured && (
-              <article className="panel px-5 py-5 transition-colors hover:border-accent-muted md:px-6">
-                <div className="flex items-center gap-2 font-mono text-[11px] text-fg-light">
-                  <span className="uppercase tracking-wider text-accent">
-                    featured
-                  </span>
-                  <span>&middot;</span>
-                  <span>{featured.category}</span>
-                  <span>&middot;</span>
-                  <span>{featured.readTime}</span>
-                </div>
-                <h2 className="mt-2 font-serif text-lg md:text-xl">
-                  <Link
-                    href={`/ideas/${featured.slug}`}
-                    className="text-fg no-underline hover:text-accent"
-                  >
-                    {featured.title}
-                  </Link>
-                </h2>
-                <p className="mt-2 max-w-[68ch] text-[13px] leading-relaxed text-fg-muted">
-                  {featured.excerpt}
-                </p>
-                <p className="mt-2 font-mono text-[11px] text-fg-light">{featured.date}</p>
-              </article>
-            )}
-
-            {/* Rest of posts */}
-            <div className="panel divide-y divide-border-light px-5 py-1 md:px-6">
-              {rest.map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/ideas/${post.slug}`}
-                  className="flex flex-col gap-0.5 py-3 no-underline hover:no-underline sm:flex-row sm:items-start sm:justify-between sm:gap-6"
-                >
-                  <div className="flex-1">
-                    <h3 className="font-sans text-[14px] font-medium text-fg hover:text-accent">
-                      {post.title}
-                    </h3>
-                    <p className="mt-0.5 line-clamp-2 text-[13px] text-fg-muted">
-                      {post.excerpt}
-                    </p>
-                  </div>
-                  <span className="flex shrink-0 items-center gap-2 font-mono text-[11px] text-fg-light">
-                    <span>{post.category}</span>
-                    <span>&middot;</span>
-                    <span>{post.readTime}</span>
-                    <span>&middot;</span>
-                    <span>{post.date}</span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Interactive post list with side pane */}
+        <IdeasView posts={posts} />
       </div>
     </>
   );

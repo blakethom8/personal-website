@@ -57,10 +57,13 @@ npm install simple-git  # for git integration (Phase 2)
 ### File Structure to Create:
 ```
 src/
+├── middleware.ts                    # Auth gate for /admin* and /api/admin* routes
 ├── app/
 │   └── admin/
-│       ├── layout.tsx              # Auth wrapper
+│       ├── layout.tsx              # Admin shell (no auth logic — middleware handles it)
 │       ├── page.tsx                # Admin dashboard
+│       ├── login/
+│       │   └── page.tsx            # Login form page
 │       └── edit/
 │           └── [slug]/
 │               └── page.tsx        # Editor page
@@ -73,7 +76,7 @@ src/
 │   └── webmcp.ts                   # WebMCP utilities
 └── app/api/
     ├── admin/
-    │   ├── auth/route.ts           # Auth check
+    │   ├── auth/route.ts           # Sets auth cookie on valid password
     │   └── content/
     │       ├── load/route.ts       # Load file content
     │       └── save/route.ts       # Save file content
@@ -85,85 +88,135 @@ src/
 
 ## Implementation Details
 
-### 1. Admin Layout with Auth
+### 1. Middleware — Single Auth Gate
 
-**File:** `src/app/admin/layout.tsx`
+**File:** `src/middleware.ts`
 
-```typescript
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [authed, setAuthed] = useState(false);
-  const [password, setPassword] = useState('');
-  const router = useRouter();
-
-  useEffect(() => {
-    // Check if already authed
-    const isAuthed = sessionStorage.getItem('admin_authed') === 'true';
-    setAuthed(isAuthed);
-  }, []);
-
-  const handleAuth = async () => {
-    const res = await fetch('/api/admin/auth', {
-      method: 'POST',
-      body: JSON.stringify({ password }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-    
-    if (res.ok) {
-      sessionStorage.setItem('admin_authed', 'true');
-      setAuthed(true);
-    } else {
-      alert('Wrong password');
-    }
-  };
-
-  if (!authed) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="bg-gray-800 p-8 rounded-lg">
-          <h1 className="text-2xl mb-4 text-white">Admin Access</h1>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
-            className="border p-2 rounded mb-4 w-full bg-gray-700 text-white"
-            placeholder="Password"
-          />
-          <button onClick={handleAuth} className="bg-blue-600 text-white px-4 py-2 rounded">
-            Enter
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-}
-```
-
-### 2. Auth API Route
-
-**File:** `src/app/api/admin/auth/route.ts`
+This is the only auth logic in the app. It protects all `/admin` pages and `/api/admin` endpoints in one place. No individual route needs to think about auth.
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server';
 
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'dev-admin-token';
+
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // Allow the login page and the auth API through without a token
+  if (pathname === '/admin/login' || pathname === '/api/admin/auth') {
+    return NextResponse.next();
+  }
+
+  const token = req.cookies.get('admin_token')?.value;
+
+  if (token !== ADMIN_TOKEN) {
+    // API routes get a 401; pages redirect to login
+    if (pathname.startsWith('/api/admin')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    return NextResponse.redirect(new URL('/admin/login', req.url));
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ['/admin/:path*', '/api/admin/:path*'],
+};
+```
+
+### 2. Auth API — Sets Cookie
+
+**File:** `src/app/api/admin/auth/route.ts`
+
+On valid password, sets an HttpOnly cookie with the token. The middleware checks this cookie on every subsequent request.
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'dev-admin-token';
+
 export async function POST(req: NextRequest) {
   const { password } = await req.json();
-  
-  // Simple password check (use env var in production)
-  const correctPassword = process.env.ADMIN_PASSWORD || 'admin123';
-  
-  if (password === correctPassword) {
-    return NextResponse.json({ success: true });
+
+  if (password !== ADMIN_PASSWORD) {
+    return NextResponse.json({ error: 'Wrong password' }, { status: 401 });
   }
-  
-  return NextResponse.json({ success: false }, { status: 401 });
+
+  const res = NextResponse.json({ success: true });
+  res.cookies.set('admin_token', ADMIN_TOKEN, {
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24, // 24 hours
+  });
+  return res;
+}
+```
+
+### 2b. Login Page
+
+**File:** `src/app/admin/login/page.tsx`
+
+Simple login form. On success the cookie is set automatically, then redirect to dashboard.
+
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+export default function AdminLogin() {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
+  const router = useRouter();
+
+  const handleLogin = async () => {
+    const res = await fetch('/api/admin/auth', {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (res.ok) {
+      router.push('/admin');
+    } else {
+      setError(true);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="bg-gray-800 p-8 rounded-lg w-80">
+        <h1 className="text-2xl mb-4 text-white">Admin Access</h1>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => { setPassword(e.target.value); setError(false); }}
+          onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+          className="border p-2 rounded mb-4 w-full bg-gray-700 text-white"
+          placeholder="Password"
+        />
+        {error && <p className="text-red-400 text-sm mb-2">Wrong password</p>}
+        <button onClick={handleLogin} className="bg-blue-600 text-white px-4 py-2 rounded w-full">
+          Enter
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+### 2c. Admin Layout — No Auth Logic
+
+**File:** `src/app/admin/layout.tsx`
+
+The layout is just a shell. Middleware already ensured the user is authenticated before this renders.
+
+```typescript
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }
 ```
 
@@ -503,6 +556,7 @@ export async function GET() {
 Add to `.env.local`:
 ```
 ADMIN_PASSWORD=your_secure_password_here
+ADMIN_TOKEN=your_random_token_here
 ```
 
 ---
@@ -511,8 +565,9 @@ ADMIN_PASSWORD=your_secure_password_here
 
 After implementation, verify:
 
-- [ ] Navigate to `localhost:3001/admin` → see auth screen
-- [ ] Enter password → access dashboard
+- [ ] Navigate to `localhost:3001/admin` → redirects to `/admin/login`
+- [ ] Enter password → cookie set, redirects to dashboard
+- [ ] Hit `/api/admin/content/list` without cookie → get 401 (auth is server-side)
 - [ ] Dashboard lists all blog posts
 - [ ] Click "Edit: bespoke-ai-model" → editor loads
 - [ ] Monaco editor shows markdown content
@@ -532,7 +587,7 @@ This is a relatively straightforward implementation. Key complexity areas:
 1. **Monaco integration:** Should be smooth with @monaco-editor/react
 2. **File I/O:** Straightforward with Node fs module
 3. **WebMCP scaffolding:** JSON-LD + JavaScript API is simple
-4. **Auth:** Basic sessionStorage approach works for prototype
+4. **Auth:** Middleware + HttpOnly cookie — lightweight but server-side
 
 Expected completion: 1.5-2 hours with xhigh reasoning.
 
@@ -544,7 +599,7 @@ Expected completion: 1.5-2 hours with xhigh reasoning.
 - WebMCP tools defined but not fully functional (Phase 2)
 - No chart insertion UI (Phase 2)
 - No MDX support (Phase 2)
-- Simple password auth (can upgrade to NextAuth later)
+- Simple token-in-cookie auth (can upgrade to NextAuth later)
 
 ---
 

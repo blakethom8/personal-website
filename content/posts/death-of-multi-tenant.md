@@ -1,10 +1,11 @@
 ---
-status: draft
-target: posts
-created: 2026-02-25
-updated: 2026-02-25
+title: "The Death of Multi-Tenant"
+date: "2026-02-25"
 tags: ["business", "technology", "healthcare-ai", "architecture"]
-notes: "Bold take. Draws from business framework + Steinberger podcast. Needs Blake's review on tone — is this too aggressive?"
+excerpt: "Why the SaaS model you grew up on is already obsolete — and what replaces it."
+readTime: "10 min"
+featured: false
+category: "the-shifting-model"
 ---
 
 # The Death of Multi-Tenant

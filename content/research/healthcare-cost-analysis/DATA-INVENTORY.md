@@ -185,16 +185,32 @@ Located at: `~/Repo/cms-data/data/provider_searcher.duckdb`
 
 ## Acquisition Checklist
 
-- [ ] Hospital Cost Reports (Form 2552-10) for FY 2022/2023
-- [ ] NHEA historical tables (2022 data)
-- [ ] Medicare enrollment data
-- [ ] MLR reports (CMS + state aggregates)
-- [ ] BLS healthcare employment and wage data
+- [x] **Hospital Cost Reports (Form 2552-10)** — Downloaded all years 2010-2025 ✅
+  - Location: `data/HOSP10-REPORTS/`
+  - Files: `HOSP10_cost_charges_YYYY.CSV` (cost & charges by provider per year)
+  - Also: `HOSP10_PRVDR_ID_INFO.CSV` (provider name/address/type lookup)
+  - Also: `IME_GMEYYYY.CSV` (indirect medical education & graduate medical education)
+  - Columns: PROVIDER_NUMBER, FYB, FYE, STATUS, C000001_20000_00500 (total costs), C000001_20000_00600 (total charges), C000001_20000_00700 (total beds?)
+  - Source: https://downloads.cms.gov/files/hcris/hosp10-reports.zip
+- [x] **NHEA historical tables** — Downloaded all 25 tables ✅
+  - Location: `data/nhea/`
+  - 25 Excel files covering aggregate spending, per capita, by type, by source, by sponsor, by program
+  - Includes: Hospital care, physician services, Rx drugs, nursing, home health, dental, DME
+  - Also: Insurance enrollment, price indexes, employer-sponsored insurance
+  - Source: https://www.cms.gov/files/zip/nhe-tables.zip
+- [ ] Medicare enrollment data — Not yet downloaded
+- [ ] **MLR reports** — Download blocked (CMS page requires JavaScript/redirects)
+  - URL: https://www.cms.gov/marketplace/resources/data/medical-loss-ratio-data-systems-resources
+  - Action: Manual download needed from CMS MLR search tool
+- [ ] **BLS healthcare employment and wage data** — Download blocked (BLS redirect issues)
+  - URL: https://www.bls.gov/oes/tables.htm
+  - Action: Manual download of OES data by industry (NAICS 622000 Hospitals, 621 Ambulatory)
 - [ ] OECD health statistics for peer countries
-- [ ] RAND commercial vs Medicare payment rate studies (via literature review)
+- [x] **RAND commercial vs Medicare payment rates** — Cited in literature review ✅
+  - Key finding: Private pays 224% of Medicare (2020 data)
 - [ ] KFF insurance premium data
 
 ---
 
-**Status**: Inventory created • Priority datasets identified • Ready for acquisition  
+**Status**: NHEA + Hospital Cost Reports acquired ✅ • MLR & BLS need manual download  
 **Last updated**: 2026-02-26

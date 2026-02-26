@@ -27,21 +27,35 @@ All of these share the same fundamental problem: **someone has to explicitly def
 
 That doesn't scale. Systems change. Data formats evolve. New tools get added. The integration layer becomes its own full-time maintenance burden.
 
-## AI Doesn't Wire — It Understands
+## AI Doesn't Wire — It Removes the Middleman Work
 
-Here's what's different about an AI agent as a glue layer:
+Most "integration work" isn't the value of the business — it's the overhead required to *move meaning* between systems. Business analysts, ops teams, reps, coordinators: an enormous fraction of the job is translating, reconciling, re-keying, and reporting across tools so other people can act. That connective tissue is expensive, tedious, and endless — and it doesn't directly improve the end-user outcome.
 
-```
-Traditional Integration:
-  System A  ──[explicit mapping]──→  System B
-  Fixed. Brittle. Breaks when either side changes.
+AI doesn't magically eliminate the job. It changes **where the time goes** by compressing the middleman steps.
 
-AI as Glue:
-  System A  ──[natural language]──→  AI Agent  ──[natural language]──→  System B
-  Flexible. Adaptive. The AI figures out the mapping.
-```
+And it quietly changes something bigger: the **user interface of work**. If the fastest path to outcomes is “state intent → agent executes across tools,” then the agent becomes the front door and apps become the back-end systems of record. That pushes applications to become **agent-native**—designed to be driven by an agent, not just clicked by a human. I’m working on a deeper dive on this “value stack” shift (coming soon). For adjacent threads, see: [The Death of Multi-Tenant SaaS →](/ideas/death-of-multi-tenant) and [The Future of Browser Apps →](/ideas/future-of-browser-apps).
+
+### How you'd get this done today
+
+If you want "email → understood → calendar event," you typically do one of two things:
+
+1. **Manual middleman work**: search inbox, read, interpret intent, extract details, create the event, confirm, follow up.
+2. **Build a brittle workflow**: wire up triggers/actions, map fields, handle edge cases, maintain it every time the email format or calendar rules change.
+
+### What the agent does instead
 
 When I tell my AI assistant "Check my email for anything from the hospital, and if there's a meeting request, add it to my calendar" — I'm not defining an integration. I'm describing an outcome. The agent:
+
+```
+Traditional (humans are the glue):
+  You → Gmail UI → (read + interpret + copy details) → Calendar UI
+
+Application with an agent (each app ships its own assistant):
+  You → Gmail Agent → (meeting intent) → Calendar Agent → Calendar event
+
+One agent for all applications (agent becomes the primary interface):
+  You → Personal Agent → Gmail / Calendar / CRM / Docs / ...
+```
 
 1. Uses the Gmail CLI to search for hospital emails
 2. Reads the content and understands it's a meeting request
@@ -49,7 +63,7 @@ When I tell my AI assistant "Check my email for anything from the hospital, and 
 4. Uses the Google Calendar CLI to create the event
 5. Tells me it's done
 
-No Zapier flow. No API mapping. No schema definitions. I just said what I wanted in English.
+No Zapier flow. No API mapping. No schema definitions. The point isn't that this is impossible without AI — it's that AI collapses the annoying, time-wasting connective steps into something you can express once, in plain language.
 
 ---
 
