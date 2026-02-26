@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { learnModules } from "@/lib/learn-modules";
 import { OverviewTab } from "./OverviewTab";
 import { ConversationSimulator } from "./ConversationSimulator";
@@ -40,18 +39,17 @@ function isTabId(value: string | null): value is TabId {
   return tabs.some((tab) => tab.id === value);
 }
 
-export function LearnTabs() {
-  const searchParams = useSearchParams();
-  const requestedTab = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+interface LearnTabsProps {
+  initialTab?: string;
+}
+
+export function LearnTabs({ initialTab }: LearnTabsProps) {
+  const [activeTab, setActiveTab] = useState<TabId>(() => {
+    const candidate = initialTab ?? null;
+    return isTabId(candidate) ? candidate : "overview";
+  });
   const activeMeta = tabs.find((tab) => tab.id === activeTab) ?? tabs[0];
   const nextTab = tabFlow[activeTab].next;
-
-  useEffect(() => {
-    if (isTabId(requestedTab)) {
-      setActiveTab(requestedTab);
-    }
-  }, [requestedTab]);
 
   return (
     <div className="panel mx-auto w-[calc(100%-2*16px)] max-w-[1200px] overflow-hidden md:w-[calc(100%-2*40px)]">
