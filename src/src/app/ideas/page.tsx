@@ -3,58 +3,17 @@ import Link from "next/link";
 import { PageBackground } from "@/components/PageBackground";
 import { Panel } from "@/components/Panel";
 import { backgrounds } from "@/lib/backgrounds";
+import { getAllPosts } from "@/lib/posts";
 
 export const metadata: Metadata = {
   title: "Ideas",
   description: "Writing on technology, healthcare, AI, and building.",
 };
 
-const posts = [
-  {
-    slug: "bespoke-ai-model",
-    title: "The Bespoke AI Model: Why We Build Inside Your Walls",
-    excerpt:
-      "The old world of software consulting looked like this: a vendor builds a product over months, hosts it on their servers, and sells subscriptions. The new world is fundamentally different.",
-    category: "business",
-    readTime: "10 min",
-    date: "Feb 25, 2026",
-    featured: true,
-  },
-  {
-    slug: "webmcp-overview",
-    title: "WebMCP: Making Websites AI-Native",
-    excerpt:
-      "A new browser API that lets websites expose their functionality directly to AI agents. Every page becomes a set of tools, not just content to scrape.",
-    category: "technology",
-    readTime: "8 min",
-    date: "Feb 20, 2026",
-    featured: false,
-  },
-  {
-    slug: "entity-resolution-healthcare",
-    title: "Entity Resolution in Healthcare: The Matching Problem",
-    excerpt:
-      "How do you know that Dr. Smith at 123 Main St in your claims data is the same Dr. Smith listed on Google? The answer is harder than you think.",
-    category: "healthcare",
-    readTime: "12 min",
-    date: "Feb 15, 2026",
-    featured: false,
-  },
-  {
-    slug: "old-model-new-model",
-    title: "Old Model vs. New Model: How AI Changed the Software Business",
-    excerpt:
-      "AI-accelerated development means a skilled team can build a production-quality application in days rather than months. But the bottleneck was never the code.",
-    category: "business",
-    readTime: "6 min",
-    date: "Feb 10, 2026",
-    featured: false,
-  },
-];
-
 const categories = ["all", "technology", "business", "healthcare", "building", "personal"];
 
 export default function IdeasPage() {
+  const posts = getAllPosts();
   const featured = posts.find((p) => p.featured);
   const rest = posts.filter((p) => !p.featured);
 

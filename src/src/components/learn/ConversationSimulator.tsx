@@ -2,25 +2,40 @@
 
 import { useState } from "react";
 import { scenarios } from "@/lib/conversation-scenarios";
+import { openclawScenarios } from "@/lib/openclaw-terminal-scenarios";
 import { useSimulator } from "@/hooks/useSimulator";
 import { ChatPane } from "./ChatPane";
 import { ApiPane } from "./ApiPane";
 
 type MobilePane = "chat" | "api";
+type ScenarioSet = "api" | "openclaw";
 
 interface ConversationSimulatorProps {
   embedded?: boolean;
 }
 
+const scenarioSets = {
+  api: { label: "api patterns", scenarios },
+  openclaw: { label: "openclaw workflows", scenarios: openclawScenarios },
+};
+
 export function ConversationSimulator({ embedded = false }: ConversationSimulatorProps) {
+  const [scenarioSet, setScenarioSet] = useState<ScenarioSet>("api");
   const [activeScenario, setActiveScenario] = useState(0);
   const [mobilePane, setMobilePane] = useState<MobilePane>("chat");
 
-  const scenario = scenarios[activeScenario];
+  const currentScenarios = scenarioSets[scenarioSet].scenarios;
+  const scenario = currentScenarios[activeScenario];
   const sim = useSimulator(scenario);
 
   const switchScenario = (idx: number) => {
     setActiveScenario(idx);
+    setMobilePane("chat");
+  };
+
+  const switchScenarioSet = (set: ScenarioSet) => {
+    setScenarioSet(set);
+    setActiveScenario(0);
     setMobilePane("chat");
   };
 
@@ -31,18 +46,39 @@ export function ConversationSimulator({ embedded = false }: ConversationSimulato
 
   return (
     <div className={embedded ? "sim-container overflow-hidden" : "sim-container panel mx-auto w-[calc(100%-2*16px)] max-w-[1200px] overflow-hidden md:w-[calc(100%-2*40px)]"}>
-      {/* Header: label + tabs */}
+      {/* Header: label + set selector + tabs */}
       <div className="border-b border-border-light">
         <div className="flex items-center justify-between px-4 py-2">
           <span className="label-mono">conversation simulator</span>
-          <span className="font-mono text-[10px] text-fg-light">
-            interactive
-          </span>
+          
+          {/* Scenario set selector */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => switchScenarioSet("api")}
+              className={`px-2 py-1 font-mono text-[10px] transition-colors rounded ${
+                scenarioSet === "api"
+                  ? "bg-accent/10 text-accent"
+                  : "text-fg-light hover:text-fg-muted"
+              }`}
+            >
+              api patterns
+            </button>
+            <button
+              onClick={() => switchScenarioSet("openclaw")}
+              className={`px-2 py-1 font-mono text-[10px] transition-colors rounded ${
+                scenarioSet === "openclaw"
+                  ? "bg-accent/10 text-accent"
+                  : "text-fg-light hover:text-fg-muted"
+              }`}
+            >
+              openclaw workflows
+            </button>
+          </div>
         </div>
 
         {/* Scenario tabs */}
         <div className="sim-tabs flex overflow-x-auto border-t border-border-light">
-          {scenarios.map((s, i) => (
+          {currentScenarios.map((s, i) => (
             <button
               key={s.id}
               onClick={() => switchScenario(i)}
