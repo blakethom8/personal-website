@@ -5,6 +5,62 @@
 
 ---
 
+## Learning Modules (Interactive)
+
+### Module 1: "LLMs & Agents in 4 Steps"
+*Simplify the entire agent stack for non-technical people*
+
+**Step 1: The Model** — What is an LLM? It predicts the next word. That's it. (Use existing ConversationSimulator to show a simple chat request/response)
+
+**Step 2: Memory & State** — LLMs are stateless. Every message includes the full conversation history. Context windows, token limits, why agents need files for persistent memory. (Show: the messages array growing with each turn)
+
+**Step 3: The Harness** — The while loop that gives agents "claws." Tools (read, write, edit, exec) let the model interact with the real world. The harness is the loop: think → call tool → observe → think again. (Use OpenClaw terminal simulator scenarios)
+
+**Step 4: The Bot Pattern** — Putting it all together: API layer, tool registration, streaming responses, user-facing interface. Reference project-base architecture. (Show: full stack diagram)
+
+### Module 2: "System Architecture: Where Does Everything Live?"
+*Interactive visual: server vs database vs browser vs local machine*
+
+- **Your browser** — The UI, JavaScript, what the user sees and clicks
+- **The server (API)** — FastAPI/Express processing requests, calling LLMs
+- **The database** — Where data persists (PostgreSQL, DuckDB, Supabase)
+- **The LLM provider** — Claude/GPT API (someone else's server)
+- **Your local machine** — Where OpenClaw runs, your files, your terminal
+- Interactive: click on each layer to see what flows between them
+- Show a real request lifecycle: user types → browser → API → LLM → tools → database → back
+
+### Module 3: "project-base Tutorial Series"
+*Adapt the existing ~/Repo/project_base/docs/ curriculum*
+
+The project-base repo has a full 11-phase tutorial from FastAPI basics through agentic patterns:
+- Phase 1-4: Foundation (FastAPI, Pydantic, SQLAlchemy, Alembic)
+- Phase 5: Sync vs Async
+- Phase 6: LLM Basics + Advanced (Pydantic AI, structured outputs)
+- Phase 7: Tool Fundamentals, Database Tools, Analyst Agent
+- Phase 8: Agentic Patterns, Framework Comparison, Advanced Patterns
+- Phase 9-10: Frontend patterns, Vercel AI SDK
+- Phase 11: Provider Classification Workflow (real-world example)
+
+### Website as CMS Data Showcase
+*Chat interface + beautiful charts + CMS healthcare data*
+
+Build an interactive showcase on the website that demos:
+- Chat sidebar that queries CMS data (90M+ rows)
+- Beautiful charts rendered in real-time from chat commands
+- "Show me cardiologists in LA by Medicare volume" → instant bar chart
+- Uses the projection space pattern from mydoclist.com
+- This becomes both a product demo AND a learning module
+
+### GitHub Overview (Plain Language)
+*Explain GitHub to non-developers in language that makes sense*
+- What's a repository? (A project folder with memory)
+- What's a commit? (A save point)
+- What's a branch? (A parallel universe for your code)
+- What's a PR? (A review before merging changes)
+- Why it matters for AI agents (they can read/write code via gh CLI)
+
+---
+
 ## Category Rethink
 
 The old categories (technology, business, healthcare, building, personal) are generic. Here's the new structure — each category is a **concept area** that Blake is genuinely exploring:
