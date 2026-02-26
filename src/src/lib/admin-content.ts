@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const POSTS_DIRECTORY = path.resolve(process.cwd(), "../content/posts");
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export class AdminContentError extends Error {
@@ -14,6 +13,14 @@ export class AdminContentError extends Error {
   }
 }
 
+function getPostsDirectory(): string {
+  const overrideRoot = process.env.ADMIN_CONTENT_ROOT;
+  if (overrideRoot && overrideRoot.trim().length > 0) {
+    return path.resolve(overrideRoot);
+  }
+  return path.resolve(process.cwd(), "../content/posts");
+}
+
 export function assertValidSlug(raw: unknown): string {
   if (typeof raw !== "string" || !SLUG_PATTERN.test(raw)) {
     throw new AdminContentError("Invalid slug format", 400);
@@ -22,9 +29,10 @@ export function assertValidSlug(raw: unknown): string {
 }
 
 function getPostFilePath(slug: string): string {
-  const filePath = path.resolve(POSTS_DIRECTORY, `${slug}.md`);
+  const postsDirectory = getPostsDirectory();
+  const filePath = path.resolve(postsDirectory, `${slug}.md`);
 
-  if (!filePath.startsWith(`${POSTS_DIRECTORY}${path.sep}`)) {
+  if (!filePath.startsWith(`${postsDirectory}${path.sep}`)) {
     throw new AdminContentError("Invalid file path", 400);
   }
 
@@ -32,9 +40,11 @@ function getPostFilePath(slug: string): string {
 }
 
 export function listPostSlugs(): string[] {
+  const postsDirectory = getPostsDirectory();
+
   try {
     return fs
-      .readdirSync(POSTS_DIRECTORY, { withFileTypes: true })
+      .readdirSync(postsDirectory, { withFileTypes: true })
       .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
       .map((entry) => entry.name.replace(/\.md$/, ""))
       .sort((a, b) => a.localeCompare(b));

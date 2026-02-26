@@ -35,13 +35,20 @@ export function LearnExplorer({ modules }: LearnExplorerProps) {
 
   return (
     <>
+      <div className="hidden items-center justify-between border-b border-border-light px-4 py-2 md:flex">
+        <p className="font-mono text-[11px] text-fg-light">
+          Step 1: expand a folder. Step 2: select a file.
+        </p>
+        <span className="font-mono text-[11px] text-fg-muted">{selectedFile}</span>
+      </div>
+
       {/* Mobile: toggle button for file tree */}
       <div className="flex items-center justify-between border-b border-border-light px-4 py-2 md:hidden">
         <button
           onClick={() => setMobileTreeOpen(!mobileTreeOpen)}
           className="font-mono text-[11px] text-fg-muted"
         >
-          {mobileTreeOpen ? "▼ hide files" : "▶ browse files"}
+          {mobileTreeOpen ? "▼ hide files" : "▶ step 1: browse files"}
         </button>
         <span className="font-mono text-[11px] text-fg-light">
           {selectedFile}

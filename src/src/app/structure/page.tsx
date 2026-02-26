@@ -3,6 +3,8 @@ export const metadata = {
   description: 'Understanding the architecture of blakethomson.com'
 };
 
+import Link from "next/link";
+
 export default function StructurePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -329,12 +331,12 @@ export default function StructurePage() {
 
         {/* Footer Nav */}
         <div className="mt-12 flex justify-between items-center text-sm">
-          <a href="/" className="text-blue-600 hover:text-blue-700">
+          <Link href="/" className="text-blue-600 hover:text-blue-700">
             ← Back to Home
-          </a>
-          <a href="/learn" className="text-blue-600 hover:text-blue-700">
+          </Link>
+          <Link href="/learn" className="text-blue-600 hover:text-blue-700">
             Explore Learn Section →
-          </a>
+          </Link>
         </div>
       </div>
     </div>

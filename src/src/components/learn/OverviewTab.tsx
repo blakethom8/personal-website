@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { MatrixTerminal } from "./MatrixTerminal";
 
 interface OverviewTabProps {
@@ -9,15 +10,15 @@ interface OverviewTabProps {
 const sections = [
   {
     tab: "guides",
-    title: "Guides",
+    title: "Guided Simulator",
     detail: "4 scenarios",
-    description: "Watch LLM conversations unfold in real-time",
+    description: "Watch LLM conversations and API traces unfold step-by-step.",
   },
   {
     tab: "modules",
-    title: "Modules",
+    title: "Module Files",
     detail: "6 modules",
-    description: "Structured lessons with real JSON examples",
+    description: "Browse the source files that power each learning module.",
   },
   {
     tab: "deep dives",
@@ -33,17 +34,38 @@ export function OverviewTab({ onNavigateTab }: OverviewTabProps) {
       {/* Terminal block */}
       <MatrixTerminal />
 
-      {/* Welcome text */}
-      <div className="px-5 py-5">
-        <p className="font-mono text-[13px] leading-relaxed text-fg-muted">
-          <span className="text-fg">welcome to the learning lab.</span>
-          <br /><br />
-          I build interactive learning materials for people who want to
-          understand AI — not just use it. Whether you&apos;re technical or not,
-          everything here is hands-on and explorable.
-          <br /><br />
-          Feedback is always welcome — this is a work in progress.
+      {/* Quick orientation */}
+      <div className="border-b border-border-light bg-bg-panel-hover px-5 py-4">
+        <p className="font-mono text-[11px] uppercase tracking-wider text-fg-light">
+          Start Here
         </p>
+        <ol className="mt-2 space-y-1 text-[13px] leading-relaxed text-fg-muted">
+          <li>1. Open <span className="font-medium text-fg">Guided Simulator</span> for a quick, hands-on walkthrough.</li>
+          <li>2. Use <span className="font-medium text-fg">Module Files</span> to inspect structured JSON and markdown examples.</li>
+          <li>3. Jump to <span className="font-medium text-fg">WebMCP Lab</span> for browser-agent tooling demos.</li>
+        </ol>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => onNavigateTab("guides")}
+            className="rounded bg-accent px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-white transition-colors hover:bg-accent-hover"
+          >
+            Start Guided Simulator
+          </button>
+          <button
+            type="button"
+            onClick={() => onNavigateTab("modules")}
+            className="rounded border border-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-fg-muted transition-colors hover:border-accent hover:text-accent"
+          >
+            Browse Module Files
+          </button>
+          <Link
+            href="/learn/webmcp-lab"
+            className="rounded border border-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-fg-muted transition-colors hover:border-accent hover:text-accent"
+          >
+            Open WebMCP Lab
+          </Link>
+        </div>
       </div>
 
       {/* Section links */}

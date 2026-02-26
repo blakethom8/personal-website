@@ -1,6 +1,6 @@
 "use client";
 
-import type { LearnModule, ModuleFile } from "@/lib/learn-modules";
+import type { LearnModule } from "@/lib/learn-modules";
 import { rootReadme } from "@/lib/learn-modules";
 import { JsonBlock } from "./JsonBlock";
 
@@ -61,8 +61,8 @@ export function FileViewer({ selectedFile, modules }: FileViewerProps) {
           <MarkdownContent content={file.content} />
           {mod.available && (
             <div className="mt-4 border-t border-border-light pt-4">
-              <span className="font-mono text-[12px] text-accent">
-                open module →
+              <span className="font-mono text-[11px] uppercase tracking-wider text-fg-light">
+                Module route coming soon — use this file explorer for now.
               </span>
             </div>
           )}

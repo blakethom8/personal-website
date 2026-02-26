@@ -1,10 +1,10 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
 
 // In Next.js build, process.cwd() is the project root (where package.json is)
 // So we need to go up one level to get to personal-website root, then into content/posts
-const postsDirectory = path.join(process.cwd(), '../content/posts');
+const postsDirectory = path.join(process.cwd(), "../content/posts");
 
 export interface Post {
   slug: string;
@@ -27,13 +27,25 @@ export interface PostMetadata {
   category: string;
   featured: boolean;
   tags?: string[];
+  podcast?: string;
 }
 
-function formatDate(date: any): string {
-  if (!date) return '';
-  if (typeof date === 'string') return date;
+function formatDate(date: unknown): string {
+  if (!date) return "";
+  if (typeof date === "string") return date;
+  if (typeof date === "number") {
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
   if (date instanceof Date) {
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   }
   return String(date);
 }
@@ -41,22 +53,23 @@ function formatDate(date: any): string {
 export function getAllPosts(): PostMetadata[] {
   const fileNames = fs.readdirSync(postsDirectory);
   const allPostsData = fileNames
-    .filter((fileName) => fileName.endsWith('.md'))
+    .filter((fileName) => fileName.endsWith(".md"))
     .map((fileName) => {
-      const slug = fileName.replace(/\.md$/, '');
+      const slug = fileName.replace(/\.md$/, "");
       const fullPath = path.join(postsDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
+      const fileContents = fs.readFileSync(fullPath, "utf8");
       const { data } = matter(fileContents);
 
       return {
         slug,
-        title: data.title || 'Untitled',
+        title: data.title || "Untitled",
         date: formatDate(data.date),
-        excerpt: data.excerpt || data.summary || '',
-        readTime: data.readTime || '5 min',
-        category: data.category || 'technology',
+        excerpt: data.excerpt || data.summary || "",
+        readTime: data.readTime || "5 min",
+        category: data.category || "technology",
         featured: data.featured || false,
         tags: data.tags || [],
+        podcast: data.podcast || undefined,
       };
     });
 
@@ -71,16 +84,16 @@ export function getAllPosts(): PostMetadata[] {
 export function getPostBySlug(slug: string): Post | null {
   try {
     const fullPath = path.join(postsDirectory, `${slug}.md`);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const fileContents = fs.readFileSync(fullPath, "utf8");
     const { data, content } = matter(fileContents);
 
     return {
       slug,
-      title: data.title || 'Untitled',
+      title: data.title || "Untitled",
       date: formatDate(data.date),
-      excerpt: data.excerpt || data.summary || '',
-      readTime: data.readTime || '5 min',
-      category: data.category || 'technology',
+      excerpt: data.excerpt || data.summary || "",
+      readTime: data.readTime || "5 min",
+      category: data.category || "technology",
       featured: data.featured || false,
       tags: data.tags || [],
       content,
@@ -94,6 +107,6 @@ export function getPostBySlug(slug: string): Post | null {
 export function getAllPostSlugs(): string[] {
   const fileNames = fs.readdirSync(postsDirectory);
   return fileNames
-    .filter((fileName) => fileName.endsWith('.md'))
-    .map((fileName) => fileName.replace(/\.md$/, ''));
+    .filter((fileName) => fileName.endsWith(".md"))
+    .map((fileName) => fileName.replace(/\.md$/, ""));
 }

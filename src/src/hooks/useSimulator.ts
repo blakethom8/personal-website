@@ -85,10 +85,12 @@ export function useSimulator(scenario: Scenario) {
   // the cleanup to cancel the advancement timer when loading kicks in.
   useEffect(() => {
     if (state.playback === "playing") {
+      // This effect intentionally schedules timer-driven state transitions
+      // for simulator playback progression.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       scheduleNext(state.currentStep);
     }
     return clearTimers;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.currentStep, state.playback, scheduleNext, clearTimers]);
 
   const play = useCallback(() => {
@@ -150,6 +152,8 @@ export function useSimulator(scenario: Scenario) {
   // Reset when scenario changes
   useEffect(() => {
     clearTimers();
+    // Resetting simulator state on scenario swap is intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState({ currentStep: 0, playback: "idle", visibleSteps: 0, isLoading: false });
   }, [scenario.id, clearTimers]);
 

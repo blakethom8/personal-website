@@ -15,6 +15,28 @@ const matrixMessages = [
   "Knock, knock, Neo.",
 ];
 
+// ASCII art of a neural network / AI system
+const asciiArt = [
+  "        ╔═══════════════════════════════════════╗",
+  "        ║   NEURAL NETWORK INITIALIZED          ║",
+  "        ╚═══════════════════════════════════════╝",
+  "",
+  "           ○────────────────────────○",
+  "          ╱│╲                      ╱│╲",
+  "         ○ ○ ○                    ○ ○ ○",
+  "        ╱│╲│╱│╲                  ╱│╲│╱│╲",
+  "       ○ ○ ○ ○ ○                ○ ○ ○ ○ ○",
+  "        ╲│╱│╲│╱                  ╲│╱│╲│╱",
+  "         ○ ○ ○                    ○ ○ ○",
+  "          ╲│╱                      ╲│╱",
+  "           ○                        ○",
+  "",
+  "        INPUT LAYER    →    OUTPUT LAYER",
+  "",
+  "     [ TRAINING: COMPLETE ]  [ MODEL: CLAUDE ]",
+  "     [ PARAMETERS: 175B+ ]   [ STATUS: READY ]",
+];
+
 // Matrix characters for the rain effect
 const matrixChars =
   "ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -26,13 +48,15 @@ interface Column {
   length: number;
 }
 
+type Phase = "messages" | "ascii" | "rain";
+
 export function MatrixTerminal() {
   const [completedLines, setCompletedLines] = useState<string[]>([]);
   const [currentText, setCurrentText] = useState("");
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [isDone, setIsDone] = useState(false);
+  const [phase, setPhase] = useState<Phase>("messages");
   const [showCursor, setShowCursor] = useState(true);
-  const [showRain, setShowRain] = useState(false);
+  const [asciiRevealed, setAsciiRevealed] = useState<string[]>([]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -51,16 +75,17 @@ export function MatrixTerminal() {
     }
   }, []);
 
-  // Typewriter effect for Matrix messages
+  // Phase 1: Typewriter effect for Matrix messages
   useEffect(() => {
+    if (phase !== "messages") return;
+
     if (hasCompletedOnce) {
       setCompletedLines(matrixMessages);
       setCurrentText("");
       setCurrentIdx(matrixMessages.length);
-      setIsDone(true);
       setShowCursor(false);
-      // Start rain immediately if already seen
-      setTimeout(() => setShowRain(true), 500);
+      // Skip straight to rain if already seen
+      setTimeout(() => setPhase("rain"), 500);
       return;
     }
 
@@ -70,31 +95,27 @@ export function MatrixTerminal() {
 
     if (prefersReducedMotion) {
       setCompletedLines(matrixMessages);
-      setIsDone(true);
       setShowCursor(false);
       hasCompletedOnce = true;
-      setTimeout(() => setShowRain(true), 500);
+      setTimeout(() => setPhase("rain"), 500);
       return;
     }
 
     setCompletedLines([]);
     setCurrentText("");
     setCurrentIdx(0);
-    setIsDone(false);
     setShowCursor(true);
 
     let lineIdx = 0;
     let charIdx = 0;
-    const speed = 35; // Slightly slower for dramatic effect
-    const lineDelay = 800; // Longer pauses between lines
+    const speed = 35;
+    const lineDelay = 800;
 
     const typeLine = () => {
       if (lineIdx >= matrixMessages.length) {
-        setIsDone(true);
         setShowCursor(false);
-        hasCompletedOnce = true;
-        // Wait 2 seconds before starting the rain
-        setTimeout(() => setShowRain(true), 2000);
+        // Move to ASCII art phase
+        setTimeout(() => setPhase("ascii"), 1500);
         return;
       }
 
@@ -112,11 +133,8 @@ export function MatrixTerminal() {
           charIdx = 0;
 
           if (lineIdx >= matrixMessages.length) {
-            setIsDone(true);
             setShowCursor(false);
-            hasCompletedOnce = true;
-            // Wait 2 seconds before starting the rain
-            setTimeout(() => setShowRain(true), 2000);
+            setTimeout(() => setPhase("ascii"), 1500);
           } else {
             timeoutRef.current = setTimeout(typeLine, lineDelay);
           }
@@ -129,17 +147,79 @@ export function MatrixTerminal() {
     timeoutRef.current = setTimeout(typeLine, 1000);
 
     return clearTimers;
-  }, [clearTimers]);
+  }, [clearTimers, phase]);
 
-  // Matrix rain effect
+  // Phase 2: ASCII art Matrix-style reveal
   useEffect(() => {
-    if (!showRain || !canvasRef.current) return;
+    if (phase !== "ascii") return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      setAsciiRevealed(asciiArt);
+      hasCompletedOnce = true;
+      setTimeout(() => setPhase("rain"), 1000);
+      return;
+    }
+
+    // Build character map for random reveal
+    const charMap: Array<{ lineIdx: number; charIdx: number; char: string }> =
+      [];
+    asciiArt.forEach((line, lineIdx) => {
+      for (let charIdx = 0; charIdx < line.length; charIdx++) {
+        const char = line[charIdx];
+        if (char !== " ") {
+          charMap.push({ lineIdx, charIdx, char });
+        }
+      }
+    });
+
+    // Shuffle for random reveal
+    const shuffled = charMap.sort(() => Math.random() - 0.5);
+
+    // Initialize with spaces
+    const revealed: string[] = asciiArt.map((line) => " ".repeat(line.length));
+    setAsciiRevealed([...revealed]);
+
+    let revealIdx = 0;
+    const revealSpeed = 15; // ms per character
+
+    intervalRef.current = setInterval(() => {
+      if (revealIdx >= shuffled.length) {
+        clearTimers();
+        hasCompletedOnce = true;
+        // Hold for a moment, then transition to rain
+        setTimeout(() => setPhase("rain"), 2000);
+        return;
+      }
+
+      // Reveal next batch of characters (reveal multiple at once for speed)
+      const batchSize = 5;
+      for (let i = 0; i < batchSize && revealIdx < shuffled.length; i++) {
+        const { lineIdx, charIdx, char } = shuffled[revealIdx];
+        revealed[lineIdx] =
+          revealed[lineIdx].substring(0, charIdx) +
+          char +
+          revealed[lineIdx].substring(charIdx + 1);
+        revealIdx++;
+      }
+
+      setAsciiRevealed([...revealed]);
+    }, revealSpeed);
+
+    return clearTimers;
+  }, [clearTimers, phase]);
+
+  // Phase 3: Matrix rain effect
+  useEffect(() => {
+    if (phase !== "rain" || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas size
     const resizeCanvas = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
@@ -165,24 +245,20 @@ export function MatrixTerminal() {
       const deltaTime = currentTime - lastTime;
       lastTime = currentTime;
 
-      // Semi-transparent black to create trail effect
       ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.font = "15px monospace";
 
       columnsRef.current.forEach((column) => {
-        // Draw characters in the column
         for (let i = 0; i < column.length; i++) {
           const y = column.y + i * 20;
           if (y < 0 || y > canvas.height) continue;
 
-          // Brighter at the head, dimmer at the tail
           const opacity = i === 0 ? 1 : 1 - i / column.length;
           const char =
             matrixChars[Math.floor(Math.random() * matrixChars.length)];
 
-          // Bright green (#00FF41) for the head, dimmer green for the tail
           if (i === 0) {
             ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
           } else {
@@ -192,10 +268,8 @@ export function MatrixTerminal() {
           ctx.fillText(char, column.x, y);
         }
 
-        // Move column down
         column.y += column.speed * (deltaTime / 16);
 
-        // Reset column when it goes off screen
         if (column.y - column.length * 20 > canvas.height) {
           column.y = Math.random() * -200;
           column.speed = 0.5 + Math.random() * 1.5;
@@ -214,7 +288,7 @@ export function MatrixTerminal() {
         cancelAnimationFrame(rainAnimationRef.current);
       }
     };
-  }, [showRain]);
+  }, [phase]);
 
   return (
     <div className="relative overflow-hidden border-b border-[#003300] bg-black text-[#00FF41]">
@@ -230,38 +304,54 @@ export function MatrixTerminal() {
         </span>
       </div>
 
-      {/* Matrix rain canvas (background) */}
-      {showRain && (
+      {/* Matrix rain canvas (background for rain phase) */}
+      {phase === "rain" && (
         <canvas
           ref={canvasRef}
           className="absolute inset-0 h-full w-full"
-          style={{ opacity: showRain ? 0.9 : 0 }}
+          style={{ opacity: 0.9 }}
         />
       )}
 
-      {/* Typewriter content (foreground when not raining) */}
+      {/* Content area */}
       <div
         className={`relative z-10 px-4 py-3 font-mono text-[13px] leading-[1.7] transition-opacity duration-1000 ${
-          showRain ? "opacity-0" : "opacity-100"
+          phase === "rain" ? "opacity-0" : "opacity-100"
         }`}
       >
-        {completedLines.map((text, i) => (
-          <div key={i} className="min-h-[1.7em]">
-            {text || "\u00A0"}
-          </div>
-        ))}
-        {!isDone && currentIdx < matrixMessages.length && (
-          <div className="min-h-[1.7em]">
-            {currentText}
-            {showCursor && (
-              <span className="animate-pulse text-[#00FF41]">▎</span>
+        {/* Phase 1: Matrix messages */}
+        {phase === "messages" && (
+          <>
+            {completedLines.map((text, i) => (
+              <div key={i} className="min-h-[1.7em]">
+                {text || "\u00A0"}
+              </div>
+            ))}
+            {currentIdx < matrixMessages.length && (
+              <div className="min-h-[1.7em]">
+                {currentText}
+                {showCursor && (
+                  <span className="animate-pulse text-[#00FF41]">▎</span>
+                )}
+              </div>
             )}
+          </>
+        )}
+
+        {/* Phase 2: ASCII art reveal */}
+        {phase === "ascii" && (
+          <div className="text-center">
+            {asciiRevealed.map((line, i) => (
+              <div key={i} className="min-h-[1.7em]">
+                {line || "\u00A0"}
+              </div>
+            ))}
           </div>
         )}
       </div>
 
       {/* Minimum height when showing rain */}
-      {showRain && <div className="h-[240px]" />}
+      {phase === "rain" && <div className="h-[300px]" />}
     </div>
   );
 }

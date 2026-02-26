@@ -1,7 +1,7 @@
 // OpenClaw Terminal Simulator Scenarios
 // These scenarios show real OpenClaw workflows in action
 
-import { Scenario, ConversationStep, ChatMessage, ApiBlock } from './conversation-scenarios';
+import { Scenario } from "./conversation-scenarios";
 
 // ─── Scenario 1: File Navigator ───
 

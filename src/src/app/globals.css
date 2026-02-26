@@ -675,25 +675,6 @@ footer {
   flex: 0 0 50%;
 }
 
-/* Categories sidebar within main area */
-.ideas-sidebar {
-  width: 100%;
-  transition: opacity 600ms ease,
-              max-height 850ms cubic-bezier(0.22, 0.61, 0.36, 1),
-              margin 850ms cubic-bezier(0.22, 0.61, 0.36, 1),
-              padding 850ms cubic-bezier(0.22, 0.61, 0.36, 1);
-  overflow: hidden;
-}
-
-.ideas-sidebar[data-hidden="true"] {
-  opacity: 0;
-  max-height: 0;
-  margin: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  border-color: transparent;
-}
-
 /* Detail pane — slides in from the right */
 .ideas-pane {
   flex: 0 0 0px;
@@ -724,25 +705,6 @@ footer {
 
 @keyframes ideas-spin {
   to { transform: rotate(360deg); }
-}
-
-/* Desktop: side-by-side layout */
-@media (min-width: 768px) {
-  .ideas-main {
-    flex-direction: row;
-  }
-
-  .ideas-sidebar {
-    width: 180px;
-    flex-shrink: 0;
-  }
-
-  .ideas-sidebar[data-hidden="true"] {
-    width: 0;
-    max-height: none;
-    padding-left: 0;
-    padding-right: 0;
-  }
 }
 
 /* Mobile: pane takes full width */
