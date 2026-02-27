@@ -1,7 +1,7 @@
 ---
 title: "Entity Resolution in Healthcare: The Matching Problem"
 date: 2026-02-26
-category: healthcare-and-data
+category: "llms-healthcare"
 tags: [healthcare, data-engineering, entity-resolution, matching, LLM]
 summary: "How do you know that 'Dr. Jane Smith' in CMS data, 'Jane A. Smith MD' on Google, and 'Smith, Jane' on a practice website are the same person? This is the matching problem—and solving it unlocks massive value in healthcare data."
 status: draft

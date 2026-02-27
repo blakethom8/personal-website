@@ -5,7 +5,7 @@ tags: ["the-terminal-and-the-agent", "openclaw"]
 excerpt: "The most powerful AI agent I've used isn't a chatbot, a copilot, or an app. It's a terminal session with tools. Here's how OpenClaw works under the hood — and why 'bash is all you need' isn't a joke."
 readTime: "15 min"
 featured: false
-category: "the-terminal-and-the-agent"
+category: "agent-interoperability"
 ---
 
 # OpenClaw Deep Dive: What Happens When Your Terminal Gets a Brain

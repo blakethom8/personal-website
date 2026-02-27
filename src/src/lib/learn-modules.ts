@@ -264,7 +264,7 @@ Coming soon.`,
       "The agent loop — think, use a tool, observe, repeat. How MCP and function calling let AI interact with the world.",
     duration: "12 min",
     difficulty: "Intermediate",
-    available: false,
+    available: true,
     files: [
       {
         name: "README",
@@ -273,12 +273,133 @@ Coming soon.`,
         content: `## Agents: AI That Takes Action
 
 The agent loop — think, use a tool, observe, repeat.
-How MCP and function calling let AI interact with
-the world.
+How function calling lets AI interact with the world.
 
 Duration: 12 min | Difficulty: Intermediate
 
-Coming soon.`,
+You'll learn:
+• What makes an agent different from a chatbot
+• The think → act → observe loop
+• How tools give LLMs "claws"
+• Why "bash is all you need"
+• The full production stack end-to-end`,
+      },
+      {
+        name: "tool-definition",
+        extension: ".json",
+        type: "json",
+        content: `{
+  "model": "claude-sonnet-4-20250514",
+  "max_tokens": 1024,
+  "tools": [
+    {
+      "name": "search_providers",
+      "description": "Search for healthcare providers by specialty and location",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "specialty": {
+            "type": "string",
+            "description": "Medical specialty (e.g. dentist, cardiologist)"
+          },
+          "location": {
+            "type": "string",
+            "description": "City or zip code"
+          },
+          "insurance": {
+            "type": "string",
+            "description": "Insurance provider name"
+          }
+        },
+        "required": ["specialty", "location"]
+      }
+    }
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": "Find me a dentist near Portland that accepts Blue Cross"
+    }
+  ]
+}`,
+        annotation: "This is a real API request with a tool definition. The model doesn't search a database — it reads the tool description and decides whether to call it. The 'input_schema' tells it what parameters are valid.",
+        highlightLines: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
+      },
+      {
+        name: "tool-call",
+        extension: ".json",
+        type: "json",
+        content: `// The model's response — it chose to call the tool:
+
+{
+  "role": "assistant",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_01A",
+      "name": "search_providers",
+      "input": {
+        "specialty": "dentist",
+        "location": "Portland, OR",
+        "insurance": "Blue Cross"
+      }
+    }
+  ],
+  "stop_reason": "tool_use"
+}
+
+// The harness runs the search, then sends results back:
+
+{
+  "role": "tool",
+  "tool_use_id": "toolu_01A",
+  "content": [
+    {
+      "type": "text",
+      "text": "Found 8 dentists. Top 3: Dr. Smith (4.9★, Pearl District), Dr. Lee (4.8★, SE Portland), Dr. Patel (4.7★, Lake Oswego)"
+    }
+  ]
+}
+
+// The model sees the results and writes a human response.`,
+        annotation: "Notice stop_reason is 'tool_use' — the model paused to ask for data. The harness executed the real search, fed results back, and the model composed a natural language answer. This is the agent loop: think → act → observe → respond.",
+      },
+      {
+        name: "agent-loop",
+        extension: ".json",
+        type: "json",
+        content: `// The Agent Loop — pseudocode for any AI agent:
+
+while (true) {
+  // 1. THINK — send everything to the LLM
+  response = llm.call(
+    system_prompt,
+    conversation_history,
+    available_tools
+  );
+
+  // 2. CHECK — did the model want to use a tool?
+  if (response.stop_reason === "end_turn") {
+    // No tool call — model is done, send reply to user
+    return response.text;
+  }
+
+  // 3. ACT — execute the tool
+  tool_name = response.tool_call.name;
+  tool_input = response.tool_call.input;
+  result = execute_tool(tool_name, tool_input);
+
+  // 4. OBSERVE — add result to history and loop back
+  conversation_history.push(response);
+  conversation_history.push(tool_result(result));
+
+  // Loop continues — model sees the result and decides
+  // whether to call another tool or respond to the user
+}
+
+// That's the whole thing. Every AI agent — ChatGPT,
+// Claude, Copilot, custom bots — runs this loop.`,
+        annotation: "This is the core of every AI agent. The while loop continues until the model decides it has enough information. Some requests need 0 tool calls (just chat). Others need 5+ (complex research). The harness controls what tools exist and whether to allow each call.",
       },
     ],
   },

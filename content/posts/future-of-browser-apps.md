@@ -5,7 +5,7 @@ tags: ["technology", "webmcp", "ai", "building"]
 excerpt: "I gave an AI agent access to my web app. Then I rebuilt the app to actually talk back. Here's what happened — and why every web developer should be paying attention."
 readTime: "14 min"
 featured: true
-category: "technology"
+category: "agent-interoperability"
 ---
 
 # The Future of Browser Applications: Building for the Agent That's Already Here

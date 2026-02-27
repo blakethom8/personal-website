@@ -23,9 +23,13 @@ export default function Home() {
             <br />
             <span className="text-accent">I wish existed.</span>
           </h1>
-          <p className="mt-3 max-w-lg text-fg-muted">
-            Personal blog, project notes, and interactive experiments from a
-            healthcare data nerd in Santa Monica.
+          <p className="mt-3 max-w-[750px] text-fg-muted">
+            This website is a collective domain of my experience building with
+            AI. The world of agents is moving fast, honestly too fast. This is
+            my attempt to keep-up, demystify LLMs, and capture topics that me
+            and Local Chief are exploring. As overwhelming as it is, the world
+            of computers is surprisingly simple. Humans are way more
+            interesting and complex.
           </p>
         </Panel>
 
@@ -48,10 +52,10 @@ export default function Home() {
                 <span className="text-fg-light"> — writing</span>
               </DirectoryItem>
               <div className="ml-7 border-l border-border-light pl-3 text-fg-light">
-                <DirectoryItem href="/ideas" label="bespoke-ai-model" indent={0} muted />
-                <DirectoryItem href="/ideas" label="webmcp-overview" indent={0} muted />
-                <DirectoryItem href="/ideas" label="entity-resolution" indent={0} muted />
-                <DirectoryItem href="/ideas" label="old-model-new-model" indent={0} muted />
+                <DirectoryItem href="/ideas/bespoke-ai-model" label="bespoke-ai-model" indent={0} muted />
+                <DirectoryItem href="/ideas/webmcp-overview" label="webmcp-overview" indent={0} muted />
+                <DirectoryItem href="/ideas/entity-resolution-healthcare" label="entity-resolution" indent={0} muted />
+                <DirectoryItem href="/ideas/ai-is-the-glue" label="old-model-new-model" indent={0} muted />
               </div>
               <DirectoryItem href="/learn" label="learn" indent={1}>
                 <span className="text-fg-light"> — modules</span>
@@ -81,24 +85,28 @@ export default function Home() {
                   category="business"
                   readTime="10 min"
                   date="Feb 25"
+                  href="/ideas/bespoke-ai-model"
                 />
                 <PostRow
                   title="WebMCP: Making Websites AI-Native"
                   category="technology"
                   readTime="8 min"
                   date="Feb 20"
+                  href="/ideas/webmcp-overview"
                 />
                 <PostRow
                   title="Entity Resolution in Healthcare"
                   category="healthcare"
                   readTime="12 min"
                   date="Feb 15"
+                  href="/ideas/entity-resolution-healthcare"
                 />
                 <PostRow
                   title="Old Model vs. New Model"
                   category="business"
                   readTime="6 min"
                   date="Feb 10"
+                  href="/ideas/ai-is-the-glue"
                 />
               </div>
             </section>
@@ -181,15 +189,17 @@ function PostRow({
   category,
   readTime,
   date,
+  href = "/ideas",
 }: {
   title: string;
   category: string;
   readTime: string;
   date: string;
+  href?: string;
 }) {
   return (
     <Link
-      href="/ideas"
+      href={href}
       className="flex flex-col gap-0.5 py-2.5 no-underline hover:no-underline sm:flex-row sm:items-center sm:justify-between"
     >
       <span className="text-[13px] text-fg hover:text-accent">{title}</span>

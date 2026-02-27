@@ -2,16 +2,185 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTheme } from "./ThemeProvider";
 
-const links = [
+interface NavChild {
+  href: string;
+  label: string;
+}
+
+interface NavLink {
+  href: string;
+  label: string;
+  children?: NavChild[];
+}
+
+const links: NavLink[] = [
   { href: "/about", label: "about" },
-  { href: "/work", label: "work" },
-  { href: "/ideas", label: "ideas" },
-  { href: "/learn", label: "learn" },
+  {
+    href: "/work",
+    label: "work",
+    children: [
+      { href: "/work", label: "overview" },
+      { href: "/work/framework", label: "business framework" },
+    ],
+  },
+  {
+    href: "/ideas",
+    label: "ideas",
+    children: [
+      { href: "/ideas", label: "all topics" },
+      { href: "/ideas/agent-interoperability", label: "agent interoperability" },
+      { href: "/ideas/rethinking-saas", label: "rethinking SaaS" },
+      { href: "/ideas/building", label: "things i'm building" },
+      { href: "/ideas/llms-healthcare", label: "LLMs & healthcare" },
+      { href: "/ideas/shower-ideas", label: "shower ideas" },
+      { href: "/ideas/in-my-feed", label: "in my feed" },
+    ],
+  },
+  {
+    href: "/learn",
+    label: "learn",
+    children: [
+      { href: "/learn", label: "all modules" },
+      { href: "/learn/agents-explained", label: "agents: 5-step guide" },
+      { href: "/learn/simulator", label: "conversation simulator" },
+      { href: "/learn/webmcp-lab", label: "WebMCP lab" },
+    ],
+  },
   { href: "/contact", label: "contact" },
 ];
+
+function DesktopDropdown({
+  link,
+  pathname,
+}: {
+  link: NavLink;
+  pathname: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const timeout = useRef<ReturnType<typeof setTimeout>>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const isActive =
+    pathname === link.href || pathname.startsWith(link.href + "/");
+
+  const handleEnter = () => {
+    if (timeout.current) clearTimeout(timeout.current);
+    setOpen(true);
+  };
+
+  const handleLeave = () => {
+    timeout.current = setTimeout(() => setOpen(false), 150);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeout.current) clearTimeout(timeout.current);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="relative"
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      <Link
+        href={link.href}
+        className={`rounded px-2.5 py-1 font-mono text-[13px] no-underline transition-colors hover:bg-bg-panel-hover hover:text-accent ${
+          isActive ? "text-accent" : "text-fg-muted"
+        }`}
+      >
+        /{link.label}
+      </Link>
+
+      {open && link.children && (
+        <div className="absolute left-0 top-full z-50 pt-1.5">
+          <div className="panel min-w-[200px] overflow-hidden rounded border border-border-light py-1 shadow-lg">
+            {link.children.map((child) => (
+              <Link
+                key={child.href}
+                href={child.href}
+                onClick={() => setOpen(false)}
+                className={`block px-4 py-2 font-mono text-[12px] no-underline transition-colors hover:bg-bg-panel-hover hover:text-accent ${
+                  pathname === child.href ? "text-accent" : "text-fg-muted"
+                }`}
+              >
+                {child.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileNavItem({
+  link,
+  pathname,
+  onClose,
+}: {
+  link: NavLink;
+  pathname: string;
+  onClose: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const isActive =
+    pathname === link.href || pathname.startsWith(link.href + "/");
+
+  if (!link.children) {
+    return (
+      <Link
+        href={link.href}
+        onClick={onClose}
+        className={`font-mono text-xl no-underline transition-colors ${
+          isActive ? "text-accent" : "text-fg-muted"
+        }`}
+      >
+        /{link.label}
+      </Link>
+    );
+  }
+
+  return (
+    <div>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className={`flex items-center gap-2 font-mono text-xl transition-colors ${
+          isActive ? "text-accent" : "text-fg-muted"
+        }`}
+      >
+        /{link.label}
+        <span className="text-[14px] text-fg-light">
+          {expanded ? "▾" : "▸"}
+        </span>
+      </button>
+
+      {expanded && (
+        <div className="mt-2 ml-4 flex flex-col gap-2 border-l border-border-light pl-4">
+          {link.children.map((child) => (
+            <Link
+              key={child.href}
+              href={child.href}
+              onClick={onClose}
+              className={`font-mono text-[14px] no-underline transition-colors ${
+                pathname === child.href
+                  ? "text-accent"
+                  : "text-fg-light hover:text-accent"
+              }`}
+            >
+              {child.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Nav() {
   const pathname = usePathname();
@@ -31,19 +200,25 @@ export function Nav() {
 
           {/* Desktop links */}
           <div className="hidden items-center gap-1 md:flex">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`rounded px-2.5 py-1 font-mono text-[13px] no-underline transition-colors hover:bg-bg-panel-hover hover:text-accent ${
-                  pathname === link.href
-                    ? "text-accent"
-                    : "text-fg-muted"
-                }`}
-              >
-                /{link.label}
-              </Link>
-            ))}
+            {links.map((link) =>
+              link.children ? (
+                <DesktopDropdown
+                  key={link.href}
+                  link={link}
+                  pathname={pathname}
+                />
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`rounded px-2.5 py-1 font-mono text-[13px] no-underline transition-colors hover:bg-bg-panel-hover hover:text-accent ${
+                    pathname === link.href ? "text-accent" : "text-fg-muted"
+                  }`}
+                >
+                  /{link.label}
+                </Link>
+              )
+            )}
             <button
               onClick={toggle}
               aria-label="Toggle dark mode"
@@ -85,16 +260,12 @@ export function Nav() {
           </div>
           <div className="flex flex-1 flex-col items-start justify-center gap-3 px-10">
             {links.map((link) => (
-              <Link
+              <MobileNavItem
                 key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={`font-mono text-xl no-underline transition-colors ${
-                  pathname === link.href ? "text-accent" : "text-fg-muted"
-                }`}
-              >
-                /{link.label}
-              </Link>
+                link={link}
+                pathname={pathname}
+                onClose={() => setMobileOpen(false)}
+              />
             ))}
             <button
               onClick={toggle}

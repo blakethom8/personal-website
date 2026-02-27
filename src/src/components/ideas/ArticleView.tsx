@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import type { Heading } from "@/lib/headings";
+import type { Category } from "@/lib/categories";
 
 interface ArticlePost {
   slug: string;
@@ -18,9 +19,10 @@ interface ArticleViewProps {
   post: ArticlePost;
   contentHtml: string;
   headings: Heading[];
+  parentCategory?: Category;
 }
 
-export function ArticleView({ post, contentHtml, headings }: ArticleViewProps) {
+export function ArticleView({ post, contentHtml, headings, parentCategory }: ArticleViewProps) {
   const [paneOpen, setPaneOpen] = useState(false);
 
   const togglePane = useCallback(() => {
@@ -29,17 +31,35 @@ export function ArticleView({ post, contentHtml, headings }: ArticleViewProps) {
 
   return (
     <div className="flex flex-col gap-4 pb-5 pt-5">
-      {/* Top bar: back link + pane toggle */}
+      {/* Top bar: breadcrumb + pane toggle */}
       <div
         className="article-topbar"
         data-shifted={paneOpen}
       >
-        <Link
-          href="/ideas"
-          className="inline-flex items-center gap-1 font-mono text-[11px] text-fg-light transition-colors hover:text-accent"
-        >
-          ← back to ideas
-        </Link>
+        <div className="flex items-center gap-1 font-mono text-[11px] text-fg-light">
+          <Link href="/" className="hover:text-accent transition-colors">
+            ~/blake.thomson
+          </Link>
+          <span className="text-border">/</span>
+          <Link href="/ideas" className="hover:text-accent transition-colors">
+            ideas
+          </Link>
+          {parentCategory && (
+            <>
+              <span className="text-border">/</span>
+              <Link
+                href={`/ideas/${parentCategory.id}`}
+                className="hover:text-accent transition-colors"
+              >
+                {parentCategory.shortLabel.toLowerCase().replace(/\s+/g, "-")}
+              </Link>
+            </>
+          )}
+          <span className="text-border">/</span>
+          <span className="text-fg-muted truncate max-w-[200px]">
+            {post.slug}
+          </span>
+        </div>
 
         {headings.length > 0 && (
           <button
@@ -144,9 +164,18 @@ export function ArticleView({ post, contentHtml, headings }: ArticleViewProps) {
             <div className="flex flex-col gap-3">
               <div>
                 <p className="label-mono mb-1.5">category</p>
-                <span className="rounded bg-bg-panel-hover px-2 py-1 font-mono text-[11px] capitalize text-fg-muted">
-                  {post.category}
-                </span>
+                {parentCategory ? (
+                  <Link
+                    href={`/ideas/${parentCategory.id}`}
+                    className="rounded bg-bg-panel-hover px-2 py-1 font-mono text-[11px] text-fg-muted no-underline hover:text-accent transition-colors"
+                  >
+                    {parentCategory.shortLabel}
+                  </Link>
+                ) : (
+                  <span className="rounded bg-bg-panel-hover px-2 py-1 font-mono text-[11px] capitalize text-fg-muted">
+                    {post.category}
+                  </span>
+                )}
               </div>
 
               {post.tags.length > 0 && (

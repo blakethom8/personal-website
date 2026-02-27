@@ -20,22 +20,28 @@ export default function AboutPage() {
           <h1 className="font-serif text-2xl md:text-3xl">
             The short version.
           </h1>
-          <div className="mt-4 grid gap-8 md:grid-cols-[2fr_1fr]">
-            <div className="content-body text-fg-muted">
-              <p>
-                Blake Thomson. 32. Santa Monica, CA. Master&apos;s in Biomedical
-                Engineering. Currently on the Business Development team at
-                Cedars-Sinai Health System. Building bespoke AI solutions for
-                healthcare organizations on the side. Getting married June 2026
-                in Napa Valley.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <DetailRow label="Location" value="Santa Monica, CA" />
-              <DetailRow label="Role" value="BD, Cedars-Sinai" />
-              <DetailRow label="Education" value="MS Biomedical Eng." />
-              <DetailRow label="Venture" value="OpenClaw AI" />
-            </div>
+          <div className="mt-4 content-body text-fg-muted">
+            <p>
+              Blake Thomson. 32. Santa Monica, CA. Master&apos;s in Biomedical
+              Engineering.
+            </p>
+            <p>
+              Professionally, I have aspired to be at the intersection of
+              business and science &amp; technology, leading to roles in
+              healthcare, biotechnology, and life sciences. My curiosity in
+              these spaces was heavily influenced by college lectures on
+              genomics, healthcare economics, and medical device product design. This led
+              me to experiencing the rise and fall of a Bay-Area Biotech
+              Company, cranking through PowerPoint slides as a ZS Consultant,
+              and more recently using data analytics to understand
+              Cedars-Sinai Health System.
+            </p>
+            <p>
+              When I&apos;m not trying to manage 4 Claude Code terminals +
+              OpenClaw + Codex, you can find me chasing the waves and wind,
+              walking our dog with my fianc&eacute;e, or researching the latest
+              piece of gear for purchase.
+            </p>
           </div>
         </Panel>
 
@@ -94,34 +100,27 @@ export default function AboutPage() {
         {/* Personal */}
         <Panel as="section">
           <h2 className="font-serif text-xl md:text-2xl">Beyond work.</h2>
-          <div className="mt-4 max-w-[68ch] content-body text-fg-muted">
+          <div className="mt-4 content-body text-fg-muted">
             <p>
-              Engaged to Devon — getting married June 2026 in Napa Valley.
-              Building a custom home in Orinda (the long game). When I&apos;m not
-              working, you&apos;ll find me surfing in Santa Monica, thinking about
-              architecture, or in a deep conversation about systems — the kind
-              where you realize two hours have passed and you haven&apos;t checked
-              your phone.
+              Water is the throughline. I grew up around the Bay Area and
+              spend as much time as possible between there and Santa Monica —
+              two coastlines with very different personalities. Surfing is the
+              anchor, but I&apos;ve fallen deep into the world of foiling:
+              hydrofoils, wing foiling, downwind runs. The physics of lift
+              through water is genuinely fascinating, and the equipment design
+              rabbit hole is endless.
             </p>
             <p>
-              I care about building things that last. Whether it&apos;s a house, a
-              company, or a tool — I want it to be something I&apos;m proud of in
-              ten years.
+              I spend an embarrassing amount of time thinking about board
+              shapes, foil mast lengths, and wing aspect ratios. It sits in a
+              strange overlap with engineering — the same instinct to
+              understand why something works, then figure out how to make it
+              work better. When I&apos;m not in the water I&apos;m usually reading about
+              it, watching it, or convincing myself I need a new piece of kit.
             </p>
           </div>
         </Panel>
       </div>
     </>
-  );
-}
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between border-b border-border-light pb-2.5">
-      <span className="font-mono text-[11px] uppercase tracking-wider text-fg-light">
-        {label}
-      </span>
-      <span className="text-[13px] text-fg">{value}</span>
-    </div>
   );
 }
