@@ -8,6 +8,11 @@ import { Scenario } from "./conversation-scenarios";
 const fileNavigator: Scenario = {
   id: "openclaw-file-navigator",
   title: "openclaw: file navigator",
+  intro: {
+    label: "memory & files",
+    heading: "An Agent That Remembers Yesterday",
+    description: "This agent reads and writes files on a computer — including its own notes. Watch it retrieve yesterday's work from a markdown file, then update its long-term memory with new decisions. This is how AI assistants maintain context across sessions.",
+  },
   steps: [
     {
       chat: {
@@ -284,6 +289,11 @@ const fileNavigator: Scenario = {
 const emailCheck: Scenario = {
   id: "openclaw-email-check",
   title: "openclaw: email check",
+  intro: {
+    label: "autonomous actions",
+    heading: "An Agent That Checks Email on Its Own",
+    description: "This agent runs on a schedule — every 30 minutes, it checks for important updates and decides whether to notify you. No prompt needed. Watch it triage an inbox and draft a reply, all triggered by a background timer.",
+  },
   steps: [
     {
       chat: {
@@ -522,6 +532,11 @@ const emailCheck: Scenario = {
 const codeDeploy: Scenario = {
   id: "openclaw-code-deploy",
   title: "openclaw: code + deploy",
+  intro: {
+    label: "agent orchestration",
+    heading: "From Feature Request to Production Deploy",
+    description: "The most advanced agent pattern: receive a feature request, delegate coding to a specialized AI, review the result, then deploy to a live server. From idea to production in minutes — with a human approving the final step.",
+  },
   steps: [
     {
       chat: {

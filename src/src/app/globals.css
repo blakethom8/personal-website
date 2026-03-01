@@ -306,8 +306,8 @@ footer {
 }
 
 .sim-pane-content {
-  min-height: 300px;
-  max-height: 420px;
+  min-height: 400px;
+  max-height: 75vh;
 }
 
 /* Message styles by role */
@@ -397,6 +397,21 @@ footer {
 .sim-control-primary:hover:not(:disabled) {
   background: var(--accent);
   color: white;
+}
+
+/* Intro play button — wider variant of sim-control-primary */
+.sim-intro-play {
+  width: auto;
+  height: auto;
+  padding: 8px 20px;
+  font-size: 12px;
+  gap: 6px;
+}
+
+/* Sub-tab row for scenario groups */
+.sim-subtabs {
+  background: var(--bg-panel-hover);
+  border-bottom: 1px solid var(--border-light);
 }
 
 /* Message enter animation */
@@ -798,6 +813,597 @@ footer {
   .article-pane[data-open="true"] {
     flex: 1 1 100%;
   }
+}
+
+/* ─── Narrator Messages ─── */
+.sim-msg-narrator {
+  background: var(--accent-light);
+  border: 1px dashed var(--accent-muted);
+  border-left: 3px solid var(--accent-muted);
+}
+
+/* ─── Simulator Side Pane Layout ─── */
+.sim-layout {
+  display: flex;
+  overflow: hidden;
+}
+
+.sim-main {
+  flex: 1 1 100%;
+  min-width: 0;
+  transition: flex-basis 850ms cubic-bezier(0.22, 0.61, 0.36, 1),
+              flex-grow 850ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.sim-main[data-shifted="true"] {
+  flex: 1 1 55%;
+}
+
+.sim-pane {
+  flex: 0 0 0px;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: flex-basis 850ms cubic-bezier(0.22, 0.61, 0.36, 1),
+              opacity 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.sim-pane[data-open="true"] {
+  flex: 0 0 45%;
+  opacity: 1;
+  border-left: 1px solid var(--border-light);
+}
+
+.sim-context-pane-scroll {
+  overflow-y: auto;
+  max-height: 75vh;
+  min-height: 400px;
+}
+
+/* ─── Context Pane Content ─── */
+.sim-context-pane-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.sim-context-pane-inner {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Hero token count */
+.sim-context-hero {
+  text-align: center;
+}
+
+.sim-context-count {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.sim-context-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-light);
+  margin-top: 4px;
+}
+
+.sim-context-bar {
+  height: 4px;
+  background: var(--border-light);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.sim-context-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 600ms ease-out;
+}
+
+/* Annotation */
+.sim-context-annotation {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--fg-muted);
+  padding: 10px 12px;
+  background: var(--accent-light);
+  border-radius: 3px;
+  border-left: 3px solid var(--accent-muted);
+}
+
+/* Section list */
+.sim-context-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sim-context-sections-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-light);
+  margin-bottom: 4px;
+}
+
+/* Section rows */
+.sim-context-section-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 6px;
+  border-radius: 2px;
+  border-left: 2px solid transparent;
+}
+
+.sim-context-section-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sim-context-section-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sim-context-section-name {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-muted);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-context-section-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-light);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.sim-context-section-bar-track {
+  height: 2px;
+  background: var(--border-light);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.sim-context-section-bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  opacity: 0.5;
+  transition: width 500ms ease-out;
+}
+
+/* Diff states */
+.sim-context-section-new {
+  border-left-color: #4CAF50;
+  animation: context-section-fade-in 500ms ease both;
+}
+
+.sim-context-section-removed {
+  border-left-color: #E57373;
+  opacity: 0.35;
+}
+
+.sim-context-section-removed .sim-context-section-name {
+  text-decoration: line-through;
+}
+
+.sim-context-section-summary {
+  border-left: 2px dashed var(--accent);
+  background: var(--accent-light);
+  padding: 6px;
+  border-radius: 3px;
+}
+
+/* Removed count note */
+.sim-context-removed-note {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #E57373;
+  text-align: center;
+}
+
+/* View full context button */
+.sim-context-view-btn {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid var(--accent-muted);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  text-align: center;
+}
+
+.sim-context-view-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* Mobile: pane below main content */
+@media (max-width: 767px) {
+  .sim-layout {
+    flex-direction: column;
+  }
+
+  .sim-main[data-shifted="true"] {
+    flex: 1 1 auto;
+  }
+
+  .sim-pane[data-open="true"] {
+    flex: 0 0 auto;
+    border-left: none;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .sim-context-pane-scroll {
+    max-height: 50vh;
+    min-height: auto;
+  }
+
+  .sim-context-count {
+    font-size: 22px;
+  }
+}
+
+/* ─── Context Modal ─── */
+.context-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.5);
+  animation: context-fade-in 300ms ease both;
+}
+
+.dark .context-modal-backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.context-modal {
+  position: fixed;
+  z-index: 201;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 48px);
+  max-width: 1100px;
+  max-height: calc(100vh - 48px);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: context-modal-in 400ms ease both;
+}
+
+@keyframes context-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes context-modal-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.context-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.context-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.context-modal-stats {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-light);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.context-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.context-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.context-modal-footer {
+  border-top: 1px solid var(--border-light);
+  background: var(--accent-light);
+  padding: 10px 16px;
+  flex-shrink: 0;
+}
+
+/* View toggle */
+.context-view-toggle {
+  display: flex;
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.context-view-toggle-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  color: var(--fg-light);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.context-view-toggle-btn:not(:last-child) {
+  border-right: 1px solid var(--border-light);
+}
+
+.context-view-toggle-btn:hover {
+  background: var(--bg-panel-hover);
+  color: var(--fg-muted);
+}
+
+.context-view-toggle-btn.active {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ─── Context Annotated View ─── */
+.context-annotated {
+  padding: 16px;
+}
+
+/* Stacked token bar */
+.context-token-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--border-light);
+  margin-bottom: 16px;
+  gap: 1px;
+}
+
+.context-token-segment {
+  height: 100%;
+  opacity: 0.7;
+  transition: width 600ms ease-out;
+}
+
+.context-token-segment-summary {
+  border: 1px dashed var(--accent);
+  border-radius: 2px;
+}
+
+/* Section list */
+.context-section-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Section row */
+.context-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 3px;
+  border: none;
+  border-left: 3px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background-color 150ms ease;
+}
+
+.context-section:hover {
+  background: var(--bg-panel-hover);
+}
+
+.context-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.context-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.context-section-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.context-section-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.context-section-tokens {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.context-section-bar-track {
+  width: 80px;
+  height: 3px;
+  background: var(--border-light);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.context-section-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 500ms ease-out;
+  opacity: 0.6;
+}
+
+.context-section-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-light);
+  font-variant-numeric: tabular-nums;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Content preview */
+.context-section-content {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-light);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.context-section-content-expanded {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+/* Diff indicators */
+.context-section-new {
+  border-left-color: #4CAF50;
+  animation: context-section-fade-in 500ms ease both;
+}
+
+.context-section-removed {
+  border-left-color: #E57373;
+  opacity: 0.4;
+}
+
+.context-section-removed .context-section-content {
+  text-decoration: line-through;
+}
+
+.context-section-removed .context-section-name {
+  text-decoration: line-through;
+}
+
+.context-section-summary {
+  border-left: 3px dashed var(--accent);
+  background: var(--accent-light);
+}
+
+.context-section-summary:hover {
+  background: var(--accent-light);
+}
+
+@keyframes context-section-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ─── Context Modal Mobile ─── */
+@media (max-width: 767px) {
+  .context-modal {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    border: none;
+    top: 0;
+    left: 0;
+    transform: none;
+  }
+
+  @keyframes context-modal-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .context-modal-header {
+    flex-wrap: wrap;
+  }
+
+  .context-section-bar-track {
+    width: 50px;
+  }
+
 }
 
 /* ─── Reduce motion ─── */

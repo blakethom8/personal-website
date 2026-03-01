@@ -11,11 +11,12 @@ export const metadata: Metadata = {
 };
 
 const STEPS = [
-  "The Message Format (JSON)",
-  "The Agent Loop",
-  "Tools & Function Calling",
-  "Memory & Context",
-  "The Harness",
+  "The Big Picture",
+  "How AI Communicates",
+  "Context & Memory",
+  "Tools & Actions",
+  "Agentic Patterns",
+  "Same Engine, Different Cars",
 ];
 
 export default function LearnPage() {
@@ -56,9 +57,7 @@ export default function LearnPage() {
                 </span>
               </div>
               <h2 className="mt-3 font-serif text-xl leading-snug md:text-2xl">
-                What the Heck Is an Agent?
-                <br />
-                <span className="text-accent">A 5-Step Guide</span>
+                How AI Agents Actually Work
               </h2>
               <p className="mt-3 text-[14px] leading-relaxed text-fg-muted">
                 When I tell people &ldquo;I build AI agents,&rdquo; they think
@@ -72,7 +71,7 @@ export default function LearnPage() {
             </div>
             <div className="shrink-0 md:w-[280px]">
               <div className="rounded border border-border-light bg-bg-panel-hover/50 p-4">
-                <p className="label-mono mb-2">5 steps</p>
+                <p className="label-mono mb-2">6 modules</p>
                 <ol className="flex flex-col gap-1.5">
                   {STEPS.map((step, i) => (
                     <li

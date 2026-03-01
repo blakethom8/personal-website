@@ -105,42 +105,23 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
         </div>
       </div>
 
-      {/* ─── Full catalogue ─── */}
+      {/* ─── Full catalogue link ─── */}
       <div className="mx-auto w-[calc(100%-2*16px)] max-w-[1200px] md:w-[calc(100%-2*40px)]">
-        <div className="flex items-baseline justify-between mb-3 px-1">
-          <p className="label-mono">full catalogue</p>
-          <span className="font-mono text-[11px] text-fg-light">
-            {articles.length} posts
+        <Link
+          href="/ideas/catalogue"
+          className="panel flex items-center justify-between px-5 py-4 no-underline transition-colors hover:border-accent-muted"
+        >
+          <div>
+            <p className="label-mono">full catalogue</p>
+            <p className="mt-1 text-[13px] text-fg-muted">
+              Browse all {posts.length} posts — search, filter by topic, tag,
+              or type.
+            </p>
+          </div>
+          <span className="font-mono text-[12px] text-accent shrink-0 ml-4">
+            browse all →
           </span>
-        </div>
-        <div className="panel divide-y divide-border-light px-5 py-1 md:px-6">
-          {articles.map((post) => {
-            const cat = CATEGORIES.find((c) => c.id === post.category);
-            return (
-              <Link
-                key={post.slug}
-                href={`/ideas/${post.slug}`}
-                className="flex flex-col gap-0.5 py-3 no-underline sm:flex-row sm:items-start sm:justify-between sm:gap-6"
-              >
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-sans text-[14px] font-medium text-fg hover:text-accent transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="mt-0.5 line-clamp-1 text-[13px] text-fg-muted">
-                    {post.excerpt}
-                  </p>
-                </div>
-                <span className="flex shrink-0 items-center gap-2 font-mono text-[11px] text-fg-light">
-                  {cat && <span>{cat.shortLabel}</span>}
-                  {cat && <span>&middot;</span>}
-                  <span>{post.readTime}</span>
-                  <span>&middot;</span>
-                  <span>{post.date}</span>
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+        </Link>
       </div>
     </div>
   );

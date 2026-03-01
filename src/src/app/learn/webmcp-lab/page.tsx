@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageBackground } from "@/components/PageBackground";
-import { Panel } from "@/components/Panel";
 import { WebMCPLab } from "@/components/learn/WebMCPLab";
 import { backgrounds } from "@/lib/backgrounds";
 
@@ -17,21 +15,6 @@ export default function WebMCPLabPage() {
       <PageBackground src={backgrounds.learn} alt="Flowing water over rocks" />
 
       <div className="flex flex-col gap-4 pb-5 pt-5">
-        {/* Breadcrumb */}
-        <div className="mx-auto w-[calc(100%-2*16px)] max-w-[1200px] md:w-[calc(100%-2*40px)]">
-          <div className="flex items-center gap-1 font-mono text-[11px] text-fg-light">
-            <Link href="/" className="hover:text-accent transition-colors">
-              ~/blake.thomson
-            </Link>
-            <span className="text-border">/</span>
-            <Link href="/learn" className="hover:text-accent transition-colors">
-              learn
-            </Link>
-            <span className="text-border">/</span>
-            <span className="text-fg-muted">webmcp-lab</span>
-          </div>
-        </div>
-
         <WebMCPLab />
       </div>
     </>

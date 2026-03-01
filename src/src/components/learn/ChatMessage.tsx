@@ -118,7 +118,7 @@ function getRoleConfig(role: ChatMessageType["role"]) {
     case "tool-call":
       return {
         wrapper: "sim-msg-tool-call",
-        label: "⚡",
+        label: "TOOL:",
         icon: null,
         labelClass: "text-accent",
         contentClass: "font-mono text-[11px] text-accent leading-relaxed",
@@ -138,6 +138,14 @@ function getRoleConfig(role: ChatMessageType["role"]) {
         icon: "…",
         labelClass: "text-fg-light italic",
         contentClass: "text-fg-light text-[12px] italic leading-relaxed",
+      };
+    case "narrator":
+      return {
+        wrapper: "sim-msg-narrator",
+        label: "",
+        icon: null,
+        labelClass: "",
+        contentClass: "text-fg-muted text-[13px] leading-relaxed",
       };
     default:
       return {

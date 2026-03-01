@@ -20,27 +20,6 @@ export default function SimulatorPage() {
       />
 
       <div className="flex flex-col gap-4 pb-5 pt-5">
-        {/* Breadcrumb */}
-        <div className="mx-auto w-[calc(100%-2*16px)] max-w-[1200px] md:w-[calc(100%-2*40px)]">
-          <div className="flex items-center gap-1 font-mono text-[11px] text-fg-light">
-            <Link
-              href="/"
-              className="hover:text-accent transition-colors"
-            >
-              ~/blake.thomson
-            </Link>
-            <span className="text-border">/</span>
-            <Link
-              href="/learn"
-              className="hover:text-accent transition-colors"
-            >
-              learn
-            </Link>
-            <span className="text-border">/</span>
-            <span className="text-fg-muted">simulator</span>
-          </div>
-        </div>
-
         {/* Header */}
         <Panel>
           <div className="flex items-start justify-between gap-4">
@@ -63,7 +42,7 @@ export default function SimulatorPage() {
         </Panel>
 
         {/* Simulator */}
-        <div className="panel mx-auto w-[calc(100%-2*16px)] max-w-[1200px] overflow-hidden md:w-[calc(100%-2*40px)]">
+        <div className="panel mx-auto w-[calc(100%-2*16px)] max-w-[1400px] overflow-hidden md:w-[calc(100%-2*40px)]">
           <ConversationSimulator />
         </div>
       </div>

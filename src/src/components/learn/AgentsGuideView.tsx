@@ -16,6 +16,14 @@ interface AgentsGuideViewProps {
   closing: string;
 }
 
+const STEP_LABELS = [
+  "The Big Picture",
+  "How AI Communicates",
+  "Context & Memory",
+  "Tools & Actions",
+  "Agentic Patterns",
+];
+
 export function AgentsGuideView({ intro, steps, closing }: AgentsGuideViewProps) {
   // null = intro, 0-4 = steps, "closing" = final section
   const [activeView, setActiveView] = useState<number | null | "closing">(null);
@@ -62,27 +70,6 @@ export function AgentsGuideView({ intro, steps, closing }: AgentsGuideViewProps)
 
   return (
     <div className="flex flex-col gap-4 pb-5 pt-5">
-      {/* Breadcrumb */}
-      <div className="mx-auto w-[calc(100%-2*16px)] max-w-[1200px] md:w-[calc(100%-2*40px)]">
-        <div className="flex items-center gap-1 font-mono text-[11px] text-fg-light">
-          <Link href="/" className="hover:text-accent transition-colors">
-            ~/blake.thomson
-          </Link>
-          <span className="text-border">/</span>
-          <Link href="/learn" className="hover:text-accent transition-colors">
-            learn
-          </Link>
-          <span className="text-border">/</span>
-          <span className="text-fg-muted">agents-explained</span>
-          {currentStep && (
-            <>
-              <span className="text-border">/</span>
-              <span className="text-accent">step-{currentStep.number}</span>
-            </>
-          )}
-        </div>
-      </div>
-
       {/* Header */}
       <Panel>
         <div className="flex items-start justify-between gap-4">
@@ -102,7 +89,7 @@ export function AgentsGuideView({ intro, steps, closing }: AgentsGuideViewProps)
           </Link>
         </div>
         <h1 className="mt-3 font-serif text-2xl md:text-3xl">
-          AI Agents Explained: A 5-Step Guide
+          How AI Agents Actually Work
         </h1>
 
         {/* Step navigator */}
@@ -130,7 +117,7 @@ export function AgentsGuideView({ intro, steps, closing }: AgentsGuideViewProps)
               }`}
             >
               <span className="hidden sm:inline">{step.number}.</span>
-              <span className="hidden md:inline">{step.title}</span>
+              <span className="hidden md:inline">{STEP_LABELS[i] ?? step.title}</span>
               <span className="md:hidden">{step.number}</span>
             </button>
           ))}
@@ -143,7 +130,7 @@ export function AgentsGuideView({ intro, steps, closing }: AgentsGuideViewProps)
                 : "text-fg-light hover:text-accent hover:bg-bg-panel-hover"
             }`}
           >
-            <span className="hidden sm:inline">summary</span>
+            <span className="hidden sm:inline">epilogue</span>
             <span className="sm:hidden">end</span>
           </button>
         </div>

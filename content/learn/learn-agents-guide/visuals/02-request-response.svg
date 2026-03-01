@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 580" font-family="Inter, system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="580" fill="#fafafa" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="36" text-anchor="middle" font-size="18" font-weight="600" fill="#1a1a1a">What Actually Gets Sent</text>
+  <text x="400" y="56" text-anchor="middle" font-size="13" fill="#6b7280">Every AI interaction is a structured envelope — not free-form chat</text>
+
+  <!-- USER -->
+  <g transform="translate(60, 85)">
+    <circle cx="30" cy="24" r="20" fill="#e0e7ff" stroke="#818cf8" stroke-width="1.5"/>
+    <text x="30" y="29" text-anchor="middle" font-size="16">👤</text>
+    <text x="65" y="29" font-size="13" font-weight="500" fill="#1a1a1a">You</text>
+  </g>
+
+  <!-- SERVER -->
+  <g transform="translate(620, 85)">
+    <circle cx="30" cy="24" r="20" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="30" y="29" text-anchor="middle" font-size="16">🧠</text>
+    <text x="65" y="29" font-size="13" font-weight="500" fill="#1a1a1a">Model API</text>
+  </g>
+
+  <!-- REQUEST ARROW -->
+  <line x1="140" y1="109" x2="610" y2="109" stroke="#818cf8" stroke-width="2" marker-end="url(#arrowPurple)"/>
+  <text x="375" y="100" text-anchor="middle" font-size="11" font-weight="500" fill="#818cf8">REQUEST</text>
+
+  <!-- Request Envelope -->
+  <g transform="translate(120, 130)">
+    <rect width="560" height="210" rx="8" fill="white" stroke="#818cf8" stroke-width="1.5" filter="url(#shadow)"/>
+
+    <!-- Model -->
+    <rect x="20" y="16" width="520" height="30" rx="4" fill="#f5f3ff"/>
+    <text x="32" y="36" font-size="11" fill="#6d28d9" font-weight="500">model:</text>
+    <text x="82" y="36" font-size="11" fill="#4c1d95">"claude-sonnet"</text>
+
+    <!-- System Prompt -->
+    <rect x="20" y="54" width="520" height="30" rx="4" fill="#f5f3ff"/>
+    <text x="32" y="74" font-size="11" fill="#6d28d9" font-weight="500">system:</text>
+    <text x="84" y="74" font-size="11" fill="#4c1d95">"You are a helpful personal assistant."</text>
+
+    <!-- Messages -->
+    <rect x="20" y="92" width="520" height="68" rx="4" fill="#f5f3ff"/>
+    <text x="32" y="112" font-size="11" fill="#6d28d9" font-weight="500">messages:</text>
+    <rect x="40" y="120" width="488" height="30" rx="4" fill="white" stroke="#e9d5ff" stroke-width="1"/>
+    <text x="56" y="139" font-size="11" fill="#7c3aed">user:</text>
+    <text x="94" y="139" font-size="11" fill="#374151">"What's the tallest building in LA?"</text>
+
+    <!-- Settings -->
+    <rect x="20" y="168" width="250" height="28" rx="4" fill="#f5f3ff"/>
+    <text x="32" y="186" font-size="11" fill="#6d28d9" font-weight="500">temperature:</text>
+    <text x="112" y="186" font-size="11" fill="#4c1d95">0.7</text>
+    <rect x="290" y="168" width="250" height="28" rx="4" fill="#f5f3ff"/>
+    <text x="302" y="186" font-size="11" fill="#6d28d9" font-weight="500">max_tokens:</text>
+    <text x="382" y="186" font-size="11" fill="#4c1d95">500</text>
+  </g>
+
+  <!-- RESPONSE ARROW -->
+  <line x1="610" y1="370" x2="140" y2="370" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowAmber)"/>
+  <text x="375" y="363" text-anchor="middle" font-size="11" font-weight="500" fill="#f59e0b">RESPONSE</text>
+
+  <!-- Response Envelope -->
+  <g transform="translate(120, 388)">
+    <rect width="560" height="160" rx="8" fill="white" stroke="#f59e0b" stroke-width="1.5" filter="url(#shadow)"/>
+
+    <!-- Role -->
+    <rect x="20" y="16" width="520" height="30" rx="4" fill="#fffbeb"/>
+    <text x="32" y="36" font-size="11" fill="#b45309" font-weight="500">role:</text>
+    <text x="68" y="36" font-size="11" fill="#92400e">"assistant"</text>
+
+    <!-- Content -->
+    <rect x="20" y="54" width="520" height="44" rx="4" fill="#fffbeb"/>
+    <text x="32" y="72" font-size="11" fill="#b45309" font-weight="500">content:</text>
+    <text x="90" y="72" font-size="11" fill="#374151">"The Wilshire Grand Center at 1,100 ft (335 m).</text>
+    <text x="90" y="88" font-size="11" fill="#374151">Tallest building west of the Mississippi."</text>
+
+    <!-- Usage -->
+    <rect x="20" y="108" width="520" height="36" rx="4" fill="#fffbeb"/>
+    <text x="32" y="130" font-size="11" fill="#b45309" font-weight="500">usage:</text>
+    <text x="80" y="130" font-size="11" fill="#92400e">34 input tokens</text>
+    <text x="220" y="130" font-size="11" fill="#92400e">41 output tokens</text>
+    <text x="380" y="130" font-size="11" fill="#92400e">cost: ~$0.0004</text>
+  </g>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrowPurple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#818cf8" stroke-width="1.5"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    </marker>
+  </defs>
+</svg>

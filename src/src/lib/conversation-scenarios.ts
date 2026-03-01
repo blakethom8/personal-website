@@ -1,7 +1,7 @@
 // ─── Types ───
 
 export interface ChatMessage {
-  role: "user" | "assistant" | "tool-call" | "tool-result" | "thinking";
+  role: "user" | "assistant" | "tool-call" | "tool-result" | "thinking" | "narrator";
   content: string;
   toolName?: string;
 }
@@ -13,23 +13,80 @@ export interface ApiBlock {
   annotation?: string;
 }
 
+// ─── Context Window Types ───
+
+export type ContextSectionType =
+  | "system-prompt"
+  | "instructions"
+  | "tool-definitions"
+  | "message-user"
+  | "message-assistant"
+  | "message-tool-call"
+  | "message-tool-result"
+  | "summary";
+
+export interface ContextSection {
+  id: string;
+  label: string;
+  type: ContextSectionType;
+  content: string;
+  tokenCount: number;
+  isNew?: boolean;
+  isRemoved?: boolean;
+  isSummary?: boolean;
+}
+
+export interface ContextSnapshot {
+  tokenCount: number;
+  maxTokens: number;
+  payload: string;
+  sections: ContextSection[];
+  annotation?: string;
+}
+
 export interface ConversationStep {
   chat: ChatMessage;
   api: ApiBlock[];
   delay?: number; // ms before auto-advance, default 1800
+  context?: ContextSnapshot;
+}
+
+export interface ScenarioIntro {
+  label: string;
+  heading: string;
+  description: string;
 }
 
 export interface Scenario {
   id: string;
   title: string;
   steps: ConversationStep[];
+  intro?: ScenarioIntro;
+}
+
+export interface ScenarioGroup {
+  id: string;
+  title: string;
+  intro: ScenarioIntro;
+  subScenarios: Scenario[];
+}
+
+export type ScenarioTabItem = Scenario | ScenarioGroup;
+
+export function isScenarioGroup(item: ScenarioTabItem): item is ScenarioGroup {
+  return "subScenarios" in item;
 }
 
 // ─── Scenario 1: Simple Chat ───
 
 const simpleChat: Scenario = {
   id: "simple-chat",
-  title: "simple chat",
+  title: "a single question",
+  intro: {
+    label: "the basics",
+    heading: "What Happens When You Send a Message",
+    description: "When you type into ChatGPT, a structured request is sent to the model behind the scenes. It includes a system prompt — hidden instructions that tell the model how to behave — along with your message. This simulation shows you exactly what that request looks like.",
+  },
   steps: [
     {
       chat: {
@@ -42,6 +99,7 @@ const simpleChat: Scenario = {
           json: `{
   "model": "claude-sonnet-4-20250514",
   "max_tokens": 1024,
+  "system": "You are a helpful, harmless, and honest assistant. Answer questions clearly and concisely. If you're not sure about something, say so.",
   "messages": [
     {
       "role": "user",
@@ -49,7 +107,8 @@ const simpleChat: Scenario = {
     }
   ]
 }`,
-          annotation: "A simple request: model, max_tokens, and a single user message.",
+          highlightLines: [4],
+          annotation: "Before your message, there's a system prompt — hidden instructions that shape how the model behaves. Every conversation has one, even if you never see it.",
         },
       ],
       delay: 2800,
@@ -78,7 +137,7 @@ const simpleChat: Scenario = {
     "output_tokens": 38
   }
 }`,
-          annotation: "Text response. The model returns content as an array — each element has a type.",
+          annotation: "The response comes back as structured data — not just plain text. The app that shows you the chat formats it into what you see on screen.",
         },
       ],
       delay: 3000,
@@ -91,6 +150,11 @@ const simpleChat: Scenario = {
 const toolUse: Scenario = {
   id: "tool-use",
   title: "tool use",
+  intro: {
+    label: "tools & actions",
+    heading: "How Models Use External Tools",
+    description: "Models can't browse the web or check the weather on their own. Instead, they request a function call, wait for the result, then respond. This back-and-forth is how ChatGPT's web search, code execution, and file uploads actually work.",
+  },
   steps: [
     {
       chat: {
@@ -124,7 +188,7 @@ const toolUse: Scenario = {
   ]
 }`,
           highlightLines: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-          annotation: "The tools array tells the model what functions it can call. Each tool has a name, description, and JSON schema.",
+          annotation: "The request includes a menu of tools the model is allowed to use. Each tool has a name, a description of what it does, and a definition of what inputs it needs.",
         },
       ],
       delay: 3000,
@@ -177,7 +241,7 @@ const toolUse: Scenario = {
     }
   ]
 }`,
-          annotation: "Your app calls the real API, then sends the result back to the model as a tool_result message.",
+          annotation: "The model can't run tools itself — the host app executes the function, then passes the real data back for the model to use.",
         },
       ],
       delay: 2800,
@@ -213,6 +277,11 @@ const toolUse: Scenario = {
 const structuredOutput: Scenario = {
   id: "structured-output",
   title: "structured output",
+  intro: {
+    label: "structured data",
+    heading: "Getting Organized Data Back",
+    description: "Normally a model replies with freeform text. But you can define a schema — a template — that tells the model exactly what fields to fill in. Instead of prose, you get structured data an app can use directly.",
+  },
   steps: [
     {
       chat: {
@@ -260,7 +329,7 @@ const structuredOutput: Scenario = {
   ]
 }`,
           highlightLines: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28],
-          annotation: "The tool schema defines exactly what fields the model must return. This is how you get typed, parseable data instead of prose.",
+          annotation: "The request includes a template defining exactly what fields the model must fill in — name, viability, strengths, risks. Instead of freeform text, you get organized data.",
         },
       ],
       delay: 3500,
@@ -302,7 +371,7 @@ const structuredOutput: Scenario = {
   "stop_reason": "tool_use"
 }`,
           highlightLines: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
-          annotation: "Every field comes back typed and structured. Your app can render this directly — no parsing, no guessing.",
+          annotation: "Every field comes back filled in and organized. The app can display this as a card, chart, or table — the model provided the data, the app controls the layout.",
         },
       ],
       delay: 3500,
@@ -329,7 +398,7 @@ const analysis = response.content[0].input;
   <List items={analysis.risks} />
   <p>{analysis.verdict}</p>
 </Card>`,
-          annotation: "This is the unlock. Structured output means your app controls the presentation — not the LLM.",
+          annotation: "This is the key idea: the model provides structured information, and the application decides how to display it. That's how products like Notion AI and Perplexity show formatted results.",
         },
       ],
       delay: 3000,
@@ -342,6 +411,11 @@ const analysis = response.content[0].input;
 const agentLoop: Scenario = {
   id: "agent-loop",
   title: "agent loop",
+  intro: {
+    label: "agents",
+    heading: "A Model That Takes Multiple Steps",
+    description: "An agent is a model that can use tools in a loop — reading files, making changes, and checking its own work. Instead of answering in one shot, it plans, acts, observes, and repeats until the task is done.",
+  },
   steps: [
     {
       chat: {
@@ -394,7 +468,7 @@ const agentLoop: Scenario = {
   ],
   "stop_reason": "tool_use"
 }`,
-          annotation: "The model thinks out loud, then decides to read a file. Two content blocks in one response.",
+          annotation: "The model thinks out loud, then decides to read a file. It can reason and act in a single response — thinking and doing at the same time.",
         },
       ],
       delay: 2500,

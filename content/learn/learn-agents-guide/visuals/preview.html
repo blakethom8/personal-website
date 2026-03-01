@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual Assets Preview — Learn Agents Guide</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: #111;
+      color: #e5e7eb;
+      padding: 40px 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #f9fafb;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #9ca3af;
+      margin-bottom: 48px;
+    }
+    .section {
+      max-width: 860px;
+      margin: 0 auto 60px;
+    }
+    .section h2 {
+      font-size: 16px;
+      font-weight: 500;
+      color: #9ca3af;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .section h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #f9fafb;
+      margin-bottom: 16px;
+    }
+    .section p {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .visual-container {
+      background: white;
+      border-radius: 12px;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .visual-container img,
+    .visual-container svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .format-tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .tag-svg { background: #1e1b4b; color: #a78bfa; }
+    .tag-mermaid { background: #042f2e; color: #5eead4; }
+    .tag-interactive { background: #422006; color: #fbbf24; }
+    hr {
+      border: none;
+      border-top: 1px solid #1f2937;
+      margin: 48px auto;
+      max-width: 860px;
+    }
+
+    /* Mermaid rendering area */
+    .mermaid-container {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .mermaid { text-align: center; }
+
+    /* Interactive demo */
+    .interactive-container {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .context-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .context-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .context-label {
+      width: 80px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #9ca3af;
+      flex-shrink: 0;
+    }
+    .context-bar-track {
+      flex: 1;
+      height: 32px;
+      background: #0f172a;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+    }
+    .context-segment {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+    .seg-system { background: #3b82f6; }
+    .seg-user { background: #818cf8; }
+    .seg-assistant { background: #fbbf24; }
+    .seg-tools { background: #a78bfa; }
+    .seg-new { background: #34d399; }
+    .seg-dropped { background: #ef4444; opacity: 0.5; }
+    .context-tokens {
+      width: 90px;
+      font-size: 11px;
+      color: #6b7280;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .demo-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .demo-controls button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .demo-controls button:hover { background: #1d4ed8; }
+    .demo-controls button.reset {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #9ca3af;
+    }
+    .demo-controls button.reset:hover { border-color: #6b7280; color: #e5e7eb; }
+    .demo-info {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Visual Assets Preview</h1>
+  <p class="subtitle">Learn Agents Guide — SVG diagrams, Mermaid charts, and interactive prototypes</p>
+
+  <!-- 01 -->
+  <div class="section">
+    <h2>Module 1 <span class="format-tag tag-svg">SVG</span></h2>
+    <h3>The Engine vs. The Car</h3>
+    <p>Side-by-side comparison showing what the model alone can do vs. what a full agent (model + harness) can do.</p>
+    <div class="visual-container">
+      <img src="01-engine-vs-car.svg" alt="Engine vs Car diagram"/>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 01b -->
+  <div class="section">
+    <h2>Module 1 <span class="format-tag tag-svg">SVG</span></h2>
+    <h3>Same Model, Three Products</h3>
+    <p>The key "aha" moment: Claude.ai IS a harness. The API is the bare engine. A custom agent is a purpose-built car. Same model underneath all three.</p>
+    <div class="visual-container">
+      <img src="01-three-products.svg" alt="Same Model Three Products"/>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 02 -->
+  <div class="section">
+    <h2>Module 2 <span class="format-tag tag-svg">SVG</span></h2>
+    <h3>Request & Response Envelope</h3>
+    <p>Shows the actual structure of what gets sent to the model API and what comes back.</p>
+    <div class="visual-container">
+      <img src="02-request-response.svg" alt="Request Response diagram"/>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 03 Context Window Growth -->
+  <div class="section">
+    <h2>Module 3 <span class="format-tag tag-svg">SVG</span></h2>
+    <h3>Context Window Growth</h3>
+    <p>Visualizes how context fills up over a conversation — every turn re-sends everything before it.</p>
+    <div class="visual-container">
+      <img src="03-context-window-growth.svg" alt="Context Window Growth diagram"/>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 03 Interactive Context Demo -->
+  <div class="section">
+    <h2>Module 3 <span class="format-tag tag-interactive">INTERACTIVE PROTOTYPE</span></h2>
+    <h3>Context Window Simulator</h3>
+    <p>Click "Send Message" to watch the context window fill up in real-time. Notice how each new message makes the request larger.</p>
+    <div class="interactive-container">
+      <div class="context-demo" id="contextDemo">
+        <!-- Bars rendered by JS -->
+      </div>
+      <div class="demo-controls">
+        <button onclick="addMessage()">Send Message</button>
+        <button class="reset" onclick="resetDemo()">Reset</button>
+        <span class="demo-info" id="demoInfo">Turn 0 · Click "Send Message" to start</span>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>System prompt</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#818cf8"></div>Your messages</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>AI responses</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div>Tool results</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div>New message</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444;opacity:0.5"></div>Dropped</div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 04 Tool Call Flow -->
+  <div class="section">
+    <h2>Module 4 <span class="format-tag tag-svg">SVG</span></h2>
+    <h3>Tool Call Flow (Sequence Diagram)</h3>
+    <p>Traces a complete tool call from user → harness → model → tool → back to user.</p>
+    <div class="visual-container">
+      <img src="04-tool-call-flow.svg" alt="Tool Call Flow diagram"/>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 05 Agent Loop -->
+  <div class="section">
+    <h2>Module 5 <span class="format-tag tag-svg">SVG</span></h2>
+    <h3>The Agent Loop (ReAct Pattern)</h3>
+    <p>The core Reason → Act → Observe → Repeat cycle that powers every agent interaction.</p>
+    <div class="visual-container">
+      <img src="05-agent-loop.svg" alt="Agent Loop diagram"/>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- 06 Comparison -->
+  <div class="section">
+    <h2>Epilogue <span class="format-tag tag-svg">SVG</span></h2>
+    <h3>Same Engine, Different Cars</h3>
+    <p>Side-by-side comparison of Claude.ai vs. Claude Desktop vs. Claude Code — proving the harness is the product.</p>
+    <div class="visual-container">
+      <img src="06-comparison-table.svg" alt="Comparison Table"/>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Mermaid: Autonomy Spectrum -->
+  <div class="section">
+    <h2>Module 5 <span class="format-tag tag-mermaid">MERMAID</span></h2>
+    <h3>Autonomy Spectrum</h3>
+    <p>Where different AI products sit on the chatbot → agent → autonomous spectrum.</p>
+    <div class="mermaid-container">
+      <pre class="mermaid">
+graph LR
+    A["💬 Chatbot<br/><small>Single turn, no tools</small>"] --> B["🤖 Assistant<br/><small>Multi-turn, basic tools</small>"]
+    B --> C["⚙️ Agent<br/><small>Tool loops, memory</small>"]
+    C --> D["🚀 Autonomous<br/><small>Proactive, self-directing</small>"]
+
+    style A fill:#f5f3ff,stroke:#818cf8,color:#1a1a1a
+    style B fill:#ecfdf5,stroke:#10b981,color:#1a1a1a
+    style C fill:#fffbeb,stroke:#f59e0b,color:#1a1a1a
+    style D fill:#fff7ed,stroke:#f97316,color:#1a1a1a
+      </pre>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Mermaid: Full Stack Architecture -->
+  <div class="section">
+    <h2>Module 4 <span class="format-tag tag-mermaid">MERMAID</span></h2>
+    <h3>Full Agent Architecture</h3>
+    <p>The complete stack from user to model to tools and back.</p>
+    <div class="mermaid-container">
+      <pre class="mermaid">
+flowchart TD
+    U["👤 User"] -->|message| F["Frontend<br/><small>Chat UI / Teams / Terminal</small>"]
+    F -->|request| H["⚙️ Harness"]
+    H -->|constructs envelope| M["🧠 Model API<br/><small>Claude / GPT / Gemini</small>"]
+    M -->|"text response"| H
+    M -->|"tool request"| T["🔧 Tools"]
+    T -->|"result"| H
+    H -->|stores| D["💾 Memory<br/><small>Files / Database</small>"]
+    D -->|loads context| H
+    H -->|response| F
+    F -->|answer| U
+
+    style U fill:#e0e7ff,stroke:#818cf8,color:#1a1a1a
+    style F fill:#f1f5f9,stroke:#94a3b8,color:#1a1a1a
+    style H fill:#ecfdf5,stroke:#10b981,color:#1a1a1a
+    style M fill:#fffbeb,stroke:#f59e0b,color:#1a1a1a
+    style T fill:#f5f3ff,stroke:#8b5cf6,color:#1a1a1a
+    style D fill:#fef3c7,stroke:#d97706,color:#1a1a1a
+      </pre>
+    </div>
+  </div>
+
+  <!-- Mermaid JS -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#ecfdf5',
+        primaryTextColor: '#1a1a1a',
+        lineColor: '#94a3b8',
+        fontSize: '14px'
+      }
+    });
+  </script>
+
+  <!-- Interactive Context Demo JS -->
+  <script>
+    const MAX_TOKENS = 200000;
+    const SYSTEM_TOKENS = 2000;
+    let turns = [];
+    let currentTurn = 0;
+
+    function resetDemo() {
+      turns = [];
+      currentTurn = 0;
+      renderBars();
+      document.getElementById('demoInfo').textContent = 'Turn 0 · Click "Send Message" to start';
+    }
+
+    function addMessage() {
+      currentTurn++;
+      // Each user message ~150 tokens, each AI response ~300, occasional tool result ~200
+      const userTokens = 100 + Math.floor(Math.random() * 150);
+      const aiTokens = 200 + Math.floor(Math.random() * 250);
+      const hasToolCall = currentTurn > 2 && Math.random() > 0.5;
+      const toolTokens = hasToolCall ? 100 + Math.floor(Math.random() * 200) : 0;
+
+      turns.push({ user: userTokens, ai: aiTokens, tool: toolTokens });
+      renderBars();
+
+      const totalTokens = SYSTEM_TOKENS + turns.reduce((sum, t) => sum + t.user + t.ai + t.tool, 0);
+      const pct = ((totalTokens / MAX_TOKENS) * 100).toFixed(1);
+      const cost = (totalTokens * 0.000003).toFixed(4);
+      document.getElementById('demoInfo').textContent =
+        `Turn ${currentTurn} · ${totalTokens.toLocaleString()} / ${MAX_TOKENS.toLocaleString()} tokens (${pct}%) · ~$${cost} per message`;
+    }
+
+    function renderBars() {
+      const container = document.getElementById('contextDemo');
+      container.innerHTML = '';
+
+      // Show last 8 turns (or all if fewer)
+      const displayTurns = turns.slice(-8);
+      const startIdx = Math.max(0, turns.length - 8);
+
+      displayTurns.forEach((turn, i) => {
+        const actualIdx = startIdx + i;
+        const totalSoFar = SYSTEM_TOKENS + turns.slice(0, actualIdx + 1).reduce((s, t) => s + t.user + t.ai + t.tool, 0);
+        const scale = 100 / MAX_TOKENS;
+
+        const row = document.createElement('div');
+        row.className = 'context-bar-row';
+
+        const label = document.createElement('div');
+        label.className = 'context-label';
+        label.textContent = `Turn ${actualIdx + 1}`;
+
+        const track = document.createElement('div');
+        track.className = 'context-bar-track';
+
+        // System prompt segment
+        const sys = document.createElement('div');
+        sys.className = 'context-segment seg-system';
+        sys.style.width = (SYSTEM_TOKENS * scale) + '%';
+        track.appendChild(sys);
+
+        // All previous turns
+        for (let j = 0; j <= actualIdx; j++) {
+          const t = turns[j];
+          const isNew = j === actualIdx;
+
+          const userSeg = document.createElement('div');
+          userSeg.className = 'context-segment ' + (isNew ? 'seg-new' : 'seg-user');
+          userSeg.style.width = (t.user * scale) + '%';
+          track.appendChild(userSeg);
+
+          if (t.tool > 0) {
+            const toolSeg = document.createElement('div');
+            toolSeg.className = 'context-segment seg-tools';
+            toolSeg.style.width = (t.tool * scale) + '%';
+            track.appendChild(toolSeg);
+          }
+
+          const aiSeg = document.createElement('div');
+          aiSeg.className = 'context-segment seg-assistant';
+          aiSeg.style.width = (t.ai * scale) + '%';
+          track.appendChild(aiSeg);
+        }
+
+        const tokens = document.createElement('div');
+        tokens.className = 'context-tokens';
+        tokens.textContent = totalSoFar.toLocaleString() + ' tok';
+
+        row.appendChild(label);
+        row.appendChild(track);
+        row.appendChild(tokens);
+        container.appendChild(row);
+      });
+    }
+
+    resetDemo();
+  </script>
+
+</body>
+</html>

@@ -31,37 +31,13 @@ export function ArticleView({ post, contentHtml, headings, parentCategory }: Art
 
   return (
     <div className="flex flex-col gap-4 pb-5 pt-5">
-      {/* Top bar: breadcrumb + pane toggle */}
-      <div
-        className="article-topbar"
-        data-shifted={paneOpen}
-      >
-        <div className="flex items-center gap-1 font-mono text-[11px] text-fg-light">
-          <Link href="/" className="hover:text-accent transition-colors">
-            ~/blake.thomson
-          </Link>
-          <span className="text-border">/</span>
-          <Link href="/ideas" className="hover:text-accent transition-colors">
-            ideas
-          </Link>
-          {parentCategory && (
-            <>
-              <span className="text-border">/</span>
-              <Link
-                href={`/ideas/${parentCategory.id}`}
-                className="hover:text-accent transition-colors"
-              >
-                {parentCategory.shortLabel.toLowerCase().replace(/\s+/g, "-")}
-              </Link>
-            </>
-          )}
-          <span className="text-border">/</span>
-          <span className="text-fg-muted truncate max-w-[200px]">
-            {post.slug}
-          </span>
-        </div>
-
-        {headings.length > 0 && (
+      {/* Top bar: pane toggle */}
+      {headings.length > 0 && (
+        <div
+          className="article-topbar"
+          data-shifted={paneOpen}
+        >
+          <div />
           <button
             onClick={togglePane}
             className="inline-flex items-center gap-1.5 rounded px-2 py-1 font-mono text-[11px] text-fg-light transition-colors hover:bg-bg-panel-hover hover:text-fg"
@@ -70,8 +46,8 @@ export function ArticleView({ post, contentHtml, headings, parentCategory }: Art
             <span className="text-[10px]">{paneOpen ? "▶" : "◀"}</span>
             {paneOpen ? "close" : "contents"}
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Article layout: main + side pane */}
       <div className="article-layout">

@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 540" font-family="Inter, system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="540" fill="#fafafa" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="36" text-anchor="middle" font-size="18" font-weight="600" fill="#1a1a1a">Same Model, Three Products</text>
+  <text x="400" y="56" text-anchor="middle" font-size="13" fill="#6b7280">All three use the exact same Claude Sonnet. The difference is what's built around it.</text>
+
+  <!-- Shared engine badge -->
+  <rect x="300" y="68" width="200" height="24" rx="12" fill="#fff7ed" stroke="#f97316" stroke-width="1"/>
+  <text x="400" y="84" text-anchor="middle" font-size="10" font-weight="500" fill="#c2410c">Same engine: Claude Sonnet</text>
+
+  <!-- Card 1: Raw API -->
+  <g transform="translate(30, 105)">
+    <rect width="236" height="410" rx="10" fill="white" stroke="#e5e7eb" stroke-width="1" filter="url(#shadow)"/>
+
+    <!-- Header -->
+    <rect width="236" height="56" rx="10" fill="#f8fafc"/>
+    <rect y="46" width="236" height="10" fill="#f8fafc"/>
+    <text x="118" y="26" text-anchor="middle" font-size="22">🔧</text>
+    <text x="118" y="48" text-anchor="middle" font-size="13" font-weight="600" fill="#374151">The Raw API</text>
+
+    <rect x="72" y="64" width="92" height="22" rx="11" fill="#f1f5f9"/>
+    <text x="118" y="79" text-anchor="middle" font-size="10" font-weight="500" fill="#64748b">Bare Engine</text>
+
+    <!-- What it is -->
+    <g transform="translate(20, 100)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">What it is</text>
+      <text x="0" y="18" font-size="10" fill="#6b7280">Direct access to the model.</text>
+      <text x="0" y="33" font-size="10" fill="#6b7280">Send a message, get text back.</text>
+      <text x="0" y="48" font-size="10" fill="#6b7280">Nothing else included.</text>
+    </g>
+
+    <!-- What's included -->
+    <g transform="translate(20, 168)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">What's included</text>
+      <text x="0" y="18" font-size="10" fill="#6b7280">Text prediction. That's it.</text>
+    </g>
+
+    <!-- You must build -->
+    <g transform="translate(20, 210)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">You must build</text>
+      <text x="0" y="18" font-size="10" fill="#f59e0b">⚠</text><text x="16" y="18" font-size="10" fill="#6b7280"> Chat interface</text>
+      <text x="0" y="33" font-size="10" fill="#f59e0b">⚠</text><text x="16" y="33" font-size="10" fill="#6b7280"> Conversation memory</text>
+      <text x="0" y="48" font-size="10" fill="#f59e0b">⚠</text><text x="16" y="48" font-size="10" fill="#6b7280"> Tool connections</text>
+      <text x="0" y="63" font-size="10" fill="#f59e0b">⚠</text><text x="16" y="63" font-size="10" fill="#6b7280"> Safety &amp; guardrails</text>
+      <text x="0" y="78" font-size="10" fill="#f59e0b">⚠</text><text x="16" y="78" font-size="10" fill="#6b7280"> Everything else</text>
+    </g>
+
+    <!-- Who uses it -->
+    <g transform="translate(20, 320)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">Who uses this</text>
+      <text x="0" y="18" font-size="10" fill="#6b7280">Developers building</text>
+      <text x="0" y="33" font-size="10" fill="#6b7280">their own AI products</text>
+    </g>
+
+    <!-- Flexibility meter -->
+    <g transform="translate(20, 372)">
+      <text x="0" y="0" font-size="10" font-weight="500" fill="#374151">Flexibility</text>
+      <rect x="0" y="10" width="196" height="7" rx="3.5" fill="#f1f5f9"/>
+      <rect x="0" y="10" width="196" height="7" rx="3.5" fill="#64748b"/>
+      <text x="0" y="30" font-size="9" fill="#9ca3af">Total — build anything you want</text>
+    </g>
+  </g>
+
+  <!-- Card 2: Claude.ai / ChatGPT -->
+  <g transform="translate(282, 105)">
+    <rect width="236" height="410" rx="10" fill="white" stroke="#e5e7eb" stroke-width="1" filter="url(#shadow)"/>
+
+    <rect width="236" height="56" rx="10" fill="#f5f3ff"/>
+    <rect y="46" width="236" height="10" fill="#f5f3ff"/>
+    <text x="118" y="26" text-anchor="middle" font-size="22">🚗</text>
+    <text x="118" y="48" text-anchor="middle" font-size="13" font-weight="600" fill="#4338ca">Claude.ai / ChatGPT</text>
+
+    <rect x="58" y="64" width="120" height="22" rx="11" fill="#ede9fe"/>
+    <text x="118" y="79" text-anchor="middle" font-size="10" font-weight="500" fill="#6d28d9">Pre-Built Sedan</text>
+
+    <g transform="translate(20, 100)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">What it is</text>
+      <text x="0" y="18" font-size="10" fill="#6b7280">A harness built by</text>
+      <text x="0" y="33" font-size="10" fill="#6b7280">Anthropic / OpenAI.</text>
+      <text x="0" y="48" font-size="10" fill="#6b7280">The consumer product.</text>
+    </g>
+
+    <g transform="translate(20, 168)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">What's included</text>
+      <text x="0" y="18" font-size="10" fill="#10b981">✓</text><text x="14" y="18" font-size="10" fill="#6b7280"> Chat interface</text>
+      <text x="0" y="33" font-size="10" fill="#10b981">✓</text><text x="14" y="33" font-size="10" fill="#6b7280"> Conversation memory</text>
+      <text x="0" y="48" font-size="10" fill="#10b981">✓</text><text x="14" y="48" font-size="10" fill="#6b7280"> Web search</text>
+      <text x="0" y="63" font-size="10" fill="#10b981">✓</text><text x="14" y="63" font-size="10" fill="#6b7280"> File uploads</text>
+      <text x="0" y="78" font-size="10" fill="#10b981">✓</text><text x="14" y="78" font-size="10" fill="#6b7280"> Code sandbox</text>
+    </g>
+
+    <g transform="translate(20, 270)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">Can't do</text>
+      <text x="0" y="18" font-size="10" fill="#ef4444">✗</text><text x="14" y="18" font-size="10" fill="#6b7280"> Access your systems</text>
+      <text x="0" y="33" font-size="10" fill="#ef4444">✗</text><text x="14" y="33" font-size="10" fill="#6b7280"> Connect to your data</text>
+      <text x="0" y="48" font-size="10" fill="#ef4444">✗</text><text x="14" y="48" font-size="10" fill="#6b7280"> Customize tools</text>
+    </g>
+
+    <g transform="translate(20, 340)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">Who uses this</text>
+      <text x="0" y="18" font-size="10" fill="#6b7280">Everyone — the everyday</text>
+      <text x="0" y="33" font-size="10" fill="#6b7280">consumer experience</text>
+    </g>
+
+    <g transform="translate(20, 372)">
+      <text x="0" y="0" font-size="10" font-weight="500" fill="#374151">Flexibility</text>
+      <rect x="0" y="10" width="196" height="7" rx="3.5" fill="#f1f5f9"/>
+      <rect x="0" y="10" width="39" height="7" rx="3.5" fill="#818cf8"/>
+      <text x="0" y="30" font-size="9" fill="#9ca3af">Low — you get what they built</text>
+    </g>
+  </g>
+
+  <!-- Card 3: Custom Agent -->
+  <g transform="translate(534, 105)">
+    <rect width="236" height="410" rx="10" fill="white" stroke="#e5e7eb" stroke-width="1" filter="url(#shadow)"/>
+
+    <rect width="236" height="56" rx="10" fill="#ecfdf5"/>
+    <rect y="46" width="236" height="10" fill="#ecfdf5"/>
+    <text x="118" y="26" text-anchor="middle" font-size="22">🛻</text>
+    <text x="118" y="48" text-anchor="middle" font-size="13" font-weight="600" fill="#065f46">Custom Agent</text>
+
+    <rect x="48" y="64" width="140" height="22" rx="11" fill="#d1fae5"/>
+    <text x="118" y="79" text-anchor="middle" font-size="10" font-weight="500" fill="#047857">Purpose-Built Vehicle</text>
+
+    <g transform="translate(20, 100)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">What it is</text>
+      <text x="0" y="18" font-size="10" fill="#6b7280">Same API, wrapped in a</text>
+      <text x="0" y="33" font-size="10" fill="#6b7280">custom harness built for</text>
+      <text x="0" y="48" font-size="10" fill="#6b7280">a specific business need.</text>
+    </g>
+
+    <g transform="translate(20, 168)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">What's included</text>
+      <text x="0" y="18" font-size="10" fill="#10b981">✓</text><text x="14" y="18" font-size="10" fill="#6b7280"> Custom interface</text>
+      <text x="0" y="33" font-size="10" fill="#10b981">✓</text><text x="14" y="33" font-size="10" fill="#6b7280"> Business-specific tools</text>
+      <text x="0" y="48" font-size="10" fill="#10b981">✓</text><text x="14" y="48" font-size="10" fill="#6b7280"> Your data connected</text>
+      <text x="0" y="63" font-size="10" fill="#10b981">✓</text><text x="14" y="63" font-size="10" fill="#6b7280"> Domain knowledge</text>
+      <text x="0" y="78" font-size="10" fill="#10b981">✓</text><text x="14" y="78" font-size="10" fill="#6b7280"> Tailored workflows</text>
+    </g>
+
+    <g transform="translate(20, 270)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">Examples</text>
+      <text x="0" y="18" font-size="10" fill="#6b7280">• CRM that queries your data</text>
+      <text x="0" y="33" font-size="10" fill="#6b7280">• Teams bot for HR policies</text>
+      <text x="0" y="48" font-size="10" fill="#6b7280">• Provider search agent</text>
+    </g>
+
+    <g transform="translate(20, 340)">
+      <text x="0" y="0" font-size="10" font-weight="600" fill="#374151">Who uses this</text>
+      <text x="0" y="18" font-size="10" fill="#6b7280">Businesses with specific</text>
+      <text x="0" y="33" font-size="10" fill="#6b7280">problems to solve</text>
+    </g>
+
+    <g transform="translate(20, 372)">
+      <text x="0" y="0" font-size="10" font-weight="500" fill="#374151">Flexibility</text>
+      <rect x="0" y="10" width="196" height="7" rx="3.5" fill="#f1f5f9"/>
+      <rect x="0" y="10" width="166" height="7" rx="3.5" fill="#10b981"/>
+      <text x="0" y="30" font-size="9" fill="#9ca3af">High — built for the job</text>
+    </g>
+  </g>
+</svg>

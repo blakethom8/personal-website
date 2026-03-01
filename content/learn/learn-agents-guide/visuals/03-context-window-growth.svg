@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" font-family="Inter, system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="520" fill="#fafafa" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="36" text-anchor="middle" font-size="18" font-weight="600" fill="#1a1a1a">Context Grows With Every Message</text>
+  <text x="400" y="56" text-anchor="middle" font-size="13" fill="#6b7280">Each turn re-sends the entire conversation. Your 50th message includes all 49 before it.</text>
+
+  <!-- Context Window Container -->
+  <rect x="60" y="80" width="680" height="28" rx="6" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="400" y="99" text-anchor="middle" font-size="10" fill="#94a3b8" font-weight="500">CONTEXT WINDOW — 200K TOKENS</text>
+
+  <!-- Turn 1 -->
+  <g transform="translate(60, 130)">
+    <text x="0" y="14" font-size="12" font-weight="500" fill="#374151">Turn 1</text>
+    <text x="0" y="30" font-size="10" fill="#9ca3af">~200 tokens</text>
+
+    <rect x="100" y="0" width="640" height="38" rx="6" fill="white" stroke="#e5e7eb" stroke-width="1" filter="url(#shadow)"/>
+    <!-- System prompt -->
+    <rect x="106" y="6" width="60" height="26" rx="4" fill="#dbeafe"/>
+    <text x="136" y="23" text-anchor="middle" font-size="9" fill="#1e40af">System</text>
+    <!-- User message -->
+    <rect x="172" y="6" width="80" height="26" rx="4" fill="#e0e7ff"/>
+    <text x="212" y="23" text-anchor="middle" font-size="9" fill="#4338ca">You: msg 1</text>
+
+    <!-- Remaining space -->
+    <rect x="258" y="6" width="476" height="26" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="3,3"/>
+    <text x="496" y="23" text-anchor="middle" font-size="9" fill="#cbd5e1">available space</text>
+  </g>
+
+  <!-- Turn 5 -->
+  <g transform="translate(60, 195)">
+    <text x="0" y="14" font-size="12" font-weight="500" fill="#374151">Turn 5</text>
+    <text x="0" y="30" font-size="10" fill="#9ca3af">~2,000 tokens</text>
+
+    <rect x="100" y="0" width="640" height="38" rx="6" fill="white" stroke="#e5e7eb" stroke-width="1" filter="url(#shadow)"/>
+    <rect x="106" y="6" width="40" height="26" rx="4" fill="#dbeafe"/>
+    <text x="126" y="23" text-anchor="middle" font-size="8" fill="#1e40af">Sys</text>
+    <rect x="150" y="6" width="50" height="26" rx="4" fill="#e0e7ff"/>
+    <text x="175" y="23" text-anchor="middle" font-size="8" fill="#4338ca">You 1</text>
+    <rect x="204" y="6" width="50" height="26" rx="4" fill="#fef3c7"/>
+    <text x="229" y="23" text-anchor="middle" font-size="8" fill="#92400e">AI 1</text>
+    <rect x="258" y="6" width="50" height="26" rx="4" fill="#e0e7ff"/>
+    <text x="283" y="23" text-anchor="middle" font-size="8" fill="#4338ca">You 2</text>
+    <rect x="312" y="6" width="50" height="26" rx="4" fill="#fef3c7"/>
+    <text x="337" y="23" text-anchor="middle" font-size="8" fill="#92400e">AI 2</text>
+    <rect x="366" y="6" width="12" height="26" rx="3" fill="#e0e7ff"/>
+    <rect x="381" y="6" width="12" height="26" rx="3" fill="#fef3c7"/>
+    <rect x="396" y="6" width="12" height="26" rx="3" fill="#e0e7ff"/>
+    <rect x="411" y="6" width="12" height="26" rx="3" fill="#fef3c7"/>
+    <rect x="426" y="6" width="55" height="26" rx="4" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+    <text x="454" y="23" text-anchor="middle" font-size="8" fill="#166534">You: new</text>
+
+    <rect x="487" y="6" width="247" height="26" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="3,3"/>
+    <text x="610" y="23" text-anchor="middle" font-size="9" fill="#cbd5e1">available space</text>
+  </g>
+
+  <!-- Turn 20 -->
+  <g transform="translate(60, 260)">
+    <text x="0" y="14" font-size="12" font-weight="500" fill="#374151">Turn 20</text>
+    <text x="0" y="30" font-size="10" fill="#9ca3af">~15,000 tokens</text>
+
+    <rect x="100" y="0" width="640" height="38" rx="6" fill="white" stroke="#e5e7eb" stroke-width="1" filter="url(#shadow)"/>
+    <rect x="106" y="6" width="24" height="26" rx="3" fill="#dbeafe"/>
+    <!-- Many messages compressed -->
+    <g>
+      <rect x="133" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="145" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="157" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="169" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="181" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="193" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="205" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="217" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="229" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="241" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="253" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="265" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="277" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="289" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="301" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="313" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="325" y="6" width="10" height="26" rx="2" fill="#ede9fe"/>
+      <rect x="337" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="349" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="361" y="6" width="10" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="373" y="6" width="10" height="26" rx="2" fill="#fef3c7"/>
+    </g>
+    <text x="397" y="23" font-size="9" fill="#6b7280">···</text>
+    <rect x="416" y="6" width="55" height="26" rx="4" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+    <text x="444" y="23" text-anchor="middle" font-size="8" fill="#166534">You: new</text>
+
+    <rect x="477" y="6" width="257" height="26" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="3,3"/>
+    <text x="606" y="23" text-anchor="middle" font-size="9" fill="#cbd5e1">available space</text>
+  </g>
+
+  <!-- Turn 50+ (overflowing) -->
+  <g transform="translate(60, 325)">
+    <text x="0" y="14" font-size="12" font-weight="500" fill="#374151">Turn 50+</text>
+    <text x="0" y="30" font-size="10" fill="#ef4444">~45,000 tokens</text>
+
+    <rect x="100" y="0" width="640" height="38" rx="6" fill="white" stroke="#e5e7eb" stroke-width="1" filter="url(#shadow)"/>
+
+    <!-- Dropped messages -->
+    <rect x="106" y="6" width="160" height="26" rx="4" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+    <text x="186" y="23" text-anchor="middle" font-size="9" fill="#dc2626">⚠ old messages dropped</text>
+
+    <!-- Remaining messages filling up -->
+    <g>
+      <rect x="272" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="282" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="292" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="302" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="312" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="322" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="332" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="342" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="352" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="362" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="372" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="382" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="392" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="402" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="412" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="422" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="432" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="442" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="452" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="462" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+      <rect x="472" y="6" width="8" height="26" rx="2" fill="#e0e7ff"/>
+      <rect x="482" y="6" width="8" height="26" rx="2" fill="#fef3c7"/>
+    </g>
+    <text x="504" y="23" font-size="9" fill="#6b7280">···</text>
+    <rect x="520" y="6" width="55" height="26" rx="4" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+    <text x="548" y="23" text-anchor="middle" font-size="8" fill="#166534">You: new</text>
+
+    <rect x="581" y="6" width="153" height="26" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="0.5" stroke-dasharray="3,3"/>
+    <text x="658" y="23" text-anchor="middle" font-size="9" fill="#cbd5e1">shrinking...</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(100, 400)">
+    <rect width="600" height="100" rx="8" fill="white" stroke="#e5e7eb" stroke-width="1" filter="url(#shadow)"/>
+    <text x="300" y="24" text-anchor="middle" font-size="12" font-weight="500" fill="#374151">Why this matters</text>
+
+    <g transform="translate(30, 42)">
+      <rect width="12" height="12" rx="2" fill="#e0e7ff"/>
+      <text x="20" y="11" font-size="10" fill="#6b7280">Your messages</text>
+    </g>
+    <g transform="translate(150, 42)">
+      <rect width="12" height="12" rx="2" fill="#fef3c7"/>
+      <text x="20" y="11" font-size="10" fill="#6b7280">AI responses</text>
+    </g>
+    <g transform="translate(280, 42)">
+      <rect width="12" height="12" rx="2" fill="#dcfce7" stroke="#86efac" stroke-width="0.5"/>
+      <text x="20" y="11" font-size="10" fill="#6b7280">New message</text>
+    </g>
+    <g transform="translate(420, 42)">
+      <rect width="12" height="12" rx="2" fill="#fef2f2" stroke="#fecaca" stroke-width="0.5"/>
+      <text x="20" y="11" font-size="10" fill="#6b7280">Dropped (forgotten)</text>
+    </g>
+
+    <text x="300" y="78" text-anchor="middle" font-size="10" fill="#9ca3af">Every message re-sends all previous messages. Cost and latency grow with each turn.</text>
+  </g>
+</svg>

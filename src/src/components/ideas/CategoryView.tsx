@@ -18,29 +18,6 @@ interface RenderedPost {
   contentHtml: string;
 }
 
-function Breadcrumb({
-  category,
-  consuming = false,
-}: {
-  category: Category;
-  consuming?: boolean;
-}) {
-  return (
-    <div className="flex items-center gap-1 font-mono text-[11px] text-fg-light">
-      <Link href="/" className="hover:text-accent transition-colors">
-        ~/blake.thomson
-      </Link>
-      <span className="text-border">/</span>
-      <Link href="/ideas" className="hover:text-accent transition-colors">
-        ideas
-      </Link>
-      <span className="text-border">/</span>
-      <span className={consuming ? "text-fg-muted" : "text-accent"}>
-        {category.shortLabel.toLowerCase().replace(/\s+/g, "-")}
-      </span>
-    </div>
-  );
-}
 
 function PreviewButton({
   onClick,
@@ -128,11 +105,6 @@ export function CategoryView({
 
   return (
     <div className="flex flex-col gap-4 pb-5 pt-5">
-      {/* ─── Breadcrumb bar ─── */}
-      <div className="mx-auto w-[calc(100%-2*16px)] max-w-[1200px] md:w-[calc(100%-2*40px)]">
-        <Breadcrumb category={category} consuming={consuming} />
-      </div>
-
       {/* ─── Header ─── */}
       <Panel>
         <div className="flex items-start justify-between gap-4">

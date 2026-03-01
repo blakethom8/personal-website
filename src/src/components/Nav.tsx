@@ -16,6 +16,15 @@ interface NavLink {
   children?: NavChild[];
 }
 
+function buildPathSegments(pathname: string): { label: string; href: string }[] {
+  if (pathname === "/") return [];
+  const parts = pathname.split("/").filter(Boolean);
+  return parts.map((part, i) => ({
+    label: part,
+    href: "/" + parts.slice(0, i + 1).join("/"),
+  }));
+}
+
 const links: NavLink[] = [
   { href: "/about", label: "about" },
   {
@@ -31,6 +40,7 @@ const links: NavLink[] = [
     label: "ideas",
     children: [
       { href: "/ideas", label: "all topics" },
+      { href: "/ideas/catalogue", label: "full catalogue" },
       { href: "/ideas/agent-interoperability", label: "agent interoperability" },
       { href: "/ideas/rethinking-saas", label: "rethinking SaaS" },
       { href: "/ideas/building", label: "things i'm building" },
@@ -186,20 +196,41 @@ export function Nav() {
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const segments = buildPathSegments(pathname);
 
   return (
     <>
       <nav className="panel sticky top-3 z-50 mx-auto mt-3 w-[calc(100%-2*16px)] max-w-[1200px] px-4 py-2.5 md:w-[calc(100%-2*40px)] md:px-5">
-        <div className="flex items-center justify-between">
-          <Link
-            href="/"
-            className="font-mono text-[13px] text-fg no-underline hover:no-underline hover:text-accent"
-          >
-            <span className="text-fg-light">~/</span>blake.thomson
-          </Link>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center min-w-0 font-mono text-[13px]">
+            <Link
+              href="/"
+              className="text-fg no-underline hover:no-underline hover:text-accent shrink-0"
+            >
+              <span className="text-fg-light">~/</span>blake.thomson
+            </Link>
+            {segments.map((seg, i) => {
+              const isLast = i === segments.length - 1;
+              return (
+                <span key={seg.href} className="inline-flex items-center shrink-0">
+                  <span className="text-fg-light">/</span>
+                  {isLast ? (
+                    <span className="text-fg-light">{seg.label}</span>
+                  ) : (
+                    <Link
+                      href={seg.href}
+                      className="text-fg-light no-underline hover:no-underline hover:text-accent transition-colors"
+                    >
+                      {seg.label}
+                    </Link>
+                  )}
+                </span>
+              );
+            })}
+          </div>
 
           {/* Desktop links */}
-          <div className="hidden items-center gap-1 md:flex">
+          <div className="hidden items-center gap-1 md:flex shrink-0">
             {links.map((link) =>
               link.children ? (
                 <DesktopDropdown
@@ -242,14 +273,35 @@ export function Nav() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-[100] flex flex-col bg-bg/98 backdrop-blur-sm">
-          <div className="flex items-center justify-between px-5 py-4">
-            <Link
-              href="/"
-              onClick={() => setMobileOpen(false)}
-              className="font-mono text-[13px] text-fg no-underline"
-            >
-              <span className="text-fg-light">~/</span>blake.thomson
-            </Link>
+          <div className="flex items-center justify-between gap-4 px-5 py-4">
+            <div className="flex items-center min-w-0 font-mono text-[13px]">
+              <Link
+                href="/"
+                onClick={() => setMobileOpen(false)}
+                className="text-fg no-underline shrink-0"
+              >
+                <span className="text-fg-light">~/</span>blake.thomson
+              </Link>
+              {segments.map((seg, i) => {
+                const isLast = i === segments.length - 1;
+                return (
+                  <span key={seg.href} className="inline-flex items-center shrink-0">
+                    <span className="text-fg-light">/</span>
+                    {isLast ? (
+                      <span className="text-fg-light">{seg.label}</span>
+                    ) : (
+                      <Link
+                        href={seg.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="text-fg-light no-underline hover:text-accent transition-colors"
+                      >
+                        {seg.label}
+                      </Link>
+                    )}
+                  </span>
+                );
+              })}
+            </div>
             <button
               onClick={() => setMobileOpen(false)}
               aria-label="Close menu"

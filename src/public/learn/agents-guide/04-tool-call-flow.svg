@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 650" font-family="Inter, system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#0ea5e9" stroke-width="1.5"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#10b981" stroke-width="1.5"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#f97316" stroke-width="1.5"/>
+    </marker>
+  </defs>
+
+  <rect width="800" height="650" fill="#fafafa" rx="12"/>
+
+  <!-- Title -->
+  <text x="400" y="36" text-anchor="middle" font-size="18" font-weight="600" fill="#1a1a1a">How a Tool Call Works</text>
+  <text x="400" y="56" text-anchor="middle" font-size="13" fill="#6b7280">The model requests. The harness executes. The model sees the result.</text>
+
+  <!-- Three columns -->
+  <!-- Column headers -->
+  <g transform="translate(0, 75)">
+    <rect x="80" y="0" width="140" height="36" rx="18" fill="#e0e7ff" stroke="#818cf8" stroke-width="1.5"/>
+    <text x="150" y="23" text-anchor="middle" font-size="12" font-weight="500" fill="#4338ca">👤 You</text>
+
+    <rect x="330" y="0" width="140" height="36" rx="18" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+    <text x="400" y="23" text-anchor="middle" font-size="12" font-weight="500" fill="#065f46">⚙️ Harness</text>
+
+    <rect x="580" y="0" width="140" height="36" rx="18" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="650" y="23" text-anchor="middle" font-size="12" font-weight="500" fill="#92400e">🧠 Model</text>
+  </g>
+
+  <!-- Vertical lines -->
+  <line x1="150" y1="120" x2="150" y2="620" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="400" y1="120" x2="400" y2="620" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="650" y1="120" x2="650" y2="620" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <!-- Step 1: User sends message -->
+  <g transform="translate(0, 140)">
+    <rect x="56" y="0" width="188" height="44" rx="6" fill="white" stroke="#818cf8" stroke-width="1" filter="url(#shadow)"/>
+    <text x="150" y="18" text-anchor="middle" font-size="10" font-weight="500" fill="#818cf8">STEP 1</text>
+    <text x="150" y="34" text-anchor="middle" font-size="10" fill="#374151">"Prep me for my meeting</text>
+    <!-- Arrow to harness -->
+    <line x1="246" y1="22" x2="394" y2="22" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+    <text x="320" y="16" text-anchor="middle" font-size="9" fill="#0ea5e9">sends message</text>
+  </g>
+
+  <!-- Step 2: Harness constructs request -->
+  <g transform="translate(0, 205)">
+    <rect x="306" y="0" width="188" height="56" rx="6" fill="white" stroke="#10b981" stroke-width="1" filter="url(#shadow)"/>
+    <text x="400" y="18" text-anchor="middle" font-size="10" font-weight="500" fill="#10b981">STEP 2</text>
+    <text x="400" y="33" text-anchor="middle" font-size="10" fill="#374151">Builds envelope:</text>
+    <text x="400" y="47" text-anchor="middle" font-size="9" fill="#6b7280">system + history + tools + msg</text>
+    <!-- Arrow to model -->
+    <line x1="496" y1="28" x2="644" y2="28" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+    <text x="570" y="22" text-anchor="middle" font-size="9" fill="#10b981">API call</text>
+  </g>
+
+  <!-- Step 3: Model requests tool -->
+  <g transform="translate(0, 290)">
+    <rect x="556" y="0" width="188" height="56" rx="6" fill="white" stroke="#f59e0b" stroke-width="1" filter="url(#shadow)"/>
+    <text x="650" y="18" text-anchor="middle" font-size="10" font-weight="500" fill="#f59e0b">STEP 3</text>
+    <text x="650" y="33" text-anchor="middle" font-size="10" fill="#374151">Requests tool call:</text>
+    <text x="650" y="47" text-anchor="middle" font-size="9" fill="#6b7280" font-style="italic">search_contacts("Dr. Patel")</text>
+    <!-- Arrow back to harness -->
+    <line x1="554" y1="28" x2="406" y2="28" stroke="#f97316" stroke-width="1.5" marker-end="url(#arrowOrange)"/>
+    <text x="480" y="22" text-anchor="middle" font-size="9" fill="#f97316">tool request</text>
+  </g>
+
+  <!-- Step 4: Harness executes -->
+  <g transform="translate(0, 375)">
+    <rect x="306" y="0" width="188" height="56" rx="6" fill="white" stroke="#10b981" stroke-width="1" filter="url(#shadow)"/>
+    <text x="400" y="18" text-anchor="middle" font-size="10" font-weight="500" fill="#10b981">STEP 4</text>
+    <text x="400" y="33" text-anchor="middle" font-size="10" fill="#374151">Executes the tool</text>
+    <text x="400" y="47" text-anchor="middle" font-size="9" fill="#6b7280">Queries CRM → gets contact data</text>
+    <!-- Arrow to model -->
+    <line x1="496" y1="28" x2="644" y2="28" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+    <text x="570" y="22" text-anchor="middle" font-size="9" fill="#10b981">tool result</text>
+  </g>
+
+  <!-- Step 5: Model responds -->
+  <g transform="translate(0, 460)">
+    <rect x="556" y="0" width="188" height="56" rx="6" fill="white" stroke="#f59e0b" stroke-width="1" filter="url(#shadow)"/>
+    <text x="650" y="18" text-anchor="middle" font-size="10" font-weight="500" fill="#f59e0b">STEP 5</text>
+    <text x="650" y="33" text-anchor="middle" font-size="10" fill="#374151">Composes answer</text>
+    <text x="650" y="47" text-anchor="middle" font-size="9" fill="#6b7280">"Here's your prep brief..."</text>
+    <!-- Arrow back through harness to user -->
+    <line x1="554" y1="28" x2="406" y2="28" stroke="#f97316" stroke-width="1.5" marker-end="url(#arrowOrange)"/>
+  </g>
+
+  <!-- Step 6: Delivered to user -->
+  <g transform="translate(0, 540)">
+    <rect x="306" y="0" width="188" height="36" rx="6" fill="white" stroke="#10b981" stroke-width="1" filter="url(#shadow)"/>
+    <text x="400" y="23" text-anchor="middle" font-size="10" fill="#374151">Delivers to you</text>
+    <line x1="304" y1="18" x2="156" y2="18" stroke="#0ea5e9" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+
+    <rect x="56" y="-4" width="188" height="44" rx="6" fill="white" stroke="#818cf8" stroke-width="1" filter="url(#shadow)"/>
+    <text x="150" y="14" text-anchor="middle" font-size="10" font-weight="500" fill="#818cf8">RESULT</text>
+    <text x="150" y="30" text-anchor="middle" font-size="10" fill="#374151">Your prep brief ✅</text>
+  </g>
+
+  <!-- Annotation -->
+  <g transform="translate(60, 608)">
+    <text x="340" y="0" text-anchor="middle" font-size="10" fill="#9ca3af">2 model calls  ·  1 tool execution  ·  ~3 seconds  ·  The model never touched the database — the harness did</text>
+  </g>
+</svg>
