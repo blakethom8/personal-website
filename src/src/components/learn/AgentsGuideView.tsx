@@ -93,11 +93,11 @@ export function AgentsGuideView({ intro, steps, closing }: AgentsGuideViewProps)
         </h1>
 
         {/* Step navigator */}
-        <div className="mt-5 flex items-center gap-1">
+        <div className="learn-tabs mt-5 flex items-center gap-1 overflow-x-auto pb-1">
           {/* Intro dot */}
           <button
             onClick={() => setActiveView(null)}
-            className={`flex h-8 items-center rounded px-3 font-mono text-[11px] transition-colors ${
+            className={`flex h-8 shrink-0 items-center rounded px-3 font-mono text-[11px] transition-colors ${
               isIntro
                 ? "bg-accent-light text-accent"
                 : "text-fg-light hover:text-accent hover:bg-bg-panel-hover"
@@ -110,7 +110,7 @@ export function AgentsGuideView({ intro, steps, closing }: AgentsGuideViewProps)
             <button
               key={step.number}
               onClick={() => setActiveView(i)}
-              className={`flex h-8 items-center gap-1.5 rounded px-3 font-mono text-[11px] transition-colors ${
+              className={`flex h-8 shrink-0 items-center gap-1.5 rounded px-3 font-mono text-[11px] transition-colors ${
                 activeView === i
                   ? "bg-accent-light text-accent"
                   : "text-fg-light hover:text-accent hover:bg-bg-panel-hover"
@@ -124,7 +124,7 @@ export function AgentsGuideView({ intro, steps, closing }: AgentsGuideViewProps)
 
           <button
             onClick={() => setActiveView("closing")}
-            className={`flex h-8 items-center rounded px-3 font-mono text-[11px] transition-colors ${
+            className={`flex h-8 shrink-0 items-center rounded px-3 font-mono text-[11px] transition-colors ${
               isClosing
                 ? "bg-accent-light text-accent"
                 : "text-fg-light hover:text-accent hover:bg-bg-panel-hover"

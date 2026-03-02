@@ -8,12 +8,18 @@ import { useTheme } from "./ThemeProvider";
 interface NavChild {
   href: string;
   label: string;
+  divider?: boolean;
 }
 
 interface NavLink {
   href: string;
   label: string;
   children?: NavChild[];
+}
+
+export interface FeaturedNavPost {
+  slug: string;
+  title: string;
 }
 
 function buildPathSegments(pathname: string): { label: string; href: string }[] {
@@ -25,14 +31,15 @@ function buildPathSegments(pathname: string): { label: string; href: string }[] 
   }));
 }
 
-const links: NavLink[] = [
-  { href: "/about", label: "about" },
+const baseLinks: NavLink[] = [
   {
-    href: "/work",
-    label: "work",
+    href: "/learn",
+    label: "learn",
     children: [
-      { href: "/work", label: "overview" },
-      { href: "/work/framework", label: "business framework" },
+      { href: "/learn", label: "overview" },
+      { href: "/learn/agents-explained", label: "agents: 5-step guide" },
+      { href: "/learn/simulator", label: "interactive labs" },
+      { href: "/learn/webmcp-lab", label: "WebMCP lab" },
     ],
   },
   {
@@ -41,33 +48,29 @@ const links: NavLink[] = [
     children: [
       { href: "/ideas", label: "all topics" },
       { href: "/ideas/catalogue", label: "full catalogue" },
-      { href: "/ideas/agent-interoperability", label: "agent interoperability" },
-      { href: "/ideas/rethinking-saas", label: "rethinking SaaS" },
-      { href: "/ideas/building", label: "things i'm building" },
-      { href: "/ideas/llms-healthcare", label: "LLMs & healthcare" },
-      { href: "/ideas/shower-ideas", label: "shower ideas" },
-      { href: "/ideas/in-my-feed", label: "in my feed" },
     ],
   },
   {
-    href: "/learn",
-    label: "learn",
+    href: "/work",
+    label: "work",
     children: [
-      { href: "/learn", label: "all modules" },
-      { href: "/learn/agents-explained", label: "agents: 5-step guide" },
-      { href: "/learn/simulator", label: "conversation simulator" },
-      { href: "/learn/webmcp-lab", label: "WebMCP lab" },
+      { href: "/work", label: "overview" },
+      { href: "/work/projects", label: "project spotlight" },
+      { href: "/work/framework", label: "consulting as a product" },
     ],
   },
+  { href: "/about", label: "about" },
   { href: "/contact", label: "contact" },
 ];
 
 function DesktopDropdown({
   link,
   pathname,
+  featuredIdeasPosts,
 }: {
   link: NavLink;
   pathname: string;
+  featuredIdeasPosts?: FeaturedNavPost[];
 }) {
   const [open, setOpen] = useState(false);
   const timeout = useRef<ReturnType<typeof setTimeout>>(null);
@@ -91,6 +94,8 @@ function DesktopDropdown({
     };
   }, []);
 
+  const showFeatured = link.href === "/ideas" && featuredIdeasPosts && featuredIdeasPosts.length > 0;
+
   return (
     <div
       ref={ref}
@@ -109,7 +114,7 @@ function DesktopDropdown({
 
       {open && link.children && (
         <div className="absolute left-0 top-full z-50 pt-1.5">
-          <div className="panel min-w-[200px] overflow-hidden rounded border border-border-light py-1 shadow-lg">
+          <div className="panel w-[220px] overflow-hidden rounded border border-border-light py-1 shadow-lg">
             {link.children.map((child) => (
               <Link
                 key={child.href}
@@ -122,6 +127,28 @@ function DesktopDropdown({
                 {child.label}
               </Link>
             ))}
+
+            {showFeatured && (
+              <>
+                <div className="mx-3 my-1 border-t border-border-light" />
+                <p className="px-4 pb-1 pt-1.5 font-mono text-[10px] uppercase tracking-wider text-fg-light">
+                  featured
+                </p>
+                {featuredIdeasPosts!.map((post) => (
+                  <Link
+                    key={post.slug}
+                    href={`/ideas/${post.slug}`}
+                    onClick={() => setOpen(false)}
+                    className={`block truncate px-4 py-2 font-mono text-[12px] no-underline transition-colors hover:bg-bg-panel-hover hover:text-accent ${
+                      pathname === `/ideas/${post.slug}` ? "text-accent" : "text-fg-muted"
+                    }`}
+                    title={post.title}
+                  >
+                    {post.title}
+                  </Link>
+                ))}
+              </>
+            )}
           </div>
         </div>
       )}
@@ -133,10 +160,12 @@ function MobileNavItem({
   link,
   pathname,
   onClose,
+  featuredIdeasPosts,
 }: {
   link: NavLink;
   pathname: string;
   onClose: () => void;
+  featuredIdeasPosts?: FeaturedNavPost[];
 }) {
   const [expanded, setExpanded] = useState(false);
   const isActive =
@@ -155,6 +184,8 @@ function MobileNavItem({
       </Link>
     );
   }
+
+  const showFeatured = link.href === "/ideas" && featuredIdeasPosts && featuredIdeasPosts.length > 0;
 
   return (
     <div>
@@ -186,23 +217,96 @@ function MobileNavItem({
               {child.label}
             </Link>
           ))}
+
+          {showFeatured && (
+            <>
+              <p className="pt-1 font-mono text-[10px] uppercase tracking-wider text-fg-light">
+                featured
+              </p>
+              {featuredIdeasPosts!.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/ideas/${post.slug}`}
+                  onClick={onClose}
+                  className={`truncate font-mono text-[13px] no-underline transition-colors ${
+                    pathname === `/ideas/${post.slug}`
+                      ? "text-accent"
+                      : "text-fg-light hover:text-accent"
+                  }`}
+                  title={post.title}
+                >
+                  {post.title}
+                </Link>
+              ))}
+            </>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-export function Nav() {
+export function Nav({ featuredIdeasPosts }: { featuredIdeasPosts?: FeaturedNavPost[] }) {
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const segments = buildPathSegments(pathname);
+  const links = baseLinks;
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const scrollY = window.scrollY;
+    const bodyStyle = document.body.style;
+    const htmlStyle = document.documentElement.style;
+    const previous = {
+      bodyOverflow: bodyStyle.overflow,
+      bodyPosition: bodyStyle.position,
+      bodyTop: bodyStyle.top,
+      bodyLeft: bodyStyle.left,
+      bodyRight: bodyStyle.right,
+      bodyWidth: bodyStyle.width,
+      htmlOverflow: htmlStyle.overflow,
+    };
+
+    bodyStyle.overflow = "hidden";
+    bodyStyle.position = "fixed";
+    bodyStyle.top = `-${scrollY}px`;
+    bodyStyle.left = "0";
+    bodyStyle.right = "0";
+    bodyStyle.width = "100%";
+    htmlStyle.overflow = "hidden";
+
+    return () => {
+      bodyStyle.overflow = previous.bodyOverflow;
+      bodyStyle.position = previous.bodyPosition;
+      bodyStyle.top = previous.bodyTop;
+      bodyStyle.left = previous.bodyLeft;
+      bodyStyle.right = previous.bodyRight;
+      bodyStyle.width = previous.bodyWidth;
+      htmlStyle.overflow = previous.htmlOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileOpen]);
 
   return (
     <>
       <nav className="panel sticky top-3 z-50 mx-auto mt-3 w-[calc(100%-2*16px)] max-w-[1200px] px-4 py-2.5 md:w-[calc(100%-2*40px)] md:px-5">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center min-w-0 font-mono text-[13px]">
+          <div className="flex min-w-0 items-center overflow-hidden font-mono text-[13px]">
             <Link
               href="/"
               className="text-fg no-underline hover:no-underline hover:text-accent shrink-0"
@@ -212,14 +316,14 @@ export function Nav() {
             {segments.map((seg, i) => {
               const isLast = i === segments.length - 1;
               return (
-                <span key={seg.href} className="inline-flex items-center shrink-0">
+                <span key={seg.href} className="inline-flex min-w-0 items-center">
                   <span className="text-fg-light">/</span>
                   {isLast ? (
-                    <span className="text-fg-light">{seg.label}</span>
+                    <span className="truncate text-fg-light">{seg.label}</span>
                   ) : (
                     <Link
                       href={seg.href}
-                      className="text-fg-light no-underline hover:no-underline hover:text-accent transition-colors"
+                      className="min-w-0 truncate text-fg-light no-underline transition-colors hover:no-underline hover:text-accent"
                     >
                       {seg.label}
                     </Link>
@@ -237,6 +341,7 @@ export function Nav() {
                   key={link.href}
                   link={link}
                   pathname={pathname}
+                  featuredIdeasPosts={featuredIdeasPosts}
                 />
               ) : (
                 <Link
@@ -263,6 +368,8 @@ export function Nav() {
           <button
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-overlay"
             className="flex h-8 w-8 items-center justify-center font-mono text-fg-muted md:hidden"
           >
             ≡
@@ -272,60 +379,66 @@ export function Nav() {
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-bg/98 backdrop-blur-sm">
-          <div className="flex items-center justify-between gap-4 px-5 py-4">
-            <div className="flex items-center min-w-0 font-mono text-[13px]">
-              <Link
-                href="/"
+        <div
+          id="mobile-nav-overlay"
+          className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain bg-bg/98 backdrop-blur-sm"
+        >
+          <div className="flex min-h-[100dvh] flex-col">
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <div className="flex min-w-0 items-center overflow-hidden font-mono text-[13px]">
+                <Link
+                  href="/"
+                  onClick={() => setMobileOpen(false)}
+                  className="shrink-0 text-fg no-underline"
+                >
+                  <span className="text-fg-light">~/</span>blake.thomson
+                </Link>
+                {segments.map((seg, i) => {
+                  const isLast = i === segments.length - 1;
+                  return (
+                    <span key={seg.href} className="inline-flex min-w-0 items-center">
+                      <span className="text-fg-light">/</span>
+                      {isLast ? (
+                        <span className="truncate text-fg-light">{seg.label}</span>
+                      ) : (
+                        <Link
+                          href={seg.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="min-w-0 truncate text-fg-light no-underline transition-colors hover:text-accent"
+                        >
+                          {seg.label}
+                        </Link>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+              <button
                 onClick={() => setMobileOpen(false)}
-                className="text-fg no-underline shrink-0"
+                aria-label="Close menu"
+                className="flex h-8 w-8 items-center justify-center font-mono text-fg-muted"
               >
-                <span className="text-fg-light">~/</span>blake.thomson
-              </Link>
-              {segments.map((seg, i) => {
-                const isLast = i === segments.length - 1;
-                return (
-                  <span key={seg.href} className="inline-flex items-center shrink-0">
-                    <span className="text-fg-light">/</span>
-                    {isLast ? (
-                      <span className="text-fg-light">{seg.label}</span>
-                    ) : (
-                      <Link
-                        href={seg.href}
-                        onClick={() => setMobileOpen(false)}
-                        className="text-fg-light no-underline hover:text-accent transition-colors"
-                      >
-                        {seg.label}
-                      </Link>
-                    )}
-                  </span>
-                );
-              })}
+                ✕
+              </button>
             </div>
-            <button
-              onClick={() => setMobileOpen(false)}
-              aria-label="Close menu"
-              className="flex h-8 w-8 items-center justify-center font-mono text-fg-muted"
-            >
-              ✕
-            </button>
-          </div>
-          <div className="flex flex-1 flex-col items-start justify-center gap-3 px-10">
-            {links.map((link) => (
-              <MobileNavItem
-                key={link.href}
-                link={link}
-                pathname={pathname}
-                onClose={() => setMobileOpen(false)}
-              />
-            ))}
-            <button
-              onClick={toggle}
-              className="mt-6 font-mono text-[13px] text-fg-light"
-              aria-label="Toggle dark mode"
-            >
-              {theme === "dark" ? "$ theme --light" : "$ theme --dark"}
-            </button>
+            <div className="flex flex-1 flex-col items-start justify-center gap-3 px-8 py-10 sm:px-10">
+              {links.map((link) => (
+                <MobileNavItem
+                  key={link.href}
+                  link={link}
+                  pathname={pathname}
+                  onClose={() => setMobileOpen(false)}
+                  featuredIdeasPosts={featuredIdeasPosts}
+                />
+              ))}
+              <button
+                onClick={toggle}
+                className="mt-6 font-mono text-[13px] text-fg-light"
+                aria-label="Toggle dark mode"
+              >
+                {theme === "dark" ? "$ theme --light" : "$ theme --dark"}
+              </button>
+            </div>
           </div>
         </div>
       )}

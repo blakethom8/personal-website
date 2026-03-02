@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import type { Heading } from "@/lib/headings";
 import type { Category } from "@/lib/categories";
@@ -25,6 +25,11 @@ interface ArticleViewProps {
 export function ArticleView({ post, contentHtml, headings, parentCategory }: ArticleViewProps) {
   const [paneOpen, setPaneOpen] = useState(false);
 
+  // Open by default on desktop
+  useEffect(() => {
+    if (window.innerWidth >= 960) setPaneOpen(true);
+  }, []);
+
   const togglePane = useCallback(() => {
     setPaneOpen((prev) => !prev);
   }, []);
@@ -37,7 +42,21 @@ export function ArticleView({ post, contentHtml, headings, parentCategory }: Art
           className="article-topbar"
           data-shifted={paneOpen}
         >
-          <div />
+          <div className="flex items-center gap-3">
+            <Link
+              href="/ideas"
+              className="font-mono text-[11px] text-fg-light no-underline transition-colors hover:text-accent"
+            >
+              ← ideas
+            </Link>
+            <span className="font-mono text-[10px] text-border">·</span>
+            <Link
+              href="/ideas/catalogue"
+              className="font-mono text-[11px] text-fg-light no-underline transition-colors hover:text-accent"
+            >
+              catalogue →
+            </Link>
+          </div>
           <button
             onClick={togglePane}
             className="inline-flex items-center gap-1.5 rounded px-2 py-1 font-mono text-[11px] text-fg-light transition-colors hover:bg-bg-panel-hover hover:text-fg"
@@ -140,18 +159,9 @@ export function ArticleView({ post, contentHtml, headings, parentCategory }: Art
             <div className="flex flex-col gap-3">
               <div>
                 <p className="label-mono mb-1.5">category</p>
-                {parentCategory ? (
-                  <Link
-                    href={`/ideas/${parentCategory.id}`}
-                    className="rounded bg-bg-panel-hover px-2 py-1 font-mono text-[11px] text-fg-muted no-underline hover:text-accent transition-colors"
-                  >
-                    {parentCategory.shortLabel}
-                  </Link>
-                ) : (
-                  <span className="rounded bg-bg-panel-hover px-2 py-1 font-mono text-[11px] capitalize text-fg-muted">
-                    {post.category}
-                  </span>
-                )}
+                <span className="rounded bg-bg-panel-hover px-2 py-1 font-mono text-[11px] text-fg-muted">
+                  {parentCategory?.shortLabel ?? post.category}
+                </span>
               </div>
 
               {post.tags.length > 0 && (

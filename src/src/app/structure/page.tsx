@@ -173,7 +173,7 @@ export default function StructurePage() {
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-3">Blog Posts</h3>
               <div className="bg-slate-50 rounded p-4 font-mono text-sm">
-                <div className="text-slate-600 mb-2">content/posts/</div>
+                <div className="text-slate-600 mb-2">content/ideas/</div>
                 <div className="ml-4 space-y-1 text-slate-700">
                   <div>├─ post-bespoke-ai-model.md</div>
                   <div>├─ post-death-of-multi-tenant.md</div>

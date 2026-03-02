@@ -7,39 +7,32 @@ export interface Category {
 
 export const CATEGORIES: Category[] = [
   {
-    id: "agent-interoperability",
-    label: "Agent Interoperability Changes Everything",
-    shortLabel: "Agent Interoperability",
+    id: "product-business",
+    label: "Product & Business of AI",
+    shortLabel: "Product & Business",
     quickDownload:
-      "How exactly do agents engage with their environment — the tools they have, the commands they run, and the emerging protocols that let AI talk to our systems. A lot of this is drawn from building with OpenClaw, bash commands, WebMCP, and what I'm seeing as the technical substrate everything else is being built on top of.",
+      "How to think about software products and business models when the cost of custom software collapses. The death of multi-tenant, the rise of bespoke, and what it means to actually build and sell in this space. Less about the technology, more about the shift.",
   },
   {
-    id: "rethinking-saas",
-    label: "Re-thinking the Business of SaaS",
-    shortLabel: "Rethinking SaaS",
+    id: "technical-deep-dives",
+    label: "Technical Deep Dives",
+    shortLabel: "Technical",
     quickDownload:
-      "Builds on the interoperability ideas but focuses on the business implications. The death of multi-tenant architectures, why companies like Salesforce aren't optimized for this environment, and how to think about software applications in total when the cost of custom software collapses to near zero.",
+      "Architecture, deployment, tools, and the mechanics of building with agents. OpenClaw, Azure, data pipelines, and how things actually work under the hood. Where the learning guides and hands-on explorations live.",
   },
   {
-    id: "building",
-    label: "Technical Explorations & What I'm Building",
-    shortLabel: "Things I'm Building",
+    id: "healthcare-data",
+    label: "Healthcare Data & Analysis",
+    shortLabel: "Healthcare",
     quickDownload:
-      "The tactical stuff. Specific platforms and tools we're developing, libraries I'm evaluating, system architecture decisions, and honest progress reports on what's working and what isn't. Less theory, more hands-on.",
+      "Using Medicare claims data, CMS datasets, and NPI records to drive real insights. Entity resolution, provider networks, fraud patterns — the research is early but the data is rich. More coming here.",
   },
   {
-    id: "llms-healthcare",
-    label: "LLMs & Healthcare",
-    shortLabel: "LLMs & Healthcare",
+    id: "thoughts-on-the-water",
+    label: "Thoughts on the Water",
+    shortLabel: "Thoughts",
     quickDownload:
-      "Healthcare data is messy, siloed, and the stakes are high. Here I explore entity resolution across CMS datasets, claims pipelines, NPI matching, and what it actually looks like to drop an LLM into a domain where precision matters and the data has been broken for decades.",
-  },
-  {
-    id: "shower-ideas",
-    label: "Shower Ideas are Sometimes Profound",
-    shortLabel: "Shower Ideas",
-    quickDownload:
-      "No agenda here. Fun things, personal things, observations that don't fit anywhere else. The unfiltered stuff. The catchall that keeps everything else honest. Read at your own risk.",
+      "Sometimes you notice things. Random observations, half-formed opinions, and whatever doesn't fit anywhere else. A lot of this gets captured with Local Chief — the unfiltered stuff.",
   },
 ];
 

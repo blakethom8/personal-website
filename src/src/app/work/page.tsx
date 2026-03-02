@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageBackground } from "@/components/PageBackground";
 import { Panel } from "@/components/Panel";
 import { backgrounds } from "@/lib/backgrounds";
@@ -159,7 +160,15 @@ export default function WorkPage() {
 
         {/* Projects */}
         <Panel as="section">
-          <p className="label-mono mb-3">projects</p>
+          <div className="flex items-baseline justify-between">
+            <p className="label-mono">projects</p>
+            <Link
+              href="/work/projects"
+              className="font-mono text-[11px] text-fg-light no-underline hover:text-accent"
+            >
+              full spotlight →
+            </Link>
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
             {projects.map((project) => (
               <article

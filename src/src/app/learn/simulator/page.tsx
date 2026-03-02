@@ -42,7 +42,7 @@ export default function SimulatorPage() {
         </Panel>
 
         {/* Simulator */}
-        <div className="panel mx-auto w-[calc(100%-2*16px)] max-w-[1400px] overflow-hidden md:w-[calc(100%-2*40px)]">
+        <div className="panel mx-auto w-[calc(100%-2*16px)] max-w-[1200px] overflow-hidden md:w-[calc(100%-2*40px)]">
           <ConversationSimulator />
         </div>
       </div>

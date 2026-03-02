@@ -3,7 +3,7 @@ title: "90 Million Rows of Medicare Data: What I Learned Building a Healthcare D
 date: "2026-02-26"
 excerpt: "CMS publishes incredible healthcare data — if you can wrangle it. Here's what I learned building a pipeline to ingest NPPES, Open Payments, and Medicare utilization data into DuckDB."
 readTime: "12 min"
-category: "building"
+category: "technical-deep-dives"
 tags: ["healthcare", "data-engineering", "duckdb", "cms", "pipeline"]
 featured: false
 ---

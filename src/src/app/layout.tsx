@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono, Instrument_Serif } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { getAllPosts } from "@/lib/posts";
 import "./globals.css";
 
 const inter = Inter({
@@ -39,6 +40,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const featuredIdeasPosts = getAllPosts()
+    .filter((p) => p.category !== "podcast-notes")
+    .slice(0, 2)
+    .map((p) => ({ slug: p.slug, title: p.title }));
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -46,7 +52,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <div className="relative min-h-screen flex flex-col">
-            <Nav />
+            <Nav featuredIdeasPosts={featuredIdeasPosts} />
             <main className="flex-1">{children}</main>
             <Footer />
           </div>

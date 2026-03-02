@@ -1,6 +1,8 @@
 "use server";
 
 import { getPostBySlug } from "./posts";
+import { getCategoryDoc } from "./category-docs";
+import { processHeadings } from "./headings";
 import { remark } from "remark";
 import html from "remark-html";
 
@@ -9,6 +11,7 @@ export async function getRenderedPost(slug: string) {
   if (!post) return null;
 
   const processed = await remark().use(html).process(post.content);
+  const { html: contentHtml, headings } = processHeadings(processed.toString());
 
   return {
     slug: post.slug,
@@ -18,6 +21,11 @@ export async function getRenderedPost(slug: string) {
     readTime: post.readTime,
     category: post.category,
     tags: post.tags || [],
-    contentHtml: processed.toString(),
+    contentHtml,
+    headings,
   };
+}
+
+export async function getRenderedCategoryDoc(categoryId: string) {
+  return getCategoryDoc(categoryId);
 }

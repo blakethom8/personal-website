@@ -5,7 +5,7 @@ import { Panel } from "@/components/Panel";
 import { backgrounds } from "@/lib/backgrounds";
 
 export const metadata: Metadata = {
-  title: "Bespoke AI Solutions: Business Framework",
+  title: "Bespoke AI Solutions: Consulting as a Product",
   description:
     "How we think about building AI-powered applications inside your environment — the paradigm shift, what we sell, and how we price it.",
 };
@@ -19,7 +19,7 @@ export default function FrameworkPage() {
         {/* Header */}
         <Panel>
           <div className="flex items-start justify-between gap-4">
-            <p className="label-mono">business framework</p>
+            <p className="label-mono">consulting as a product</p>
             <Link
               href="/work"
               className="font-mono text-[11px] text-fg-light no-underline hover:text-accent transition-colors"
@@ -28,7 +28,7 @@ export default function FrameworkPage() {
             </Link>
           </div>
           <h1 className="mt-2 font-serif text-2xl md:text-3xl">
-            Bespoke AI Solutions: Business Framework
+            Bespoke AI Solutions: Consulting as a Product
           </h1>
           <p className="mt-2 font-mono text-[12px] text-fg-light">
             Draft — February 25, 2026

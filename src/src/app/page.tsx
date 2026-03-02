@@ -13,137 +13,93 @@ export default function Home() {
       />
 
       <div className="flex flex-col gap-4 pb-5 pt-5">
-        {/* Hero — compact, code-inflected */}
-        <Panel className="py-8 md:py-10">
-          <p className="label-mono mb-3">
-            healthcare &middot; data &middot; ai
-          </p>
-          <h1 className="font-serif text-2xl leading-tight md:text-3xl lg:text-4xl">
-            Building the tools
-            <br />
-            <span className="text-accent">I wish existed.</span>
-          </h1>
-          <p className="mt-3 max-w-[750px] text-fg-muted">
-            This website is a collective domain of my experience building with
-            AI. The world of agents is moving fast, honestly too fast. This is
-            my attempt to keep-up, demystify LLMs, and capture topics that me
-            and Local Chief are exploring. As overwhelming as it is, the world
-            of computers is surprisingly simple. Humans are way more
-            interesting and complex.
-          </p>
-        </Panel>
-
-        {/* Two-column: Directory + Latest */}
-        <div className="mx-auto flex w-[calc(100%-2*16px)] max-w-[1200px] flex-col gap-4 md:w-[calc(100%-2*40px)] md:flex-row">
-          {/* Site Directory */}
-          <div className="panel shrink-0 px-5 py-5 md:w-[240px]">
+        {/* Row 1: Hero + Site Directory side by side */}
+        <div className="mx-auto flex w-[calc(100%-2*16px)] max-w-[1200px] flex-col gap-4 md:w-[calc(100%-2*40px)] md:flex-row md:items-start">
+          {/* Hero */}
+          <div className="panel flex-1 px-5 py-8 md:px-7 md:py-10">
             <p className="label-mono mb-3">
-              site map
+              healthcare &middot; data &middot; ai
             </p>
-            <div className="font-mono text-[13px] leading-relaxed text-fg-muted">
-              <DirectoryItem href="/" label="index" active />
-              <DirectoryItem href="/about" label="about" indent={1}>
-                <span className="text-fg-light"> — story</span>
-              </DirectoryItem>
-              <DirectoryItem href="/work" label="work" indent={1}>
-                <span className="text-fg-light"> — projects</span>
-              </DirectoryItem>
-              <DirectoryItem href="/ideas" label="ideas" indent={1}>
-                <span className="text-fg-light"> — writing</span>
-              </DirectoryItem>
-              <div className="ml-7 border-l border-border-light pl-3 text-fg-light">
-                <DirectoryItem href="/ideas/bespoke-ai-model" label="bespoke-ai-model" indent={0} muted />
-                <DirectoryItem href="/ideas/webmcp-overview" label="webmcp-overview" indent={0} muted />
-                <DirectoryItem href="/ideas/entity-resolution-healthcare" label="entity-resolution" indent={0} muted />
-                <DirectoryItem href="/ideas/ai-is-the-glue" label="old-model-new-model" indent={0} muted />
-              </div>
-              <DirectoryItem href="/learn" label="learn" indent={1}>
-                <span className="text-fg-light"> — modules</span>
-              </DirectoryItem>
-              <DirectoryItem href="/contact" label="contact" indent={1}>
-                <span className="text-fg-light"> — reach out</span>
-              </DirectoryItem>
+            <h1 className="font-serif text-2xl leading-tight md:text-3xl lg:text-4xl">
+              Chatting about AI
+              <br />
+              <span className="text-accent">And keeping it real.</span>
+            </h1>
+            <div className="mt-3 max-w-[750px] space-y-3 text-fg-muted">
+              <p>
+                This website is a collection of my experience and thoughts while
+                building with AI. My primary focus is educational, where I attempt
+                to simplify the key concepts of &ldquo;Applied Agents&rdquo; and share ideas
+                around the LLM application space. I feel somewhat confident
+                speaking on the topic because I am currently spending way too much
+                time behind the computer, creating agentic applications through
+                the help of agents.
+              </p>
+              <p>
+                In addition, I&rsquo;m building a career in this space. This isn&rsquo;t my
+                formal business page, but let&rsquo;s connect. I love talking about
+                LLMs, and most importantly how we can maximize their use to spend
+                less time behind a screen and more time in the real world.
+              </p>
+              <p className="mt-6">A couple of notes:</p>
+              <ul className="list-disc space-y-1.5 pl-5 text-[13px]">
+                <li>
+                  AI slop is ruining the internet (blog post coming later). That
+                  said, yes, I will be working with agents to help build out my
+                  content. My promise is to prefer quality over quantity, and
+                  ensure the content is at least well curated.
+                </li>
+                <li>
+                  On the design — I spend a lot of my time in Claude Code
+                  terminals to manage all aspects of my work. Terminals are funny.
+                  Folder structure matters a lot. I&rsquo;m trying to incorporate some
+                  of that &ldquo;feel&rdquo; throughout this website.
+                </li>
+              </ul>
             </div>
           </div>
 
-          {/* Latest + Featured stacked */}
-          <div className="flex flex-1 flex-col gap-4">
-            {/* Latest Ideas */}
-            <section className="panel px-5 py-5 md:px-6">
-              <div className="flex items-baseline justify-between">
-                <p className="label-mono">latest posts</p>
-                <Link
-                  href="/ideas"
-                  className="font-mono text-[11px] text-fg-light no-underline hover:text-accent"
-                >
-                  all &rarr;
-                </Link>
-              </div>
-              <div className="mt-3 divide-y divide-border-light">
-                <PostRow
-                  title="The Bespoke AI Model: Why We Build Inside Your Walls"
-                  category="business"
-                  readTime="10 min"
-                  date="Feb 25"
-                  href="/ideas/bespoke-ai-model"
-                />
-                <PostRow
-                  title="WebMCP: Making Websites AI-Native"
-                  category="technology"
-                  readTime="8 min"
-                  date="Feb 20"
-                  href="/ideas/webmcp-overview"
-                />
-                <PostRow
-                  title="Entity Resolution in Healthcare"
-                  category="healthcare"
-                  readTime="12 min"
-                  date="Feb 15"
-                  href="/ideas/entity-resolution-healthcare"
-                />
-                <PostRow
-                  title="Old Model vs. New Model"
-                  category="business"
-                  readTime="6 min"
-                  date="Feb 10"
-                  href="/ideas/ai-is-the-glue"
-                />
-              </div>
-            </section>
-
-            {/* Featured Project */}
-            <section className="panel px-5 py-5 md:px-6">
-              <div className="flex items-baseline justify-between">
-                <p className="label-mono">currently building</p>
-                <Link
-                  href="/work"
-                  className="font-mono text-[11px] text-fg-light no-underline hover:text-accent"
-                >
-                  all &rarr;
-                </Link>
-              </div>
-              <div className="mt-3">
-                <h3 className="font-sans text-[15px] font-semibold text-fg">
-                  Provider Intelligence Platform
-                </h3>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-fg-muted">
-                  Search and analytics for physician liaisons — 90M+ rows of
-                  Medicare claims, Google Places integration, cascading NPI
-                  match engine.
-                </p>
-                <div className="mt-2.5 flex flex-wrap gap-1.5">
-                  {["FastAPI", "React", "DuckDB", "Docker", "CMS Data", "MCP"].map(
-                    (tag) => (
-                      <span key={tag} className="tag">
-                        {tag}
-                      </span>
-                    )
-                  )}
-                </div>
-              </div>
-            </section>
+          {/* Site Directory */}
+          <div className="panel shrink-0 px-5 py-5 md:w-[240px]">
+            <p className="label-mono mb-3">site map</p>
+            <div className="font-mono text-[13px] leading-relaxed text-fg-muted">
+              <DirectoryItem href="/" label="index" active />
+              <DirectoryItem href="/learn" label="learn" indent={1} desc="guides, labs & modules" />
+              <DirectoryItem href="/ideas" label="ideas" indent={1} desc="essays & writing" />
+              <DirectoryItem href="/work" label="work" indent={1} desc="projects & offerings" />
+              <DirectoryItem href="/about" label="about" indent={1} desc="background & story" />
+              <DirectoryItem href="/contact" label="contact" indent={1} desc="let's connect" />
+            </div>
           </div>
         </div>
+
+        {/* Row 2: Featured Content — full width */}
+        <Panel as="section">
+          <p className="label-mono mb-4">featured</p>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <FeaturedCard
+              href="/learn/agents-explained"
+              type="guide"
+              title="How AI Agents Actually Work"
+              description="Break down the 5 layers of an AI agent — from the model to tools to memory. Built for curious people, not engineers."
+              cta="start the guide"
+            />
+            <FeaturedCard
+              href="/learn/simulator"
+              type="interactive lab"
+              title="AI Conversation Simulator"
+              description="Watch a real AI API call happen step by step. See the system prompt, the messages array, and how the model responds."
+              cta="open simulator"
+            />
+            <FeaturedCard
+              href="/ideas/death-of-multi-tenant"
+              type="essay"
+              title="The Death of Multi-Tenant"
+              description="Why bespoke, single-tenant AI deployments are replacing shared infrastructure — and what that means for how software gets built."
+              cta="read essay"
+            />
+          </div>
+        </Panel>
       </div>
     </>
   );
@@ -155,14 +111,14 @@ function DirectoryItem({
   indent = 0,
   active = false,
   muted = false,
-  children,
+  desc,
 }: {
   href: string;
   label: string;
   indent?: number;
   active?: boolean;
   muted?: boolean;
-  children?: React.ReactNode;
+  desc?: string;
 }) {
   const ml = indent === 1 ? "ml-4" : "";
   return (
@@ -179,37 +135,41 @@ function DirectoryItem({
       >
         {muted ? label : <>{active ? "~/" : "├─ "}{label}</>}
       </Link>
-      {children}
+      {desc && (
+        <p className="ml-5 text-[11px] leading-snug text-fg-light">{desc}</p>
+      )}
     </div>
   );
 }
 
-function PostRow({
+function FeaturedCard({
+  href,
+  type,
   title,
-  category,
-  readTime,
-  date,
-  href = "/ideas",
+  description,
+  cta,
 }: {
+  href: string;
+  type: string;
   title: string;
-  category: string;
-  readTime: string;
-  date: string;
-  href?: string;
+  description: string;
+  cta: string;
 }) {
   return (
     <Link
       href={href}
-      className="flex flex-col gap-0.5 py-2.5 no-underline hover:no-underline sm:flex-row sm:items-center sm:justify-between"
+      className="panel flex flex-col px-5 py-5 no-underline transition-colors hover:border-accent-muted"
     >
-      <span className="text-[13px] text-fg hover:text-accent">{title}</span>
-      <span className="flex shrink-0 items-center gap-2 font-mono text-[11px] text-fg-light">
-        <span>{category}</span>
-        <span>&middot;</span>
-        <span>{readTime}</span>
-        <span>&middot;</span>
-        <span>{date}</span>
+      <span className="font-mono text-[10px] uppercase tracking-wider text-accent">
+        {type}
       </span>
+      <h3 className="mt-2 font-serif text-[15px] leading-snug text-fg md:text-[16px]">
+        {title}
+      </h3>
+      <p className="mt-2 flex-1 text-[12px] leading-relaxed text-fg-muted">
+        {description}
+      </p>
+      <p className="mt-4 font-mono text-[11px] text-accent">{cta} &rarr;</p>
     </Link>
   );
 }

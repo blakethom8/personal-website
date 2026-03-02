@@ -5,7 +5,7 @@ tags: ["the-shifting-model", "business"]
 excerpt: "Forget SaaS. Forget multi-tenant. The future of enterprise AI is bespoke applications deployed inside the client's own infrastructure. Here's the business model — and why it works."
 readTime: "12 min"
 featured: false
-category: "rethinking-saas"
+category: "product-business"
 ---
 
 # The Bespoke AI Model: Why We Build Inside Your Walls

@@ -6,7 +6,7 @@ describe("posts loader", () => {
     vi.restoreAllMocks();
   });
 
-  it("loads slugs and metadata from content/posts", () => {
+  it("loads slugs and metadata from content/ideas", () => {
     const slugs = getAllPostSlugs();
     const posts = getAllPosts();
 

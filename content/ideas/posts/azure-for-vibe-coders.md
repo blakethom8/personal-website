@@ -3,7 +3,7 @@ title: "Azure for Vibe Coders: A Practical Guide to Deploying AI Apps"
 date: "2026-02-25"
 excerpt: "You can build an AI app in a weekend. But Azure's portal makes your eyes glaze over. This guide maps Azure's concepts to what you actually need."
 readTime: "15 min"
-category: "building"
+category: "technical-deep-dives"
 tags: ["azure", "deployment", "docker", "cloud", "ai"]
 featured: false
 ---

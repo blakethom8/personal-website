@@ -18,7 +18,7 @@ function getPostsDirectory(): string {
   if (overrideRoot && overrideRoot.trim().length > 0) {
     return path.resolve(overrideRoot);
   }
-  return path.resolve(process.cwd(), "../content/posts");
+  return path.resolve(process.cwd(), "../content/ideas");
 }
 
 export function assertValidSlug(raw: unknown): string {

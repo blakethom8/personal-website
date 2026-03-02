@@ -3,7 +3,7 @@ title: "Agent-Native Architecture: Building Apps That Serve Humans and AI Simult
 date: "2026-02-26"
 excerpt: "AI browser agents can now interact with web apps in real-time. This changes how we build — apps need to serve two users: humans clicking buttons, and AI agents calling tools."
 readTime: "10 min"
-category: "agent-interoperability"
+category: "technical-deep-dives"
 tags: ["agents", "architecture", "webmcp", "ai", "web"]
 featured: false
 ---

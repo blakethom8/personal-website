@@ -3,7 +3,7 @@ title: "Why Your Doctor Doesn't Know Your Name"
 date: "2026-02-26"
 excerpt: "Your doctor's office can't reliably tell which John Smith you are across two different systems. That's not a tech problem — it's a 50-year-old design choice we never fixed."
 readTime: "5 min"
-category: "shower-ideas"
+category: "healthcare-data"
 tags: ["healthcare", "data", "entity-resolution", "opinion"]
 featured: false
 ---

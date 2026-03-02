@@ -5,7 +5,7 @@ tags: ["the-future-of-applications"]
 excerpt: "We don't need more apps. We need something that connects the ones we already have. AI isn't replacing your tools — it's becoming the layer that finally makes them work together."
 readTime: "10 min"
 featured: false
-category: "rethinking-saas"
+category: "product-business"
 ---
 
 # AI Is the Glue: Why the Future of Applications Isn't More Applications

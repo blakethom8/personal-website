@@ -9,7 +9,7 @@
 
   /* Foreground */
   --fg: #2C2825;
-  --fg-muted: #6B665F;
+  --fg-muted: #4A4540;
   --fg-light: #9E9890;
 
   /* Borders */
@@ -777,7 +777,7 @@ footer {
 .article-pane {
   flex: 0 0 0px;
   min-width: 0;
-  overflow: hidden;
+  overflow: clip;
   opacity: 0;
   transform: translateX(40px);
   transition: flex-basis 850ms cubic-bezier(0.22, 0.61, 0.36, 1),
@@ -802,8 +802,8 @@ footer {
   }
 }
 
-/* Mobile: pane takes full width */
-@media (max-width: 767px) {
+/* Mobile + tablet portrait: keep reading column full width */
+@media (max-width: 959px) {
   .article-main[data-shifted="true"] {
     flex: 0 0 0px;
     overflow: hidden;

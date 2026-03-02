@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageBackground } from "@/components/PageBackground";
 import { backgrounds } from "@/lib/backgrounds";
-import { getPostBySlug, getAllPosts, getAllPostSlugs } from "@/lib/posts";
+import { getPostBySlug, getAllPostSlugs } from "@/lib/posts";
 import { CATEGORIES, CONSUMING_CATEGORY, ALL_CATEGORY_IDS } from "@/lib/categories";
 import { processHeadings } from "@/lib/headings";
 import { ArticleView } from "@/components/ideas/ArticleView";
 import { CategoryView } from "@/components/ideas/CategoryView";
+import { getCategoryDoc } from "@/lib/category-docs";
 import { remark } from "remark";
 import html from "remark-html";
 
@@ -54,26 +55,24 @@ export default async function IdeasSlugPage({ params }: Props) {
   // ── Category page ──
   const category = CATEGORIES.find((c) => c.id === slug);
   if (category) {
-    const allPosts = getAllPosts();
-    const categoryPosts = allPosts.filter((p) => p.category === category.id);
+    const doc = await getCategoryDoc(category.id);
     return (
       <>
         <PageBackground src={backgrounds.ideas} alt="Coastal fog over the ocean" />
-        <CategoryView category={category} posts={categoryPosts} />
+        <CategoryView category={category} contentHtml={doc?.contentHtml ?? ""} />
       </>
     );
   }
 
   // ── "In My Feed" page ──
   if (slug === CONSUMING_CATEGORY.id) {
-    const allPosts = getAllPosts();
-    const consumingPosts = allPosts.filter((p) => p.category === "podcast-notes");
+    const doc = await getCategoryDoc(CONSUMING_CATEGORY.id);
     return (
       <>
         <PageBackground src={backgrounds.ideas} alt="Coastal fog over the ocean" />
         <CategoryView
           category={CONSUMING_CATEGORY}
-          posts={consumingPosts}
+          contentHtml={doc?.contentHtml ?? ""}
           consuming
         />
       </>
