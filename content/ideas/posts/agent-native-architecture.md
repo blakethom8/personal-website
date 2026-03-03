@@ -5,7 +5,8 @@ excerpt: "AI browser agents can now interact with web apps in real-time. This ch
 readTime: "10 min"
 category: "technical-deep-dives"
 tags: ["agents", "architecture", "webmcp", "ai", "web"]
-featured: false
+featured: true
+coverImage: "/images/posts/agent-native-architecture.jpg"
 ---
 
 # Agent-Native Architecture: Building Apps That Serve Humans and AI Simultaneously

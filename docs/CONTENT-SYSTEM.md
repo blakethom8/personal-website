@@ -50,6 +50,8 @@ Claude can:
 | **Blog metadata** (title, tags, date...) | Frontmatter in `*.md` files | Database properties in Ideas | Editable in raw markdown | Parsed at build time |
 | **Page copy** (headlines, descriptions) | TSX component files | Extracted to Notion pages | Not editable here | Hardcoded in components |
 | **Learn section copy** (terminal text, nav) | Component files in `learn/` | Extracted to Learn page | Not editable here | In `OverviewTab.tsx`, etc. |
+| **Agents guide content** (modules 1-5) | `content/learn/learn-agents-guide/*.md` | Not in Notion | Not editable here | Server-rendered via remark+remark-html |
+| **Simulator scenarios** | TS files in `src/src/lib/` | Not in Notion | Not editable here | `conversation-scenarios.ts`, `context-scenarios.ts`, `openclaw-terminal-scenarios.ts` |
 | **Component structure** (layout, styles) | TSX files | Not in Notion | Not editable here | Full source in `src/` |
 
 **Key principle:** The files in the repo are always the source of truth. Notion is a comfortable editing layer on top. The admin editor is a quick-access tool for posts. Neither replaces the repo.
@@ -141,13 +143,25 @@ This is a manual step by design — automatic sync would be fragile and surprisi
 | File | Purpose |
 |---|---|
 | `content/posts/*.md` | Blog post content (frontmatter + markdown body) |
+| `content/learn/learn-agents-guide/00-introduction.md` | Agents guide intro |
+| `content/learn/learn-agents-guide/01-05.md` | Agents guide modules 1-5 (numbered markdown) |
+| `content/learn/learn-agents-guide/06-same-engine-different-cars.md` | Agents guide epilogue |
 | `src/src/app/page.tsx` | Home page copy |
 | `src/src/app/about/page.tsx` | About page copy |
 | `src/src/app/work/page.tsx` | Work page copy |
 | `src/src/app/contact/page.tsx` | Contact page copy |
+| `src/src/app/learn/agents-explained/page.tsx` | Agents guide page (server-side markdown rendering) |
+| `src/src/components/learn/AgentsGuideView.tsx` | Agents guide UI (step navigator, modal system) |
+| `src/src/components/learn/ConversationSimulator.tsx` | Conversation simulator (main orchestrator) |
+| `src/src/components/learn/SimulatorFlow.tsx` | Simulator message rendering |
+| `src/src/components/learn/ContextPane.tsx` | Simulator context window side panel |
 | `src/src/components/learn/OverviewTab.tsx` | Learn overview copy |
 | `src/src/components/learn/TerminalSplitBlock.tsx` | Terminal narrative text |
 | `src/src/components/learn/DeepDivesTab.tsx` | Deep dives listing copy |
+| `src/src/lib/conversation-scenarios.ts` | "How it works" simulator scenarios + context snapshots |
+| `src/src/lib/openclaw-terminal-scenarios.ts` | "Agent workflows" simulator scenarios |
+| `src/src/lib/context-scenarios.ts` | "Context window" simulator scenarios |
+| `src/src/hooks/useSimulator.ts` | Simulator playback state machine (play/pause/step/goToStep) |
 | `src/src/lib/admin-content.ts` | Admin editor file operations |
 | `src/src/app/api/admin/content/save/route.ts` | Save API (POST, writes to disk) |
 | `src/src/app/api/admin/content/load/route.ts` | Load API (GET, reads from disk) |

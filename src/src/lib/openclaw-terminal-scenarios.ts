@@ -1,7 +1,106 @@
 // OpenClaw Terminal Simulator Scenarios
 // These scenarios show real OpenClaw workflows in action
 
-import { Scenario } from "./conversation-scenarios";
+import {
+  Scenario,
+  type WorkspaceItem,
+  type WorkspaceItemStatus,
+  type WorkspaceSnapshot,
+} from "./conversation-scenarios";
+
+function wsItem(path: string, kind: WorkspaceItem["kind"], meta?: string): WorkspaceItem {
+  return { path, kind, meta };
+}
+
+function wsSnapshot(
+  rootLabel: string,
+  activity: string,
+  note: string | undefined,
+  baseItems: WorkspaceItem[],
+  overrides: Record<string, { status?: WorkspaceItemStatus; meta?: string }> = {},
+  additions: WorkspaceItem[] = []
+): WorkspaceSnapshot {
+  const items = [...baseItems, ...additions].map((item) => {
+    const override = overrides[item.path];
+    return override ? { ...item, ...override } : { ...item };
+  });
+
+  return {
+    rootLabel,
+    activity,
+    note,
+    items,
+  };
+}
+
+const navigatorWorkspaceBase: WorkspaceItem[] = [
+  wsItem("memory", "directory"),
+  wsItem("memory/2026-02-25.md", "file", "Yesterday's daily note with project decisions."),
+  wsItem("MEMORY.md", "file", "Long-term memory the agent updates over time."),
+  wsItem("data", "directory"),
+  wsItem("data/cms-providers.duckdb", "database", "Local healthcare dataset behind the CMS pipeline."),
+];
+
+const emailWorkspaceBase: WorkspaceItem[] = [
+  wsItem("HEARTBEAT.md", "file", "Autonomous rules for what the heartbeat should do."),
+  wsItem("mail", "directory"),
+  wsItem("mail/inbox-cache.sqlite", "database", "Local mail index the Gmail workflow refreshes."),
+  wsItem("mail/unread", "directory"),
+  wsItem("mail/outbox", "directory"),
+  wsItem("logs", "directory"),
+];
+
+const emailUnreadFiles: WorkspaceItem[] = [
+  wsItem("mail/unread/dave-devries.json", "file", "Prospect reply asking to schedule a call."),
+  wsItem("mail/unread/morning-brew.json", "file", "Routine newsletter."),
+  wsItem("mail/unread/github-issue.json", "file", "Low-priority repository alert."),
+];
+
+const emailOutboxFiles: WorkspaceItem[] = [
+  wsItem("mail/outbox/dave-devries-reply.eml", "file", "Reply drafted for Thursday afternoon."),
+  wsItem("logs/heartbeat-0900.log", "file", "Audit trail for this 9:00 AM heartbeat run."),
+];
+
+const codeWorkspaceBase: WorkspaceItem[] = [
+  wsItem("src", "directory"),
+  wsItem("src/components", "directory"),
+  wsItem("src/components/ExcelTableView.tsx", "file", "Results table that needs the export button."),
+  wsItem("src/utils", "directory"),
+  wsItem("package.json", "file", "Build and type-check scripts for the repo."),
+  wsItem("docker-compose.yml", "file", "Production services used during deploy."),
+  wsItem("data", "directory"),
+  wsItem("data/provider-cache.duckdb", "database", "Provider search data already backing the visible table."),
+];
+
+const codeCreatedFiles: WorkspaceItem[] = [
+  wsItem("src/utils/csvExport.ts", "file", "New helper that turns visible rows into a downloadable CSV."),
+];
+
+function navigatorWorkspace(
+  activity: string,
+  note?: string,
+  overrides: Record<string, { status?: WorkspaceItemStatus; meta?: string }> = {}
+) {
+  return wsSnapshot("~/chief", activity, note, navigatorWorkspaceBase, overrides);
+}
+
+function emailWorkspace(
+  activity: string,
+  note?: string,
+  overrides: Record<string, { status?: WorkspaceItemStatus; meta?: string }> = {},
+  additions: WorkspaceItem[] = []
+) {
+  return wsSnapshot("~/chief-mail", activity, note, emailWorkspaceBase, overrides, additions);
+}
+
+function codeWorkspace(
+  activity: string,
+  note?: string,
+  overrides: Record<string, { status?: WorkspaceItemStatus; meta?: string }> = {},
+  additions: WorkspaceItem[] = []
+) {
+  return wsSnapshot("~/Repo/provider-search", activity, note, codeWorkspaceBase, overrides, additions);
+}
 
 // ─── Scenario 1: File Navigator ───
 
@@ -45,6 +144,13 @@ const fileNavigator: Scenario = {
           annotation: "Agent receives question, knows it needs to check memory files.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Orient around the memory files for yesterday's work",
+        "The agent begins by locating the parts of the workspace that store durable memory.",
+        {
+          memory: { status: "active" },
+        }
+      ),
       delay: 2500,
     },
     {
@@ -67,6 +173,13 @@ const fileNavigator: Scenario = {
           annotation: "Agent reasons about where to find the information.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Target memory/2026-02-25.md as the best source of truth",
+        "The thought process resolves to a specific file path before any tool call is made.",
+        {
+          "memory/2026-02-25.md": { status: "active" },
+        }
+      ),
       delay: 2000,
     },
     {
@@ -93,6 +206,13 @@ const fileNavigator: Scenario = {
           annotation: "Agent calls the read tool to fetch yesterday's notes.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Read yesterday's note from memory/2026-02-25.md",
+        "The active file lights up exactly where the tool call is pointed.",
+        {
+          "memory/2026-02-25.md": { status: "active" },
+        }
+      ),
       delay: 2000,
     },
     {
@@ -116,6 +236,13 @@ const fileNavigator: Scenario = {
           annotation: "File contents returned to the model.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Pull yesterday's note contents back into the agent loop",
+        "The note has been opened and read; the rest of the workspace stays untouched.",
+        {
+          "memory/2026-02-25.md": { status: "active" },
+        }
+      ),
       delay: 2500,
     },
     {
@@ -139,6 +266,13 @@ const fileNavigator: Scenario = {
           annotation: "Agent synthesizes the notes into a natural summary.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Summarize what was learned from the daily note",
+        "No new file operations yet; the agent is using the note it just read.",
+        {
+          "memory/2026-02-25.md": { status: "active" },
+        }
+      ),
       delay: 3000,
     },
     {
@@ -161,6 +295,13 @@ const fileNavigator: Scenario = {
           annotation: "User asks to persist important info to long-term memory.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Shift focus from the daily log into long-term memory",
+        "The next step is no longer recall. It is persistence.",
+        {
+          "MEMORY.md": { status: "active" },
+        }
+      ),
       delay: 2000,
     },
     {
@@ -184,6 +325,13 @@ const fileNavigator: Scenario = {
           annotation: "Agent reads current MEMORY.md to find where to insert updates.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Open MEMORY.md to find the exact insertion point",
+        "The agent reads before writing so it can make a precise edit instead of rewriting the whole file.",
+        {
+          "MEMORY.md": { status: "active" },
+        }
+      ),
       delay: 2000,
     },
     {
@@ -206,6 +354,13 @@ const fileNavigator: Scenario = {
           annotation: "Current content retrieved.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Inspect the current MEMORY.md contents",
+        "The file is loaded into working memory so the edit can be targeted to the right section.",
+        {
+          "MEMORY.md": { status: "active" },
+        }
+      ),
       delay: 2000,
     },
     {
@@ -234,6 +389,16 @@ const fileNavigator: Scenario = {
           annotation: "Agent makes precise edit — finds exact location and inserts new lines.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Append the new architectural decisions into MEMORY.md",
+        "This is the durable write. The memory file becomes richer than it was one phase ago.",
+        {
+          "MEMORY.md": {
+            status: "updated",
+            meta: "Three new lines are being inserted for the match engine, cost model, and hybrid architecture.",
+          },
+        }
+      ),
       delay: 2500,
     },
     {
@@ -256,6 +421,16 @@ const fileNavigator: Scenario = {
           annotation: "Confirmation from the tool.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Persist the edit and confirm the write succeeded",
+        "The workspace now contains the updated long-term memory entry.",
+        {
+          "MEMORY.md": {
+            status: "updated",
+            meta: "Long-term memory now includes the match rate gain, GPT-4o-mini cost, and hybrid enrichment plan.",
+          },
+        }
+      ),
       delay: 1500,
     },
     {
@@ -279,6 +454,16 @@ const fileNavigator: Scenario = {
           annotation: "Task complete. Knowledge persisted.",
         },
       ],
+      workspace: navigatorWorkspace(
+        "Return control with MEMORY.md updated",
+        "The important part of the workflow is that the state on disk changed, not just the reply in chat.",
+        {
+          "MEMORY.md": {
+            status: "updated",
+            meta: "Persisted knowledge is ready for future sessions and future tool calls.",
+          },
+        }
+      ),
       delay: 2500,
     },
   ],
@@ -316,6 +501,13 @@ const emailCheck: Scenario = {
           annotation: "Periodic heartbeat fires automatically.",
         },
       ],
+      workspace: emailWorkspace(
+        "Start the scheduled heartbeat run",
+        "Autonomous workflows often begin by reading a standing instruction file before they touch anything else.",
+        {
+          "HEARTBEAT.md": { status: "active" },
+        }
+      ),
       delay: 2000,
     },
     {
@@ -337,6 +529,13 @@ const emailCheck: Scenario = {
           annotation: "Agent decides to check inbox proactively.",
         },
       ],
+      workspace: emailWorkspace(
+        "Move into the mail workspace and decide what to inspect",
+        "The agent is now focused on the mailbox area but has not touched the unread cache yet.",
+        {
+          mail: { status: "active" },
+        }
+      ),
       delay: 2000,
     },
     {
@@ -362,6 +561,16 @@ const emailCheck: Scenario = {
           annotation: "Calls Gmail CLI (gog) to fetch unread emails.",
         },
       ],
+      workspace: emailWorkspace(
+        "Query the unread mail index through the Gmail CLI",
+        "This is the data touch: the workflow refreshes the local mail index before it reasons about what matters.",
+        {
+          "mail/inbox-cache.sqlite": {
+            status: "queried",
+            meta: "Unread mail is being refreshed and indexed for triage.",
+          },
+        }
+      ),
       delay: 3000,
     },
     {
@@ -385,6 +594,16 @@ const emailCheck: Scenario = {
           annotation: "3 unread emails returned. First one looks important.",
         },
       ],
+      workspace: emailWorkspace(
+        "Materialize the unread messages into the working inbox",
+        "Three concrete message artifacts appear. One of them is clearly worth attention.",
+        {
+          "mail/unread/dave-devries.json": { status: "created" },
+          "mail/unread/morning-brew.json": { status: "created" },
+          "mail/unread/github-issue.json": { status: "created" },
+        },
+        emailUnreadFiles
+      ),
       delay: 2500,
     },
     {
@@ -406,6 +625,14 @@ const emailCheck: Scenario = {
           annotation: "Agent prioritizes based on context (knows Dave is a prospect).",
         },
       ],
+      workspace: emailWorkspace(
+        "Focus on Dave's message and ignore the routine noise",
+        "The file map helps show that the agent is choosing between concrete items, not just generating vibes.",
+        {
+          "mail/unread/dave-devries.json": { status: "active" },
+        },
+        emailUnreadFiles
+      ),
       delay: 2000,
     },
     {
@@ -429,6 +656,14 @@ const emailCheck: Scenario = {
           annotation: "Proactive alert with context. Agent knows what matters.",
         },
       ],
+      workspace: emailWorkspace(
+        "Present the triage result to the user",
+        "The important unread message stays highlighted because it is the one driving the next action.",
+        {
+          "mail/unread/dave-devries.json": { status: "active" },
+        },
+        emailUnreadFiles
+      ),
       delay: 2500,
     },
     {
@@ -451,6 +686,14 @@ const emailCheck: Scenario = {
           annotation: "User approves next action.",
         },
       ],
+      workspace: emailWorkspace(
+        "Prepare the outbox for a new reply",
+        "The workflow pivots from inbox triage into message creation.",
+        {
+          "mail/outbox": { status: "active" },
+        },
+        emailUnreadFiles
+      ),
       delay: 2000,
     },
     {
@@ -477,6 +720,15 @@ const emailCheck: Scenario = {
           annotation: "Sends email via Gmail CLI. Natural, professional tone.",
         },
       ],
+      workspace: emailWorkspace(
+        "Create the outbound reply and send it",
+        "A new email artifact appears in the outbox while the workflow records its own run log.",
+        {
+          "mail/outbox/dave-devries-reply.eml": { status: "created" },
+          "logs/heartbeat-0900.log": { status: "updated" },
+        },
+        [...emailUnreadFiles, ...emailOutboxFiles]
+      ),
       delay: 3000,
     },
     {
@@ -499,6 +751,18 @@ const emailCheck: Scenario = {
           annotation: "Confirmation from Gmail API.",
         },
       ],
+      workspace: emailWorkspace(
+        "Record that the reply left the system successfully",
+        "The outbox file is now a completed artifact rather than a draft-in-progress.",
+        {
+          "mail/outbox/dave-devries-reply.eml": { status: "updated" },
+          "logs/heartbeat-0900.log": {
+            status: "updated",
+            meta: "Heartbeat log updated with send confirmation and message id.",
+          },
+        },
+        [...emailUnreadFiles, ...emailOutboxFiles]
+      ),
       delay: 1500,
     },
     {
@@ -522,6 +786,15 @@ const emailCheck: Scenario = {
           annotation: "Task complete. Proactive work done during heartbeat.",
         },
       ],
+      workspace: emailWorkspace(
+        "Finish the heartbeat with inbox, outbox, and audit trail all updated",
+        "This is the direct perspective you were asking for: the agent moved across the instruction file, database index, unread files, and outbox in a single run.",
+        {
+          "mail/outbox/dave-devries-reply.eml": { status: "updated" },
+          "logs/heartbeat-0900.log": { status: "updated" },
+        },
+        [...emailUnreadFiles, ...emailOutboxFiles]
+      ),
       delay: 2000,
     },
   ],
@@ -572,6 +845,14 @@ const codeDeploy: Scenario = {
           annotation: "User requests a code change to the production app.",
         },
       ],
+      workspace: codeWorkspace(
+        "Scope the provider-search repo for the new CSV export feature",
+        "The workflow begins with the part of the app that already renders provider results.",
+        {
+          "src/components": { status: "active" },
+          "src/components/ExcelTableView.tsx": { status: "active" },
+        }
+      ),
       delay: 2500,
     },
     {
@@ -593,6 +874,14 @@ const codeDeploy: Scenario = {
           annotation: "Agent decides to delegate to specialized coding agent.",
         },
       ],
+      workspace: codeWorkspace(
+        "Plan work around the table component and a new export helper",
+        "The agent has enough context to know which file changes and which directory likely gets a new utility.",
+        {
+          "src/components/ExcelTableView.tsx": { status: "active" },
+          "src/utils": { status: "active" },
+        }
+      ),
       delay: 2000,
     },
     {
@@ -621,6 +910,14 @@ const codeDeploy: Scenario = {
           annotation: "Spawns Claude Code with clear task. PTY required for interactive CLI.",
         },
       ],
+      workspace: codeWorkspace(
+        "Hand off the implementation to Claude Code inside the repo",
+        "The coding agent opens the existing table view and starts shaping a dedicated export helper.",
+        {
+          "src/components/ExcelTableView.tsx": { status: "active" },
+          "src/utils": { status: "active" },
+        }
+      ),
       delay: 3000,
     },
     {
@@ -643,6 +940,22 @@ const codeDeploy: Scenario = {
           annotation: "Claude Code completed the task. Two files changed, build passed.",
         },
       ],
+      workspace: codeWorkspace(
+        "Surface the changed tree after the coding agent finishes",
+        "One file was updated and a brand-new utility file appeared as part of the implementation.",
+        {
+          "src/components/ExcelTableView.tsx": {
+            status: "updated",
+            meta: "Toolbar updated with a visible CSV export action.",
+          },
+          "src/utils/csvExport.ts": { status: "created" },
+          "package.json": {
+            status: "active",
+            meta: "Build and type-check scripts were run successfully.",
+          },
+        },
+        codeCreatedFiles
+      ),
       delay: 3500,
     },
     {
@@ -666,6 +979,15 @@ const codeDeploy: Scenario = {
           annotation: "Agent summarizes work and asks for deployment approval.",
         },
       ],
+      workspace: codeWorkspace(
+        "Hold the modified files for review before deployment",
+        "The changed file tree is now stable enough for a human approval checkpoint.",
+        {
+          "src/components/ExcelTableView.tsx": { status: "updated" },
+          "src/utils/csvExport.ts": { status: "created" },
+        },
+        codeCreatedFiles
+      ),
       delay: 2500,
     },
     {
@@ -685,6 +1007,16 @@ const codeDeploy: Scenario = {
           annotation: "User approves deployment.",
         },
       ],
+      workspace: codeWorkspace(
+        "Shift from coding mode into deployment mode",
+        "At this point the repo contents are ready; the operational file becomes docker-compose.yml.",
+        {
+          "docker-compose.yml": { status: "active" },
+          "src/components/ExcelTableView.tsx": { status: "updated" },
+          "src/utils/csvExport.ts": { status: "created" },
+        },
+        codeCreatedFiles
+      ),
       delay: 1500,
     },
     {
@@ -710,6 +1042,15 @@ const codeDeploy: Scenario = {
           annotation: "Commits and pushes changes to GitHub.",
         },
       ],
+      workspace: codeWorkspace(
+        "Package the repo changes for git and push them upstream",
+        "The same two code artifacts remain the meaningful changes in the tree while the workflow moves through source control.",
+        {
+          "src/components/ExcelTableView.tsx": { status: "updated" },
+          "src/utils/csvExport.ts": { status: "created" },
+        },
+        codeCreatedFiles
+      ),
       delay: 3000,
     },
     {
@@ -732,6 +1073,15 @@ const codeDeploy: Scenario = {
           annotation: "Commit successful, pushed to remote.",
         },
       ],
+      workspace: codeWorkspace(
+        "Keep the modified tree intact after the push succeeds",
+        "Nothing new changed in the workspace, but the repo state is now durable beyond the local machine.",
+        {
+          "src/components/ExcelTableView.tsx": { status: "updated" },
+          "src/utils/csvExport.ts": { status: "created" },
+        },
+        codeCreatedFiles
+      ),
       delay: 2500,
     },
     {
@@ -757,6 +1107,19 @@ const codeDeploy: Scenario = {
           annotation: "SSH to production server, pull latest code, rebuild containers.",
         },
       ],
+      workspace: codeWorkspace(
+        "Use docker-compose.yml to roll the new code into production",
+        "The focus leaves the source files and moves to the operational artifact that controls the live containers.",
+        {
+          "docker-compose.yml": {
+            status: "active",
+            meta: "Production stack is being pulled and rebuilt on the server.",
+          },
+          "src/components/ExcelTableView.tsx": { status: "updated" },
+          "src/utils/csvExport.ts": { status: "created" },
+        },
+        codeCreatedFiles
+      ),
       delay: 4000,
     },
     {
@@ -779,6 +1142,16 @@ const codeDeploy: Scenario = {
           annotation: "Production deployment complete. Both containers restarted successfully.",
         },
       ],
+      workspace: codeWorkspace(
+        "Confirm the deploy completed with the new tree in place",
+        "The repo state is unchanged now, but the live environment has caught up to it.",
+        {
+          "docker-compose.yml": { status: "active" },
+          "src/components/ExcelTableView.tsx": { status: "updated" },
+          "src/utils/csvExport.ts": { status: "created" },
+        },
+        codeCreatedFiles
+      ),
       delay: 3000,
     },
     {
@@ -802,6 +1175,16 @@ const codeDeploy: Scenario = {
           annotation: "Full workflow complete: idea → code → test → deploy → production. ~2 minutes total.",
         },
       ],
+      workspace: codeWorkspace(
+        "Land the final state: repo updated, helper created, deployment complete",
+        "The side pane now tells the whole story from request to changed files to production rollout.",
+        {
+          "src/components/ExcelTableView.tsx": { status: "updated" },
+          "src/utils/csvExport.ts": { status: "created" },
+          "docker-compose.yml": { status: "active" },
+        },
+        codeCreatedFiles
+      ),
       delay: 2500,
     },
   ],

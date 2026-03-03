@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import type { Heading } from "@/lib/headings";
 import type { Category } from "@/lib/categories";
+import type { Source } from "@/lib/posts";
+import { SourceCard } from "./SourceCard";
 
 interface ArticlePost {
   slug: string;
@@ -13,6 +15,8 @@ interface ArticlePost {
   readTime: string;
   category: string;
   tags: string[];
+  source?: Source;
+  coverImage?: string;
 }
 
 interface ArticleViewProps {
@@ -27,7 +31,11 @@ export function ArticleView({ post, contentHtml, headings, parentCategory }: Art
 
   // Open by default on desktop
   useEffect(() => {
-    if (window.innerWidth >= 960) setPaneOpen(true);
+    if (window.innerWidth < 960) return;
+    const frame = window.requestAnimationFrame(() => {
+      setPaneOpen(true);
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const togglePane = useCallback(() => {
@@ -49,7 +57,7 @@ export function ArticleView({ post, contentHtml, headings, parentCategory }: Art
             >
               ← ideas
             </Link>
-            <span className="font-mono text-[10px] text-border">·</span>
+            <span className="font-mono text-[10px] text-fg-light">·</span>
             <Link
               href="/ideas/catalogue"
               className="font-mono text-[11px] text-fg-light no-underline transition-colors hover:text-accent"
@@ -109,6 +117,21 @@ export function ArticleView({ post, contentHtml, headings, parentCategory }: Art
           )}
 
           <hr className="my-6 border-border-light" />
+
+          {/* Cover image */}
+          {post.coverImage && (
+            <div className="mb-6 overflow-hidden rounded-lg">
+              <img
+                src={post.coverImage}
+                alt=""
+                className="w-full h-auto object-cover"
+                loading="lazy"
+              />
+            </div>
+          )}
+
+          {/* Source card */}
+          {post.source && <SourceCard source={post.source} />}
 
           {/* Content */}
           <div

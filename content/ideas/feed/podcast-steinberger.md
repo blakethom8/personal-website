@@ -4,7 +4,14 @@ date: 2026-02-26
 category: podcast-notes
 tags: [agents, openclaw, AI, apps, APIs, peter-steinberger]
 summary: "Peter Steinberger (creator of OpenClaw) explains why 80% of apps will disappear in the agent era, why fighting agent access makes you less useful than your competitors, and what agent-friendly companies should do right now."
-podcast: "Lex Fridman Podcast #491 - Peter Steinberger"
+source:
+  type: youtube
+  platform: YouTube
+  show: "Lex Fridman Podcast"
+  episode: "491"
+  guest: "Peter Steinberger"
+  url: "https://www.youtube.com/watch?v=YFjfBk8HI5o"
+  videoId: "YFjfBk8HI5o"
 status: draft
 ---
 

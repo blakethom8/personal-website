@@ -8,6 +8,16 @@ const ideasDirectory = path.join(process.cwd(), "../content/ideas");
 const postsDirectory = path.join(ideasDirectory, "posts");
 const feedDirectory = path.join(ideasDirectory, "feed");
 
+export interface Source {
+  type: "youtube" | "podcast" | "article" | "video";
+  platform: string;
+  show?: string;
+  episode?: string;
+  guest?: string;
+  url: string;
+  videoId?: string;
+}
+
 export interface Post {
   slug: string;
   title: string;
@@ -18,6 +28,8 @@ export interface Post {
   featured: boolean;
   content: string;
   tags?: string[];
+  source?: Source;
+  coverImage?: string;
 }
 
 export interface PostMetadata {
@@ -29,7 +41,8 @@ export interface PostMetadata {
   category: string;
   featured: boolean;
   tags?: string[];
-  podcast?: string;
+  source?: Source;
+  coverImage?: string;
 }
 
 function formatDate(date: unknown): string {
@@ -78,7 +91,8 @@ export function getAllPosts(): PostMetadata[] {
       category: data.category || "technology",
       featured: data.featured || false,
       tags: data.tags || [],
-      podcast: data.podcast || undefined,
+      source: data.source || undefined,
+      coverImage: data.coverImage || undefined,
     };
   });
 
@@ -108,6 +122,8 @@ export function getPostBySlug(slug: string): Post | null {
         category: data.category || "technology",
         featured: data.featured || false,
         tags: data.tags || [],
+        source: data.source || undefined,
+        coverImage: data.coverImage || undefined,
         content,
       };
     } catch (error) {

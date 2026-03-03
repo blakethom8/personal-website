@@ -1,59 +1,41 @@
 # Module 1: The Big Picture
 
-**What an AI agent actually is — and why the model is the least interesting part.**
+**What an AI agent actually is — why the model is not as interesting as the architecture supporting it.**
 
 ---
 
-## The Car Analogy
+## The Model vs. The Agent
 
-When people hear "AI agent," they think of the model — ChatGPT, Claude, Gemini. But that's like hearing "self-driving car" and only thinking about the engine.
+AI companies have used various branding language, so it's not a surprise that it's hard for us to separate the concept of the LLM model vs. the agent. However, it's critical to know that the LLM model is just part of the product you are engaging with when you are asking questions to ChatGPT in your browser.
 
-An engine is powerful. It generates force. But drop an engine in a parking lot and it doesn't go anywhere. It needs a chassis, steering, brakes, sensors, GPS, and a computer to orchestrate all of it. The engine provides the power. Everything else provides the *direction, awareness, and control.*
+In reality, there is a full architecture system supporting it, and you could use that model in the browser's ChatGPT architecture, or a different architecture that someone else built.
 
-AI agents work the same way:
+In simple terms, you could almost think of the model as the engine of the product, but there are all these other features you need to get from point A to point B. In LLM land, point A is input text you send to chat: *"What is the weather in Paris?"* Point B is the response you see: *"It is 23 degrees Celsius. Would you like a croissant there?"* Between the input and the response, there's a lot more happening under the hood that's not the LLM itself.
 
-```
-┌──────────────────────────────────────────────────────┐
-│              THE AI AGENT = A CAR                     │
-├──────────────────────────────────────────────────────┤
-│                                                      │
-│  🚗 The Car (Complete Agent)                         │
-│                                                      │
-│  ┌─────────────┐  The Engine                         │
-│  │   LLM       │  Generates text. Predicts the       │
-│  │  (Model)    │  next word. That's it.              │
-│  └─────────────┘                                     │
-│                                                      │
-│  ┌─────────────┐  The Dashboard & Controls           │
-│  │  System     │  Instructions that shape how the    │
-│  │  Prompt     │  model behaves. Its "personality"   │
-│  └─────────────┘  and rules.                         │
-│                                                      │
-│  ┌─────────────┐  The GPS & Sensors                  │
-│  │  Context    │  The conversation history and        │
-│  │  Window     │  information the model can "see"    │
-│  └─────────────┘  at any given moment.               │
-│                                                      │
-│  ┌─────────────┐  The Wheels & Hands                 │
-│  │  Tools      │  How the agent interacts with the   │
-│  │             │  real world — files, web, email,    │
-│  └─────────────┘  databases.                         │
-│                                                      │
-│  ┌─────────────┐  The Computer (ECU)                 │
-│  │  Harness    │  The code that orchestrates         │
-│  │             │  everything — runs the loop,        │
-│  └─────────────┘  manages memory, executes tools.    │
-│                                                      │
-└──────────────────────────────────────────────────────┘
-```
+Within our Learning Module, I'll call this the **Agent Architecture**, where it includes these key components:
 
-The **harness** is the most important piece most people have never heard of. It's the system that wraps around the model and turns raw text prediction into useful action.
+| Component | What It Does |
+|-----------|-------------|
+| **LLM Model** | The prediction engine. Takes text in, generates text out. That's it. |
+| **System Prompt** | Instructions that shape how the model behaves — its personality, rules, and role. |
+| **Context Window** | The conversation history and information the model can "see" at any given moment. |
+| **Tools** | How the agent interacts with the real world — files, web, email, databases. |
+| **Harness** | The code that orchestrates everything — runs the loop, manages memory, executes tools. |
 
 ---
 
 ## What Is a Harness?
 
-A harness (sometimes called an "agentic harness" or "agent framework") is the software that:
+You've probably used several harnesses without knowing it:
+
+- **ChatGPT's web interface** — OpenAI's harness manages your conversation, provides web browsing and code execution tools, stores your chat history
+- **Claude Desktop** — Anthropic's harness with file access and MCP tool support
+- **GitHub Copilot** — A harness that feeds your code as context and provides code-editing tools
+- **OpenClaw** — An open-source harness that runs on your local machine with deep system access (this is what powers the assistant I use daily)
+
+Every AI product you interact with is a harness + a model. The model is often the same (Claude, GPT-4). The harness is what makes the experience different.
+
+A harness (sometimes called an "agentic harness" or "agent framework") is the software that wraps around the model and turns raw text prediction into useful action. It's the most important piece most people have never heard of. Specifically, the harness:
 
 1. **Receives your message** — from a chat window, Slack, a terminal, wherever
 2. **Constructs the request** — assembles the conversation history, system prompt, and available tools into a structured package
@@ -65,181 +47,69 @@ A harness (sometimes called an "agentic harness" or "agent framework") is the so
 
 Without the harness, the model just sits there. It can't read your files. It can't search the web. It can't remember what you said yesterday. The harness provides all of that.
 
-### Examples of Harnesses You've Used
+---
 
-You've probably used several harnesses without knowing it:
+## What We'll Explore in This Guide
 
-- **ChatGPT's web interface** — OpenAI's harness manages your conversation, provides web browsing and code execution tools, stores your chat history
-- **Claude Desktop** — Anthropic's harness with file access and MCP tool support
-- **GitHub Copilot** — A harness that feeds your code as context and provides code-editing tools
-- **OpenClaw** — An open-source harness that runs on your local machine with deep system access (this is what powers the assistant I use daily)
+Every harness manages three fundamental things. We'll dedicate a full module to each:
 
-Every AI product you interact with is a harness + a model. The model is often the same (Claude, GPT-4). The harness is what makes the experience different.
+- **Context & Memory** — The model has no memory. Every request starts fresh. The harness decides what information the model needs to see right now — conversation history, files, tool results — and packs it into a finite context window. *(Module 3)*
+- **Tools & Actions** — A raw model can only generate text. Tools let it interact with the real world. The harness defines what tools are available and handles executing them. *(Module 4)*
+- **Agentic Patterns** — How the harness orchestrates multi-step reasoning. The difference between a chatbot that answers once and an agent that plans, acts, observes, and iterates. *(Module 5)*
 
 ---
 
-## The Three Key Concepts
+## Putting It Together
 
-Every harness manages three fundamental things. These are the concepts we'll explore in depth throughout this guide:
+Let's trace what actually happens end-to-end when you ask an agent: *"What's on my calendar today?"*
 
-### 1. System Prompts — The Instruction Manual
+**Point A — Your Input** → **Point B — The Response**
 
-Before the model sees your message, the harness prepends a **system prompt** — a set of instructions that shapes how the model behaves. Think of it as the model's job description.
-
-A system prompt might say:
-- *"You are a helpful medical assistant. Never give diagnostic advice. Always recommend consulting a doctor."*
-- *"You are a coding agent. You have access to the filesystem. Always explain what you're doing before making changes."*
-- *"You are Blake's personal assistant. You know his schedule, preferences, and current projects."*
-
-The same model with different system prompts behaves like a completely different product. This is why Claude on claude.ai feels different from Claude in a custom business application — same engine, different instructions.
-
-### 2. Context Management — What the Model Can See
-
-The model has no memory. Every time it receives a request, it starts completely fresh. So the harness has to decide: **what information does the model need to see right now?**
-
-This includes:
-- The conversation history (your previous messages and the model's responses)
-- Relevant files or documents
-- Results from previous tool calls
-- Long-term memory (stored preferences, past decisions)
-
-All of this gets packed into a "context window" — a finite amount of text the model can process at once. Managing what goes in and what gets left out is one of the hardest problems in agent design.
-
-### 3. Tool Calls — The Ability to Act
-
-A raw model can only generate text. Tools are what let it interact with the real world. The harness defines a set of tools — functions the model can request to use — and handles actually executing them.
-
-Tools are how an AI agent can:
-- Read and write files
-- Search the internet
-- Query databases
-- Send messages
-- Run code
-- Control applications
-
-The model doesn't *execute* tools directly. It generates a structured request ("I'd like to search the web for X"), and the harness decides whether to actually do it. This separation is important for safety — the harness can refuse, require confirmation, or limit what's available.
-
----
-
-## Same Model, Three Different Products
-
-Here's where this gets concrete. Let's take a single model — Claude Sonnet — and show how it appears in three completely different contexts. Same engine. Three different cars.
-
-### 1. The Raw API (Just the Engine)
-
-AI companies like Anthropic and OpenAI sell direct access to their models through an **API** (Application Programming Interface). This is the engine, sold bare — no steering wheel, no dashboard, no GPS.
-
-A developer sends a structured message to the API and gets a response back. That's it. No chat interface, no memory between messages, no tools. Just text in, text out. The developer has to build *everything else* themselves.
-
-**Who uses this:** Developers building custom AI products. They buy the engine and build their own car around it.
-
-### 2. ChatGPT / Claude.ai (The Pre-Built Car)
-
-When you use ChatGPT or claude.ai, you're not interacting with the model directly. You're using a **harness that Anthropic or OpenAI built for you.** The chat interface, the conversation memory, the web search feature, the file upload — that's all harness code, not the model itself.
-
-These products are pre-built cars: comfortable, easy to use, but you can't modify them. You get whatever tools they decided to include and nothing more. You can't connect it to your company's database or give it access to your CRM.
-
-**Who uses this:** Everyone. It's the consumer product — the sedan you drive off the lot.
-
-### 3. A Custom Agent (The Car You Build)
-
-When someone like me builds an AI agent for a business, we take that same API — the same engine — and wrap it in a custom harness with specific tools, context, and instructions for a particular job.
-
-Same Claude Sonnet that powers claude.ai. But now it has tools that query a healthcare database, a system prompt that understands medical terminology, and memory that tracks provider relationships. Completely different product. Same engine.
-
-**Who uses this:** Businesses that need AI to do specific things with their specific data.
-
-### The Comparison
-
-```
-┌──────────────────────────────────────────────────────┐
-│           SAME MODEL, THREE PRODUCTS                 │
-├──────────────────────────────────────────────────────┤
-│                                                      │
-│             │ Raw API     │ Claude.ai   │ Custom     │
-│             │             │ / ChatGPT   │ Agent      │
-│  ───────────┼─────────────┼─────────────┼─────────── │
-│  Model      │ Claude      │ Claude      │ Claude     │
-│  (same!)    │ Sonnet      │ Sonnet      │ Sonnet     │
-│             │             │             │            │
-│  Harness    │ None —      │ Built by    │ Built for  │
-│             │ you build   │ Anthropic   │ a specific │
-│             │ it          │             │ business   │
-│             │             │             │            │
-│  Tools      │ Whatever    │ Web search, │ CRM, DB,   │
-│             │ you create  │ file upload,│ email,     │
-│             │             │ code sandbox│ custom     │
-│             │             │             │            │
-│  Context    │ You manage  │ Chat history│ Business   │
-│             │ everything  │ + memory    │ data +     │
-│             │             │ feature     │ knowledge  │
-│             │             │             │ base       │
-│             │             │             │            │
-│  Who uses   │ Developers  │ Everyone    │ Businesses │
-│             │             │             │            │
-│  Analogy    │ 🔧 Bare     │ 🚗 Sedan    │ 🛻 Custom  │
-│             │ engine      │ off the lot │ built      │
-│                                                      │
-└──────────────────────────────────────────────────────┘
-```
-
-**This is the single most important concept in this guide.** When someone says "we're using Claude" or "we're building with GPT," the model is the *starting point*, not the product. The product is everything around it — the harness, tools, context, and system prompt that turn a prediction engine into something that solves a real problem.
-
-And that's exactly what we'll explore in the rest of this guide.
-
----
-
-## Putting It Together: A Simple Example
-
-Let's trace through what happens when you ask an AI agent: *"What's on my calendar today?"*
-
-```
-┌──────────────────────────────────────────────────────┐
-│  WHAT ACTUALLY HAPPENS                               │
-├──────────────────────────────────────────────────────┤
-│                                                      │
-│  YOU: "What's on my calendar today?"                 │
-│           │                                          │
-│           ▼                                          │
-│  HARNESS assembles the request:                      │
-│    • System prompt: "You are a personal assistant    │
-│      with access to the user's calendar..."          │
-│    • Conversation history: [previous messages]       │
-│    • Available tools: [read_calendar, send_email,    │
-│      search_web, read_file, ...]                     │
-│    • Your new message                                │
-│           │                                          │
-│           ▼                                          │
-│  MODEL receives everything, responds:                │
-│    "I need to check the calendar. I'll use the       │
-│     read_calendar tool for today's date."            │
-│           │                                          │
-│           ▼                                          │
-│  HARNESS executes the tool call                      │
-│    → Returns: 3 events found                         │
-│           │                                          │
-│           ▼                                          │
-│  MODEL sees the results, composes answer:            │
-│    "You have 3 things today:                         │
-│     - 9:00 AM: Team standup                          │
-│     - 1:00 PM: Lunch with Sarah                      │
-│     - 3:30 PM: Project review"                       │
-│           │                                          │
-│           ▼                                          │
-│  HARNESS delivers the response to you                │
-│                                                      │
-└──────────────────────────────────────────────────────┘
-```
+> **You:** "What's on my calendar today?"
+>
+> → **Harness** receives your message, assembles the full request: system prompt + conversation history + available tools + your new message
+>
+> → **Model** receives everything, responds: *"I need to check the calendar. I'll use the read_calendar tool for today's date."*
+>
+> → **Harness** executes the tool call, gets back 3 events
+>
+> → **Model** sees the results, composes the answer: *"You have 3 things today: 9 AM Team standup, 1 PM Lunch with Sarah, 3:30 PM Project review"*
+>
+> → **Harness** delivers the response to you
 
 Two model calls. One tool execution. The model predicted text. The harness did everything else.
 
 ---
 
+## Deep Dive: The API and What Sits on Top of It
+
+AI companies like Anthropic and OpenAI sell direct access to their models through an **API** (Application Programming Interface). The API is the raw engine — you send it a structured message and get a response back. No chat interface, no memory between messages, no tools. Just text in, text out.
+
+The API is the foundation. Everything else is built on top of it:
+
+When you use **ChatGPT** or **claude.ai**, you're not talking to the model directly. You're using a harness that OpenAI or Anthropic built on top of their API. The chat interface, conversation memory, web search, file upload — that's all harness code. You get whatever tools they decided to include.
+
+When someone builds a **custom agent** for a business, they use that same API — the same model — but wrap it in a different harness with different tools, different context, and different instructions. Same Claude Sonnet that powers claude.ai, but now with tools that query a healthcare database and a system prompt that understands medical terminology.
+
+What actually makes these products different?
+
+| | ChatGPT / Claude.ai | Custom Agent |
+|---|---|---|
+| **Model** | Same (Claude, GPT, etc.) | Same |
+| **Tools available** | Web search, file upload, code sandbox | CRM, databases, email, domain-specific |
+| **System prompt** | General-purpose assistant | Tailored for a specific job |
+| **Context** | Your chat history | Business data + knowledge base |
+| **Who controls it** | The AI company | You or your developer |
+
+The model is the starting point, not the product. The tools available to the agent and the harness orchestrating them — that's what determines what it can actually do.
+
+---
+
 ## Why This Matters
 
-When you evaluate an AI product — or when someone tells you they're "building with AI" — the model is the *least* differentiating part. Most products use the same handful of models (Claude, GPT, Gemini).
+When you evaluate an AI product — or when someone tells you they're "building with AI" — the model is the *least* differentiating part. Most products use the same handful of models.
 
-The real questions are:
+The real questions to ask:
 - **What tools does the agent have?** (What can it actually *do*?)
 - **How does it manage context?** (What does it know about you and your situation?)
 - **What's the system prompt?** (What are its instructions and constraints?)

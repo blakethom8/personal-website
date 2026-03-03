@@ -102,6 +102,8 @@ export default async function IdeasSlugPage({ params }: Props) {
           readTime: post.readTime,
           category: post.category,
           tags: post.tags || [],
+          source: post.source,
+          coverImage: post.coverImage,
         }}
         contentHtml={contentHtml}
         headings={headings}

@@ -9,8 +9,8 @@
 
   /* Foreground */
   --fg: #2C2825;
-  --fg-muted: #4A4540;
-  --fg-light: #9E9890;
+  --fg-muted: #403B37;
+  --fg-light: #736B63;
 
   /* Borders */
   --border: #DDD8D0;
@@ -41,8 +41,8 @@
   --bg-panel-hover: #2A2726;
 
   --fg: #EDE9E3;
-  --fg-muted: #9E9890;
-  --fg-light: #6E6860;
+  --fg-muted: #B4ADA5;
+  --fg-light: #9A9289;
 
   --border: #3A3533;
   --border-light: #2E2A28;
@@ -93,7 +93,8 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
-  line-height: 1.6;
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -107,12 +108,22 @@ body {
 /* ─── Typography ─── */
 h1, h2 {
   font-family: var(--font-serif);
-  line-height: 1.15;
+  font-weight: 500;
+  line-height: 1.12;
   color: var(--fg);
+  text-wrap: balance;
+  font-synthesis: weight;
 }
 
 h1 {
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  color: var(--fg);
+  font-weight: 500;
+  line-height: 1.28;
+  text-wrap: balance;
 }
 
 a {
@@ -148,10 +159,15 @@ code:not(pre code) {
 .label-mono {
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--fg-light);
+}
+
+p.text-fg-muted,
+li.text-fg-muted {
+  font-weight: 450;
 }
 
 /* ─── Smooth transitions for dark mode ─── */
@@ -399,13 +415,176 @@ footer {
   color: white;
 }
 
-/* Intro play button — wider variant of sim-control-primary */
-.sim-intro-play {
-  width: auto;
-  height: auto;
-  padding: 8px 20px;
-  font-size: 12px;
+/* Labeled simulator actions */
+.sim-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 3px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.sim-action-btn:hover:not(:disabled) {
+  background: var(--bg-panel-hover);
+  color: var(--fg);
+}
+
+.sim-action-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.sim-action-primary {
+  background: var(--accent-light);
+  border-color: var(--accent-muted);
+  color: var(--accent);
+}
+
+.sim-action-primary:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+}
+
+/* Labeled timeline chips */
+.sim-phase-scroller {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  padding-bottom: 4px;
+}
+
+.sim-phase-rail {
+  display: flex;
+  gap: 6px;
+  width: max-content;
+  min-width: 100%;
+  padding-right: 8px;
+}
+
+.sim-phase-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  color: var(--fg-light);
+  cursor: pointer;
+  transition: all 150ms ease;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  scroll-snap-align: start;
+}
+
+.sim-phase-chip:hover {
+  background: var(--bg-panel-hover);
+  color: var(--fg);
+  border-color: var(--border);
+}
+
+.sim-phase-chip-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--bg-panel-hover);
+  color: var(--fg-light);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-phase-chip-label {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: inherit;
+  max-width: clamp(84px, 20vw, 160px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-phase-chip-current {
+  background: var(--accent-light);
+  border-color: var(--accent-muted);
+  color: var(--accent);
+}
+
+.sim-phase-chip-current .sim-phase-chip-index {
+  background: rgba(43, 122, 111, 0.14);
+  color: var(--accent);
+}
+
+.dark .sim-phase-chip-current .sim-phase-chip-index {
+  background: rgba(78, 205, 196, 0.16);
+}
+
+.sim-phase-chip-visited {
+  color: var(--fg-muted);
+  background: var(--bg-panel-hover);
+}
+
+.sim-phase-chip-future {
+  color: var(--fg-light);
+}
+
+.sim-phase-chip:focus-visible {
+  outline: 2px solid var(--accent-muted);
+  outline-offset: 2px;
+}
+
+/* Step dots — clickable timeline indicators */
+.sim-step-dot {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  min-width: 8px;
+  padding: 0;
+}
+
+.sim-step-dot-future {
+  background: var(--border-light);
+}
+
+.sim-step-dot-visited {
+  background: var(--accent-muted);
+}
+
+.sim-step-dot-current {
+  background: var(--accent);
+}
+
+.sim-step-dot:hover {
+  transform: scaleY(1.8);
+  background: var(--accent);
 }
 
 /* Sub-tab row for scenario groups */
@@ -461,9 +640,10 @@ footer {
 /* ─── Post Content (rendered markdown) ─── */
 .post-content {
   max-width: none;
-  color: var(--fg-muted);
+  color: var(--fg);
   font-size: 15px;
   line-height: 1.72;
+  font-weight: 450;
 }
 
 /* Hide the first h1 since title is shown in the page header */
@@ -479,21 +659,23 @@ footer {
 .post-content h1 {
   font-family: var(--font-serif);
   font-size: 1.7rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--fg);
   margin-top: 2.5em;
   margin-bottom: 0.6em;
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
 }
 
 .post-content h2 {
   font-family: var(--font-serif);
   font-size: 1.35rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--fg);
   margin-top: 2em;
   margin-bottom: 0.5em;
-  line-height: 1.25;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 .post-content h3 {
@@ -522,7 +704,7 @@ footer {
 /* Bold and emphasis */
 .post-content strong {
   color: var(--fg);
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .post-content em {
@@ -573,7 +755,7 @@ footer {
   border-left: 3px solid var(--accent);
   padding: 0.6em 0 0.6em 1.25em;
   margin: 1.5em 0;
-  color: var(--fg-light);
+  color: var(--fg-muted);
   font-style: italic;
   background: var(--accent-light);
   border-radius: 0 6px 6px 0;
@@ -836,7 +1018,7 @@ footer {
 }
 
 .sim-main[data-shifted="true"] {
-  flex: 1 1 55%;
+  flex: 1 1 62%;
 }
 
 .sim-pane {
@@ -849,15 +1031,196 @@ footer {
 }
 
 .sim-pane[data-open="true"] {
-  flex: 0 0 45%;
+  flex: 0 0 min(38%, 420px);
   opacity: 1;
   border-left: 1px solid var(--border-light);
+  background: var(--bg-panel-hover);
 }
 
 .sim-context-pane-scroll {
   overflow-y: auto;
   max-height: 75vh;
   min-height: 400px;
+}
+
+/* ─── Workspace Pane Content ─── */
+.sim-workspace-pane-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.sim-workspace-pane-inner {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sim-workspace-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+}
+
+.sim-workspace-root {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+}
+
+.sim-workspace-activity-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-light);
+}
+
+.sim-workspace-activity {
+  color: var(--fg);
+  font-size: 15px;
+  font-weight: 550;
+  line-height: 1.35;
+}
+
+.sim-workspace-note {
+  margin: 0;
+  color: var(--fg-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.sim-workspace-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sim-workspace-row {
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding-top: 8px;
+  padding-right: 8px;
+  padding-bottom: 8px;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.sim-workspace-row-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sim-workspace-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  color: var(--fg-light);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.sim-workspace-icon-database {
+  color: var(--accent);
+}
+
+.sim-workspace-name {
+  min-width: 0;
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-workspace-meta {
+  margin-top: 4px;
+  color: var(--fg-light);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.sim-workspace-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  min-height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  color: var(--fg-light);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+.sim-workspace-row-active {
+  background: rgba(43, 122, 111, 0.08);
+  border-color: rgba(43, 122, 111, 0.18);
+}
+
+.sim-workspace-row-created {
+  background: rgba(76, 175, 80, 0.08);
+  border-color: rgba(76, 175, 80, 0.2);
+}
+
+.sim-workspace-row-updated {
+  background: rgba(212, 165, 116, 0.1);
+  border-color: rgba(212, 165, 116, 0.24);
+}
+
+.sim-workspace-row-queried {
+  background: rgba(82, 136, 165, 0.1);
+  border-color: rgba(82, 136, 165, 0.22);
+}
+
+.sim-workspace-badge-active {
+  color: var(--accent);
+  background: var(--accent-light);
+  border-color: var(--accent-muted);
+}
+
+.sim-workspace-badge-created {
+  color: #2f7d32;
+  background: rgba(76, 175, 80, 0.12);
+  border-color: rgba(76, 175, 80, 0.28);
+}
+
+.sim-workspace-badge-updated {
+  color: #9c5f1a;
+  background: rgba(212, 165, 116, 0.16);
+  border-color: rgba(212, 165, 116, 0.3);
+}
+
+.sim-workspace-badge-queried {
+  color: #386b83;
+  background: rgba(82, 136, 165, 0.14);
+  border-color: rgba(82, 136, 165, 0.28);
 }
 
 /* ─── Context Pane Content ─── */
@@ -1070,6 +1433,24 @@ footer {
 
   .sim-context-count {
     font-size: 22px;
+  }
+
+  .sim-phase-chip {
+    min-height: 32px;
+    padding: 0 10px 0 7px;
+  }
+
+  .sim-phase-chip-label {
+    font-size: 11px;
+    max-width: 112px;
+  }
+
+  .sim-workspace-row {
+    padding-right: 6px;
+  }
+
+  .sim-workspace-meta {
+    font-size: 10px;
   }
 }
 

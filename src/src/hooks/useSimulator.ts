@@ -144,6 +144,21 @@ export function useSimulator(scenario: Scenario) {
     });
   }, [clearTimers]);
 
+  const goToStep = useCallback(
+    (stepNum: number) => {
+      clearTimers();
+      const steps = scenarioRef.current.steps;
+      const targetStep = Math.max(0, Math.min(stepNum - 1, steps.length - 1));
+      setState({
+        currentStep: targetStep,
+        visibleSteps: targetStep + 1,
+        playback: "paused",
+        isLoading: false,
+      });
+    },
+    [clearTimers]
+  );
+
   const reset = useCallback(() => {
     clearTimers();
     setState({ currentStep: 0, playback: "idle", visibleSteps: 0, isLoading: false });
@@ -164,6 +179,7 @@ export function useSimulator(scenario: Scenario) {
     pause,
     stepForward,
     stepBack,
+    goToStep,
     reset,
   };
 }

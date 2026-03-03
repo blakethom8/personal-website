@@ -4,7 +4,12 @@ date: 2026-02-26
 category: podcast-notes
 tags: [webmcp, agents, AI, web, architecture, APIs]
 summary: "WebMCP is like responsive design for AI — annotate your website once, and agents can discover and use your tools automatically. No separate MCP server needed."
-podcast: "Syntax #979 - WebMCP: New Standard to Expose Your Apps to AI"
+source:
+  type: podcast
+  platform: Syntax.fm
+  show: "Syntax"
+  episode: "979"
+  url: "https://syntax.fm/show/979/webmcp-new-standard-to-expose-your-apps-to-ai"
 status: draft
 ---
 

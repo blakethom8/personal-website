@@ -158,18 +158,18 @@ function FeaturedCard({
   return (
     <Link
       href={href}
-      className="panel flex flex-col px-5 py-5 no-underline transition-colors hover:border-accent-muted"
+      className="panel group flex flex-col px-5 py-5 no-underline transition-colors hover:border-accent-muted hover:bg-bg-panel-hover/40"
     >
-      <span className="font-mono text-[10px] uppercase tracking-wider text-accent">
+      <span className="inline-flex self-start rounded border border-accent/20 bg-accent-light/30 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
         {type}
       </span>
-      <h3 className="mt-2 font-serif text-[15px] leading-snug text-fg md:text-[16px]">
+      <h3 className="mt-3 font-sans text-[17px] font-semibold leading-tight tracking-[-0.01em] text-fg transition-colors group-hover:text-accent">
         {title}
       </h3>
-      <p className="mt-2 flex-1 text-[12px] leading-relaxed text-fg-muted">
+      <p className="mt-2.5 flex-1 text-[13px] leading-[1.65] text-fg-muted">
         {description}
       </p>
-      <p className="mt-4 font-mono text-[11px] text-accent">{cta} &rarr;</p>
+      <p className="mt-5 font-mono text-[11px] font-medium text-accent">{cta} &rarr;</p>
     </Link>
   );
 }

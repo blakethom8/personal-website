@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   scenarios,
   isScenarioGroup,
   type Scenario,
+  type ConversationStep,
   type ScenarioTabItem,
   type ScenarioIntro,
 } from "@/lib/conversation-scenarios";
@@ -14,6 +15,8 @@ import { useSimulator } from "@/hooks/useSimulator";
 import { SimulatorFlow } from "./SimulatorFlow";
 import { ContextPane } from "./ContextPane";
 import { ContextModal } from "./ContextModal";
+import { WorkspacePane } from "./WorkspacePane";
+import type { PlaybackState } from "@/hooks/useSimulator";
 
 type ScenarioSet = "api" | "openclaw" | "context";
 
@@ -29,11 +32,242 @@ const scenarioSets: Record<ScenarioSet, { label: string; scenarios: ScenarioTabI
 
 const EMPTY_SCENARIO: Scenario = { id: "__empty__", title: "", steps: [] };
 
+interface SimulatorControlsProps {
+  steps: ConversationStep[];
+  totalSteps: number;
+  visibleSteps: number;
+  playback: PlaybackState;
+  isLoading: boolean;
+  paneToggleLabel: string | null;
+  paneOpen: boolean;
+  onStepBack: () => void;
+  onStepForward: () => void;
+  onPlay: () => void;
+  onPause: () => void;
+  onReset: () => void;
+  onGoToStep: (stepNum: number) => void;
+  onTogglePane: () => void;
+}
+
+function toTitleCase(value: string): string {
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function compactPhaseLabel(label: string): string {
+  return label
+    .replace(/\s*\([^)]*\)/g, "")
+    .replace(/^Assistant\s+/i, "")
+    .replace(/\s+Message$/i, " Message")
+    .trim();
+}
+
+function getPhaseLabel(step: ConversationStep): string {
+  const newestSection = step.context?.sections.find((section) => section.isNew);
+  if (newestSection?.label) {
+    return compactPhaseLabel(newestSection.label);
+  }
+
+  if (step.chat.role === "tool-call") {
+    return step.chat.toolName ? `${step.chat.toolName} Call` : "Tool Call";
+  }
+
+  if (step.chat.role === "tool-result") {
+    return step.chat.toolName ? `${step.chat.toolName} Result` : "Tool Result";
+  }
+
+  const apiLabel = step.api[0]?.label?.toLowerCase().trim();
+  if (apiLabel) {
+    if (apiLabel.includes("request")) return "Request";
+    if (apiLabel.includes("response")) return "Response";
+    if (apiLabel.includes("tool_use")) return "Tool Call";
+    return toTitleCase(apiLabel.replace(/[^a-z0-9]+/g, " "));
+  }
+
+  switch (step.chat.role) {
+    case "user":
+      return "User Message";
+    case "assistant":
+      return "Assistant Reply";
+    case "thinking":
+      return "Reasoning";
+    case "narrator":
+      return "Concept";
+    default:
+      return "Phase";
+  }
+}
+
+function SimulatorControls({
+  steps,
+  totalSteps,
+  visibleSteps,
+  playback,
+  isLoading,
+  paneToggleLabel,
+  paneOpen,
+  onStepBack,
+  onStepForward,
+  onPlay,
+  onPause,
+  onReset,
+  onGoToStep,
+  onTogglePane,
+}: SimulatorControlsProps) {
+  const hasStarted = visibleSteps > 0;
+  const atEnd = totalSteps > 0 && visibleSteps >= totalSteps;
+  const phaseRailRef = useRef<HTMLDivElement | null>(null);
+  const phaseChipRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const currentPhaseLabel =
+    visibleSteps > 0 && steps[visibleSteps - 1]
+      ? getPhaseLabel(steps[visibleSteps - 1]!)
+      : null;
+
+  useEffect(() => {
+    if (totalSteps === 0) return;
+
+    const targetIndex = visibleSteps > 0 ? visibleSteps - 1 : 0;
+    const targetChip = phaseChipRefs.current[targetIndex];
+
+    if (targetChip) {
+      targetChip.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+      return;
+    }
+
+    phaseRailRef.current?.scrollTo({ left: 0, behavior: "smooth" });
+  }, [totalSteps, visibleSteps]);
+
+  return (
+    <div className="border-b border-border-light bg-bg-panel/85">
+      <div className="flex flex-col gap-3 px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={onStepBack}
+              disabled={visibleSteps <= 1}
+              className="sim-action-btn"
+              aria-label="Go back one phase"
+            >
+              <span>◁</span>
+              <span>back</span>
+            </button>
+
+            <button
+              onClick={onStepForward}
+              disabled={atEnd}
+              className="sim-action-btn sim-action-primary"
+              aria-label="Advance to the next phase"
+            >
+              <span>next phase</span>
+              <span>▷</span>
+            </button>
+
+            {playback === "playing" ? (
+              <button
+                onClick={onPause}
+                className="sim-action-btn"
+                aria-label="Pause autoplay"
+              >
+                <span>▮▮</span>
+                <span>pause</span>
+              </button>
+            ) : (
+              <button
+                onClick={onPlay}
+                className="sim-action-btn"
+                aria-label="Autoplay the simulation"
+              >
+                <span>▶</span>
+                <span>autoplay</span>
+              </button>
+            )}
+
+            <button
+              onClick={onReset}
+              disabled={!hasStarted && playback === "idle"}
+              className="sim-action-btn"
+              aria-label="Reset simulation"
+            >
+              <span>↺</span>
+              <span>reset</span>
+            </button>
+
+            {paneToggleLabel && (
+              <button
+                onClick={onTogglePane}
+                className="sim-action-btn"
+                aria-pressed={paneOpen}
+                aria-label={paneOpen ? `Hide ${paneToggleLabel}` : `Show ${paneToggleLabel}`}
+              >
+                <span>{paneOpen ? "◫" : "◧"}</span>
+                <span>{paneOpen ? `hide ${paneToggleLabel}` : `show ${paneToggleLabel}`}</span>
+              </button>
+            )}
+          </div>
+
+          <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-fg-light">
+            {hasStarted ? `phase ${visibleSteps}/${totalSteps}` : `${totalSteps} phases`}
+            {isLoading ? " · loading" : ""}
+          </span>
+        </div>
+
+        {totalSteps > 0 && (
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-fg-light">
+                timeline
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-fg-light">
+                {currentPhaseLabel ?? "ready to begin"}
+              </span>
+            </div>
+            <div ref={phaseRailRef} className="sim-phase-scroller sim-tabs">
+              <div className="sim-phase-rail">
+                {steps.map((step, i) => {
+                  const phaseNum = i + 1;
+                  const isCurrent = visibleSteps === phaseNum;
+                  const isVisited = visibleSteps > phaseNum;
+                  const isFuture = visibleSteps < phaseNum;
+
+                  return (
+                    <button
+                      key={phaseNum}
+                      ref={(node) => {
+                        phaseChipRefs.current[i] = node;
+                      }}
+                      onClick={() => onGoToStep(phaseNum)}
+                      className={`sim-phase-chip${isCurrent ? " sim-phase-chip-current" : ""}${isVisited ? " sim-phase-chip-visited" : ""}${isFuture ? " sim-phase-chip-future" : ""}`}
+                      aria-current={isCurrent ? "step" : undefined}
+                      aria-label={`Go to phase ${phaseNum}: ${getPhaseLabel(step)}`}
+                      title={`Phase ${phaseNum}: ${getPhaseLabel(step)}`}
+                    >
+                      <span className="sim-phase-chip-index">{phaseNum}</span>
+                      <span className="sim-phase-chip-label">{getPhaseLabel(step)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ConversationSimulator({ embedded = false }: ConversationSimulatorProps) {
   const [scenarioSet, setScenarioSet] = useState<ScenarioSet>("api");
   const [activeScenario, setActiveScenario] = useState(0);
   const [activeSubScenario, setActiveSubScenario] = useState<number | null>(null);
   const [contextModalOpen, setContextModalOpen] = useState(false);
+  const [sidePaneOverride, setSidePaneOverride] = useState<boolean | null>(null);
 
   const currentItems = scenarioSets[scenarioSet].scenarios;
   const activeItem = currentItems[activeScenario];
@@ -60,20 +294,21 @@ export function ConversationSimulator({ embedded = false }: ConversationSimulato
   const switchScenario = (idx: number) => {
     setActiveScenario(idx);
     setActiveSubScenario(null);
+    setSidePaneOverride(null);
   };
 
   const switchScenarioSet = (set: ScenarioSet) => {
     setScenarioSet(set);
     setActiveScenario(0);
     setActiveSubScenario(null);
+    setSidePaneOverride(null);
   };
 
-  const progressPct =
-    sim.totalSteps > 0
-      ? Math.round((sim.visibleSteps / sim.totalSteps) * 100)
-      : 0;
+  const switchSubScenario = (idx: number | null) => {
+    setActiveSubScenario(idx);
+    setSidePaneOverride(null);
+  };
 
-  const isContextSet = scenarioSet === "context";
   const showUmbrellaIntro = isScenarioGroup(activeItem) && activeSubScenario === null;
 
   // Get context snapshot for current visible step
@@ -81,6 +316,35 @@ export function ConversationSimulator({ embedded = false }: ConversationSimulato
     sim.visibleSteps > 0 && scenario
       ? scenario.steps[sim.visibleSteps - 1]?.context
       : undefined;
+  const initialWorkspace =
+    scenario?.steps.find((step) => step.workspace)?.workspace;
+  const currentWorkspace =
+    scenario && sim.visibleSteps > 0
+      ? scenario.steps[sim.visibleSteps - 1]?.workspace ?? initialWorkspace
+      : initialWorkspace;
+
+  // Show context pane if any step in the scenario has context data
+  const hasContextData = scenario?.steps.some((step) => step.context) ?? false;
+  const hasWorkspaceData = scenario?.steps.some((step) => step.workspace) ?? false;
+  const paneKind =
+    scenarioSet === "openclaw" && hasWorkspaceData
+      ? "workspace"
+      : hasContextData
+        ? "context"
+        : hasWorkspaceData
+          ? "workspace"
+          : null;
+  const paneToggleLabel =
+    paneKind === "workspace" ? "workspace" : paneKind === "context" ? "context" : null;
+  const paneHeaderLabel =
+    paneKind === "workspace" ? "workspace map" : paneKind === "context" ? "context window" : null;
+  const defaultPaneOpen =
+    paneKind === "context"
+      ? scenarioSet === "context"
+      : paneKind === "workspace"
+        ? scenarioSet === "openclaw"
+        : false;
+  const sidePaneOpen = paneKind !== null && (sidePaneOverride ?? defaultPaneOpen);
 
   return (
     <div className={embedded ? "sim-container overflow-hidden" : "sim-container panel mx-auto w-[calc(100%-2*16px)] max-w-[1200px] overflow-hidden md:w-[calc(100%-2*40px)]"}>
@@ -128,7 +392,7 @@ export function ConversationSimulator({ embedded = false }: ConversationSimulato
         {isScenarioGroup(activeItem) && (
           <div className="sim-subtabs sim-tabs flex overflow-x-auto">
             <button
-              onClick={() => setActiveSubScenario(null)}
+              onClick={() => switchSubScenario(null)}
               className={`whitespace-nowrap px-3 py-1.5 font-mono text-[10px] transition-colors ${
                 activeSubScenario === null
                   ? "text-accent"
@@ -140,7 +404,7 @@ export function ConversationSimulator({ embedded = false }: ConversationSimulato
             {activeItem.subScenarios.map((sub, i) => (
               <button
                 key={sub.id}
-                onClick={() => setActiveSubScenario(i)}
+                onClick={() => switchSubScenario(i)}
                 className={`whitespace-nowrap px-3 py-1.5 font-mono text-[10px] transition-colors ${
                   activeSubScenario === i
                     ? "text-accent"
@@ -153,6 +417,27 @@ export function ConversationSimulator({ embedded = false }: ConversationSimulato
           </div>
         )}
       </div>
+
+      {!showUmbrellaIntro && (
+        <SimulatorControls
+          steps={scenario?.steps ?? []}
+          totalSteps={sim.totalSteps}
+          visibleSteps={sim.visibleSteps}
+          playback={sim.playback}
+          isLoading={sim.isLoading}
+          paneToggleLabel={paneToggleLabel}
+          paneOpen={sidePaneOpen}
+          onStepBack={sim.stepBack}
+          onStepForward={sim.stepForward}
+          onPlay={sim.play}
+          onPause={sim.pause}
+          onReset={sim.reset}
+          onGoToStep={sim.goToStep}
+          onTogglePane={() =>
+            setSidePaneOverride((previous) => !(previous ?? defaultPaneOpen))
+          }
+        />
+      )}
 
       {/* Content area — flex layout with optional side pane */}
       {showUmbrellaIntro ? (
@@ -169,105 +454,35 @@ export function ConversationSimulator({ embedded = false }: ConversationSimulato
         </div>
       ) : (
         <div className="sim-layout">
-          <div className="sim-main" data-shifted={isContextSet && scenario !== null}>
+          <div className="sim-main" data-shifted={sidePaneOpen && paneKind !== null && scenario !== null}>
             <SimulatorFlow
               steps={scenario?.steps ?? []}
               visibleSteps={sim.visibleSteps}
               isLoading={sim.isLoading}
               intro={activeIntro}
-              onPlay={sim.play}
             />
           </div>
 
-          <div className="sim-pane" data-open={isContextSet && scenario !== null}>
-            <div className="sim-pane-header">
-              <span className="label-mono">context window</span>
+          <div className="sim-pane" data-open={sidePaneOpen && paneKind !== null && scenario !== null}>
+            <div className="sim-pane-header flex items-center justify-between gap-3">
+              <span className="label-mono">{paneHeaderLabel}</span>
+              <button
+                onClick={() => setSidePaneOverride(false)}
+                className="font-mono text-[10px] uppercase tracking-[0.08em] text-fg-light transition-colors hover:text-accent"
+              >
+                hide
+              </button>
             </div>
             <div className="sim-context-pane-scroll">
-              <ContextPane
-                snapshot={currentContext}
-                onOpenModal={() => setContextModalOpen(true)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Controls bar — hidden during umbrella intro */}
-      {!showUmbrellaIntro && (
-        <div className="border-t border-border-light">
-          {/* Progress bar */}
-          <div className="h-[2px] bg-border-light">
-            <div
-              className="h-full bg-accent transition-all duration-400 ease-out"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-
-          <div className="flex items-center justify-between px-4 py-2.5">
-            {/* Playback controls */}
-            <div className="flex items-center gap-1">
-              {/* Step back */}
-              <button
-                onClick={sim.stepBack}
-                disabled={sim.visibleSteps <= 1}
-                className="sim-control-btn"
-                aria-label="Step back"
-              >
-                ◁
-              </button>
-
-              {/* Play/Pause */}
-              {sim.playback === "playing" ? (
-                <button
-                  onClick={sim.pause}
-                  className="sim-control-btn sim-control-primary"
-                  aria-label="Pause"
-                >
-                  ▮▮
-                </button>
+              {paneKind === "workspace" ? (
+                <WorkspacePane snapshot={currentWorkspace} />
               ) : (
-                <button
-                  onClick={sim.play}
-                  className="sim-control-btn sim-control-primary"
-                  aria-label="Play"
-                >
-                  ▶
-                </button>
+                <ContextPane
+                  snapshot={currentContext}
+                  onOpenModal={() => setContextModalOpen(true)}
+                />
               )}
-
-              {/* Step forward */}
-              <button
-                onClick={sim.stepForward}
-                disabled={sim.visibleSteps >= sim.totalSteps}
-                className="sim-control-btn"
-                aria-label="Step forward"
-              >
-                ▷
-              </button>
-
-              {/* Reset */}
-              <button
-                onClick={sim.reset}
-                className="sim-control-btn ml-1"
-                aria-label="Reset"
-              >
-                ↺
-              </button>
             </div>
-
-            {/* Step counter */}
-            <span className="font-mono text-[10px] text-fg-light">
-              {sim.visibleSteps > 0 ? (
-                <>
-                  step {sim.visibleSteps}/{sim.totalSteps}
-                </>
-              ) : (
-                <>
-                  {sim.totalSteps} steps
-                </>
-              )}
-            </span>
           </div>
         </div>
       )}

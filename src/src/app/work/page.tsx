@@ -54,8 +54,8 @@ export default function WorkPage() {
             <br />
             <span className="text-accent">Don&apos;t be limited by multi-tenant, legacy SaaS.</span>
           </h1>
-          <div className="mt-4 content-body text-fg-muted">
-            <p>
+          <div className="mt-4 max-w-[82ch] content-body text-fg-muted">
+            <p className="font-medium text-fg">
               We build AI-powered applications specifically for you — seriously,
               the application is entirely owned and isolated to your
               organization&apos;s network. Here&apos;s our thoughts:
@@ -114,8 +114,8 @@ export default function WorkPage() {
         {/* Approach */}
         <Panel as="section">
           <p className="label-mono mb-3">approach</p>
-          <div className="content-body text-fg-muted">
-            <p>
+          <div className="max-w-[82ch] content-body text-fg-muted">
+            <p className="font-medium text-fg">
               The world of software development changed dramatically in December
               2025. We have officially entered a new environment where writing
               code is a commodity. The capability of coding agents cannot be
@@ -179,10 +179,21 @@ export default function WorkPage() {
                     : "border-border-light"
                 }`}
               >
-                <h3 className="font-sans text-[14px] font-semibold text-fg">
+                <div className="mb-3 flex items-center gap-2">
+                  <span
+                    className={`inline-flex rounded border px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] ${
+                      project.highlight
+                        ? "border-accent/20 bg-accent-light/35 text-accent"
+                        : "border-border-light bg-bg-panel-hover text-fg-light"
+                    }`}
+                  >
+                    {project.highlight ? "featured project" : "project"}
+                  </span>
+                </div>
+                <h3 className="font-sans text-[16px] font-semibold tracking-[-0.01em] text-fg">
                   {project.title}
                 </h3>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-fg-muted">
+                <p className="mt-2 text-[13px] leading-[1.65] text-fg-muted">
                   {project.description}
                 </p>
                 <div className="mt-2.5 flex flex-wrap gap-1.5">
@@ -242,10 +253,12 @@ function ApproachCard({
   text: string;
 }) {
   return (
-    <div className="rounded border border-border-light p-3">
-      <span className="font-mono text-[11px] text-accent">{number}</span>
-      <h3 className="mt-0.5 font-sans text-[14px] font-semibold text-fg">{title}</h3>
-      <p className="mt-1 text-[13px] leading-relaxed text-fg-muted">{text}</p>
+    <div className="rounded border border-border-light p-4">
+      <span className="inline-flex rounded border border-accent/20 bg-accent-light/30 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
+        {number}
+      </span>
+      <h3 className="mt-3 font-sans text-[16px] font-semibold tracking-[-0.01em] text-fg">{title}</h3>
+      <p className="mt-2 text-[13px] leading-[1.65] text-fg-muted">{text}</p>
     </div>
   );
 }
@@ -274,15 +287,17 @@ function ServiceCard({
       }`}
     >
       <div className="flex items-baseline justify-between gap-2">
-        <span className="font-mono text-[11px] text-accent">{number}</span>
+        <span className="inline-flex rounded border border-accent/20 bg-accent-light/30 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
+          {number}
+        </span>
         {status && (
           <span className="rounded border border-accent/30 px-1.5 py-0.5 font-mono text-[10px] text-accent">
             {status}
           </span>
         )}
       </div>
-      <h3 className="mt-1.5 font-sans text-[14px] font-semibold text-fg">{title}</h3>
-      <p className="mt-2 flex-1 text-[13px] leading-relaxed text-fg-muted">{description}</p>
+      <h3 className="mt-3 font-sans text-[16px] font-semibold tracking-[-0.01em] text-fg">{title}</h3>
+      <p className="mt-2.5 flex-1 text-[13px] leading-[1.65] text-fg-muted">{description}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {tags.map((tag) => (
           <span key={tag} className="tag">
@@ -304,11 +319,11 @@ function ServiceCard({
 
 function TechGroup({ label, items }: { label: string; items: string[] }) {
   return (
-    <div className="rounded border border-border-light p-3">
-      <p className="label-mono mb-1.5">
+    <div className="rounded border border-border-light p-4">
+      <p className="label-mono mb-2">
         {label}
       </p>
-      <p className="text-[13px] text-fg-muted">{items.join(", ")}</p>
+      <p className="text-[13px] font-medium leading-[1.65] text-fg-muted">{items.join(", ")}</p>
     </div>
   );
 }

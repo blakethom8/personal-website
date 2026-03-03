@@ -231,6 +231,23 @@ After the initial build session (this memory), other agent sessions added:
 
 ---
 
+## Current Projects to Feature
+
+### Social Media Exchange Platform ⭐ FLAGSHIP (March 2026)
+- **Launch post:** `content/drafts/post-social-media-exchange.md` (ready for Blake's review)
+- **Project repo:** `~/openclaw/workspace/social-media-exchange/` (separate project, comprehensive docs)
+- **Mission:** Open-source platform to share Twitter feeds, break information silos
+- **Tech:** Next.js 14 + TypeScript + PostgreSQL + Twitter API
+- **Timeline:** MVP by March 30, public launch April 2026
+- **Why feature:** This is Blake's flagship open-source project, mission-driven (not commercial), strong narrative
+- **Post status:** Draft written, needs Blake's approval before publishing
+- **Where to showcase:**
+  - Work page: Add as featured project with link to GitHub (once public)
+  - Ideas: Publish the announcement post
+  - Learn: Could create module on building social platforms (future)
+
+---
+
 ## Known Issues & TODO
 
 ### Bugs / Cleanup

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageBackground } from "@/components/PageBackground";
-import { Panel } from "@/components/Panel";
 import { backgrounds } from "@/lib/backgrounds";
 
 export const metadata: Metadata = {

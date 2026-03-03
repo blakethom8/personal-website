@@ -76,12 +76,12 @@ const whatsInTheWindow: Scenario = {
       },
       delay: 3500,
     },
-    // Step 2: CLAUDE.md / project instructions
+    // Step 2: CLAUDE.md / sol.md project instructions
     {
       chat: {
         role: "narrator",
         content:
-          "Tools like Claude Code inject project instructions (CLAUDE.md files, memory, codebase context) into the system prompt. These can be thousands of tokens.",
+          "Agent harnesses inject project instructions into the system prompt. Claude Code loads CLAUDE.md, OpenClaw loads sol.md — files that live in your project and describe the tech stack, conventions, and rules. These can be thousands of tokens.",
       },
       api: [
         {
@@ -89,12 +89,12 @@ const whatsInTheWindow: Scenario = {
           json: `{
   "model": "claude-sonnet-4-20250514",
   "max_tokens": 8096,
-  "system": "You are a helpful coding assistant.\\n\\n# Project Instructions (CLAUDE.md)\\n\\n## Stack\\n- Next.js 15, App Router\\n- TypeScript strict mode\\n- Tailwind CSS with design tokens\\n- Docker deployment on Hetzner\\n\\n## Conventions\\n- Prefer server components by default\\n- Use 'use client' only when needed\\n- Follow existing patterns in the codebase\\n- Run npm run build before committing\\n\\n## File Structure\\nsrc/app/ — pages and routes\\nsrc/components/ — React components\\nsrc/lib/ — utilities and data\\nsrc/hooks/ — custom React hooks\\n\\n[... 2,200 more tokens of project context ...]",
+  "system": "You are a helpful coding assistant.\\n\\n# Project Instructions (sol.md)\\n\\n## Stack\\n- Next.js 15, App Router\\n- TypeScript strict mode\\n- Tailwind CSS with design tokens\\n- Docker deployment on Hetzner\\n\\n## Conventions\\n- Prefer server components by default\\n- Use 'use client' only when needed\\n- Follow existing patterns in the codebase\\n- Run npm run build before committing\\n\\n## File Structure\\nsrc/app/ — pages and routes\\nsrc/components/ — React components\\nsrc/lib/ — utilities and data\\nsrc/hooks/ — custom React hooks\\n\\n# Memory (MEMORY.md)\\n- User prefers morning standups\\n- Last sprint: built auth module\\n\\n[... 2,200 more tokens of project context ...]",
   "messages": []
 }`,
-          highlightLines: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+          highlightLines: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
           annotation:
-            "Project instructions can easily be 2,000–5,000 tokens. They're included on every single API call.",
+            "Project instructions (sol.md / CLAUDE.md) and memory files can easily be 2,000–5,000 tokens. They're included on every single API call — the agent reads them fresh each time.",
         },
       ],
       context: {
@@ -103,7 +103,7 @@ const whatsInTheWindow: Scenario = {
         payload: `{
   "model": "claude-sonnet-4-20250514",
   "max_tokens": 8096,
-  "system": "You are a helpful coding assistant.\\n\\n# Project Instructions (CLAUDE.md)\\n\\n## Stack\\n- Next.js 15, App Router\\n- TypeScript strict mode\\n- Tailwind CSS with design tokens\\n- Docker deployment on Hetzner\\n\\n## Conventions\\n- Prefer server components\\n- Use 'use client' only when needed\\n- Follow existing patterns\\n- Run npm run build before committing\\n\\n## File Structure\\nsrc/app/ — pages\\nsrc/components/ — React components\\nsrc/lib/ — utilities\\nsrc/hooks/ — custom hooks\\n\\n[... 2,200 more tokens of project context ...]",
+  "system": "You are a helpful coding assistant.\\n\\n# Project Instructions (sol.md)\\n\\n## Stack\\n- Next.js 15, App Router\\n- TypeScript strict mode\\n- Tailwind CSS with design tokens\\n- Docker deployment on Hetzner\\n\\n## Conventions\\n- Prefer server components\\n- Use 'use client' only when needed\\n- Follow existing patterns\\n- Run npm run build before committing\\n\\n## File Structure\\nsrc/app/ — pages\\nsrc/components/ — React components\\nsrc/lib/ — utilities\\nsrc/hooks/ — custom hooks\\n\\n# Memory (MEMORY.md)\\n- User prefers morning standups\\n- Last sprint: built auth module\\n\\n[... 2,200 more tokens of project context ...]",
   "messages": []
 }`,
         sections: sections(
@@ -116,15 +116,15 @@ const whatsInTheWindow: Scenario = {
           ),
           s(
             "inst",
-            "Project Instructions (CLAUDE.md)",
+            "Project Instructions (sol.md)",
             "instructions",
-            "Stack: Next.js 15, TypeScript, Tailwind, Docker on Hetzner\nConventions: Server components by default, strict mode, existing patterns\nFile structure: src/app, src/components, src/lib, src/hooks\n[... 2,200 more tokens of project context ...]",
+            "Stack: Next.js 15, TypeScript, Tailwind, Docker on Hetzner\nConventions: Server components by default, strict mode, existing patterns\nFile structure: src/app, src/components, src/lib, src/hooks\nMemory: User prefers morning standups, last sprint built auth module\n[... 2,200 more tokens of project context ...]",
             2700,
             { isNew: true }
           )
         ),
         annotation:
-          "Project instructions added ~2,700 tokens. We're at 3,200 tokens and nobody has said anything yet.",
+          "Project instructions (sol.md) and memory added ~2,700 tokens. We're at 3,200 tokens and nobody has said anything yet.",
       },
       delay: 3500,
     },
@@ -141,7 +141,7 @@ const whatsInTheWindow: Scenario = {
           json: `{
   "model": "claude-sonnet-4-20250514",
   "max_tokens": 8096,
-  "system": "[system prompt + CLAUDE.md — 3,200 tokens]",
+  "system": "[system prompt + sol.md + memory — 3,200 tokens]",
   "tools": [
     {
       "name": "Read",
@@ -195,7 +195,7 @@ const whatsInTheWindow: Scenario = {
         payload: `{
   "model": "claude-sonnet-4-20250514",
   "max_tokens": 8096,
-  "system": "[system prompt + CLAUDE.md — 3,200 tokens]",
+  "system": "[system prompt + sol.md + memory — 3,200 tokens]",
   "tools": [
     {
       "name": "Read",
@@ -225,7 +225,7 @@ const whatsInTheWindow: Scenario = {
           ),
           s(
             "inst",
-            "Project Instructions (CLAUDE.md)",
+            "Project Instructions (sol.md)",
             "instructions",
             "Stack: Next.js 15, TypeScript, Tailwind, Docker on Hetzner\nConventions: Server components by default, strict mode, existing patterns\n[... 2,200 more tokens ...]",
             2700
@@ -254,7 +254,7 @@ const whatsInTheWindow: Scenario = {
         {
           label: "what the model sees",
           json: `{
-  "system": "[system prompt + CLAUDE.md — 3,200 tokens]",
+  "system": "[system prompt + sol.md + memory — 3,200 tokens]",
   "tools": "[3 tool definitions — 2,600 tokens]",
   "messages": [
     {
@@ -274,7 +274,7 @@ const whatsInTheWindow: Scenario = {
         payload: `{
   "model": "claude-sonnet-4-20250514",
   "max_tokens": 8096,
-  "system": "[system prompt + CLAUDE.md — 3,200 tokens]",
+  "system": "[system prompt + sol.md + memory — 3,200 tokens]",
   "tools": "[3 tool definitions — 2,600 tokens]",
   "messages": [
     {
@@ -293,7 +293,7 @@ const whatsInTheWindow: Scenario = {
           ),
           s(
             "inst",
-            "Project Instructions (CLAUDE.md)",
+            "Project Instructions (sol.md)",
             "instructions",
             "Stack: Next.js 15, TypeScript, Tailwind, Docker on Hetzner\nConventions: Server components by default, strict mode...\n[... 2,200 more tokens ...]",
             2700

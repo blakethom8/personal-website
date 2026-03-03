@@ -47,6 +47,10 @@ export default function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Temporary: Figma capture script — remove after capture */}
+        <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+      </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable}`}
       >

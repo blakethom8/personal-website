@@ -4,8 +4,9 @@ date: "2026-02-25"
 tags: ["business", "technology", "healthcare-ai", "architecture"]
 excerpt: "Why the SaaS model you grew up on is already obsolete — and what replaces it."
 readTime: "10 min"
-featured: false
+featured: true
 category: "product-business"
+coverImage: "/images/posts/death-of-multi-tenant.jpg"
 ---
 
 # The Death of Multi-Tenant

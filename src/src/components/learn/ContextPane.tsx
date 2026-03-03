@@ -34,7 +34,9 @@ function AnimatedCount({ value }: { value: number }) {
       "(prefers-reduced-motion: reduce)"
     ).matches;
     if (prefersReducedMotion) {
-      setDisplay(to);
+      rafRef.current = requestAnimationFrame(() => {
+        setDisplay(to);
+      });
       return;
     }
 

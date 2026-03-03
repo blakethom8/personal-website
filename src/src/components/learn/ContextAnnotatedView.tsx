@@ -5,7 +5,7 @@ import type { ContextSection, ContextSectionType } from "@/lib/conversation-scen
 
 interface ContextAnnotatedViewProps {
   sections: ContextSection[];
-  totalTokens: number;
+  totalTokens?: number;
 }
 
 const SECTION_COLORS: Record<ContextSectionType, string> = {
@@ -21,7 +21,7 @@ const SECTION_COLORS: Record<ContextSectionType, string> = {
 
 export function ContextAnnotatedView({
   sections,
-  totalTokens,
+  totalTokens: _totalTokens,
 }: ContextAnnotatedViewProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 

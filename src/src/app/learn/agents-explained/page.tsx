@@ -24,7 +24,7 @@ const GUIDE_DIR = "../content/learn/learn-agents-guide";
 
 const STEP_FILES = [
   { file: "01-the-big-picture.md", number: 1 },
-  { file: "02-how-ai-communicates.md", number: 2 },
+  { file: "02-how-ai-communicates.md", number: 2 }, // Content rendered by Module2Content component
   { file: "03-context-and-memory.md", number: 3 },
   { file: "04-tools-and-actions.md", number: 4 },
   { file: "05-agentic-patterns.md", number: 5 },

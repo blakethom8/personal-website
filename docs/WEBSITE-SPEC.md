@@ -179,52 +179,43 @@ Blake Thomson
 
 **Target audience:** Friends, family, colleagues, healthcare professionals, anyone curious but not technical.
 
-**Module Ideas:**
+**Current Content:**
 
-1. **"What Is an LLM?"**
-   - Visual: Token prediction animation
-   - Interactive: Type a sentence, see how the model "thinks" about the next word
-   - Concept: It's prediction, not understanding
-   - Analogy: World's best autocomplete
+1. **Flagship Guide: "How AI Agents Actually Work"** (20 min, beginner)
+   - 5-step walkthrough with intro and epilogue, built as `AgentsGuideView` component
+   - Content lives in `content/learn/learn-agents-guide/` as numbered markdown files (00-06)
+   - Server-rendered via remark + remark-html, displayed in step-by-step panel navigator
+   - Includes clickable modal links (`#modal-*`) for deeper examples (system context comparisons, sol.md samples)
+   - **Module 1:** The Big Picture — model vs. harness, engines vs. cars
+   - **Module 2:** How AI Communicates — API anatomy, the five parts of every request (model, system prompt, tools, messages, settings)
+   - **Module 3:** Context & Memory — system context/system prompts (with sol.md/CLAUDE.md examples), the goldfish problem, context window mechanics, long-term memory patterns
+   - **Module 4:** Tools & Actions — function calling, MCP, how agents interact with the world
+   - **Module 5:** Agentic Patterns — loops, orchestration, multi-agent systems
 
-2. **"How ChatGPT Actually Works"**
-   - Visual: The training pipeline (pre-training → fine-tuning → RLHF)
-   - Interactive: Slider showing temperature (creative vs. deterministic)
-   - Concept: Training vs. inference, why it "hallucinates"
+2. **Conversation Simulator** (interactive)
+   - Three scenario sets: "how it works" (API basics), "agent workflows" (OpenClaw terminal), "context window" (overflow strategies)
+   - Step-by-step playback with play/pause, step forward/back, and clickable step-dot timeline
+   - Context pane shows real-time token breakdown as conversation progresses (visible across all modes when scenario has context data)
+   - Scenarios defined in `src/src/lib/conversation-scenarios.ts`, `openclaw-terminal-scenarios.ts`, `context-scenarios.ts`
+   - References sol.md and MEMORY.md in system context examples
 
-3. **"What Are Tokens?"**
-   - Interactive: Paste text, see it tokenized in real-time
-   - Visual: Token cost calculator
-   - Concept: Why "cheaper" models matter, context windows
-
-4. **"Agents: AI That Takes Action"**
-   - Visual: The agent loop (think → use tool → observe → repeat)
-   - Interactive: Simple agent demo — give it a task, watch it break it down
-   - Concept: Tools, MCP, function calling
-   - Connect to: WebMCP, how websites become AI-accessible
-
-5. **"AI in Healthcare: What's Real, What's Hype"**
-   - Visual: Use case matrix (what works today vs. what's coming)
-   - Interactive: "Ask me about a healthcare AI use case"
-   - Concept: Where AI actually helps vs. where it's oversold
-
-6. **"Prompt Engineering for Normal People"**
-   - Interactive: Side-by-side — bad prompt vs. good prompt with live results
-   - Concept: Why specificity matters, system prompts, context
-   - Practical: Templates people can actually use
+3. **Context Window Simulator** (interactive)
+   - Visualizes how context grows, what gets dropped, and how different overflow strategies work
+   - Three strategies: drop oldest, summarize, smart retrieval
 
 **Design Principles for Learn section:**
 - Mobile-first (people will share these with friends)
 - Progressive disclosure (start simple, click to go deeper)
-- Every module should be completable in 5-10 minutes
-- Real interactions, not just text — people learn by doing
+- The flagship guide is completable in ~20 minutes with step navigation
+- Real interactions via the simulator — people learn by doing
 - No jargon without explanation
-- Connect to Blake's GitHub education repo
+- Dense ASCII diagrams moved into modals to keep reading space clean
 
-**GitHub Integration:**
-- Link to education repository
-- Module source code is open source
-- Encourage contributions and forks
+**Future Module Ideas:**
+- "What Is an LLM?" — Token prediction, autocomplete analogy
+- "What Are Tokens?" — Interactive tokenizer, cost calculator
+- "AI in Healthcare: What's Real, What's Hype" — Use case matrix
+- "Prompt Engineering for Normal People" — Side-by-side prompt comparison
 
 **WebMCP tools:**
 - `list_modules` — Returns available learning modules with descriptions

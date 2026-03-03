@@ -1,3 +1,5 @@
+import { CodeComparison } from '@/components/diagrams'
+
 # Module 2: How AI Communicates
 
 **The structured messages that flow between you and the model — what actually gets sent over the internet.**
@@ -10,13 +12,8 @@ To think like an agent, we need to see everything the agent-system sees. For thi
 
 Maybe the easiest way to think about a JSON object is a list of information, where parts of the information are categorized or defined. For example, when the browser displays a list of information for a recipe, here is what the JSON package looks like for the browser:
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; align-items: start;">
-
-<div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-<div style="background: #f9fafb; padding: 0.5rem 1rem; border-bottom: 1px solid #e5e7eb; font-family: monospace; font-size: 11px; color: #6b7280;">
-JSON Package
-</div>
-<pre style="margin: 0; padding: 1rem; background: #ffffff; overflow-x: auto; font-size: 13px; line-height: 1.6;"><code>{
+<CodeComparison
+  jsonCode={`{
   "recipe": "Chocolate Chip Cookies",
   "prep_time": "15 minutes",
   "cook_time": "12 minutes",
@@ -31,49 +28,34 @@ JSON Package
     "Fold in chocolate chips",
     "Bake for 12 minutes"
   ]
-}</code></pre>
-</div>
-
-<div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-<div style="background: #f9fafb; padding: 0.5rem 1rem; border-bottom: 1px solid #e5e7eb; font-family: monospace; font-size: 11px; color: #6b7280; display: flex; align-items: center; gap: 0.5rem;">
-<span style="display: inline-flex; gap: 4px;">
-<span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
-<span style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></span>
-<span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
-</span>
-<span>Browser View</span>
-</div>
-<div style="padding: 1.5rem; background: #ffffff;">
-<h3 style="margin: 0 0 0.75rem 0; font-family: serif; font-size: 20px; font-weight: 600;">Chocolate Chip Cookies</h3>
-<div style="display: flex; gap: 1.5rem; margin-bottom: 1rem; font-size: 13px; color: #6b7280;">
-<div><strong style="color: #111827;">Prep:</strong> 15 minutes</div>
-<div><strong style="color: #111827;">Cook:</strong> 12 minutes</div>
-</div>
-<div style="margin-bottom: 1rem;">
-<h4 style="margin: 0 0 0.5rem 0; font-size: 14px; font-weight: 600; color: #111827;">Ingredients</h4>
-<ul style="margin: 0; padding-left: 1.25rem; font-size: 13px; line-height: 1.8; color: #374151;">
-<li>2 cups flour</li>
-<li>1 cup butter</li>
-<li>1 cup chocolate chips</li>
-</ul>
-</div>
-<div>
-<h4 style="margin: 0 0 0.5rem 0; font-size: 14px; font-weight: 600; color: #111827;">Instructions</h4>
-<ol style="margin: 0; padding-left: 1.25rem; font-size: 13px; line-height: 1.8; color: #374151;">
-<li>Preheat oven to 375°F</li>
-<li>Mix dry ingredients</li>
-<li>Fold in chocolate chips</li>
-<li>Bake for 12 minutes</li>
-</ol>
-</div>
-</div>
-</div>
-
-</div>
-
-<div style="text-align: center; margin: 1rem 0; font-family: monospace; font-size: 12px; color: #6b7280;">
-Same data, different format → The browser transforms JSON into visual UI
-</div>
+}`}
+  browserContent={
+    <div>
+      <h3 className="mb-3 font-serif text-xl font-semibold">Chocolate Chip Cookies</h3>
+      <div className="mb-4 flex gap-6 text-[13px] text-fg-muted">
+        <div><strong className="text-fg">Prep:</strong> 15 minutes</div>
+        <div><strong className="text-fg">Cook:</strong> 12 minutes</div>
+      </div>
+      <div className="mb-4">
+        <h4 className="mb-2 text-[14px] font-semibold">Ingredients</h4>
+        <ul className="list-disc space-y-1 pl-5 text-[13px]">
+          <li>2 cups flour</li>
+          <li>1 cup butter</li>
+          <li>1 cup chocolate chips</li>
+        </ul>
+      </div>
+      <div>
+        <h4 className="mb-2 text-[14px] font-semibold">Instructions</h4>
+        <ol className="list-decimal space-y-1 pl-5 text-[13px]">
+          <li>Preheat oven to 375°F</li>
+          <li>Mix dry ingredients</li>
+          <li>Fold in chocolate chips</li>
+          <li>Bake for 12 minutes</li>
+        </ol>
+      </div>
+    </div>
+  }
+/>
 
 When your LLM receives your message, it doesn't see just "What is the weather today?" — it sees a complete JSON package containing your message plus all the supporting metadata from your system. By analyzing this JSON structure, we can see exactly how the agent categorizes information and understand what's happening under the hood.
 

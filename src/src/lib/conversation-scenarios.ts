@@ -44,11 +44,30 @@ export interface ContextSnapshot {
   annotation?: string;
 }
 
+export type WorkspaceItemKind = "directory" | "file" | "database";
+
+export type WorkspaceItemStatus = "active" | "created" | "updated" | "queried";
+
+export interface WorkspaceItem {
+  path: string;
+  kind: WorkspaceItemKind;
+  status?: WorkspaceItemStatus;
+  meta?: string;
+}
+
+export interface WorkspaceSnapshot {
+  rootLabel: string;
+  activity: string;
+  note?: string;
+  items: WorkspaceItem[];
+}
+
 export interface ConversationStep {
   chat: ChatMessage;
   api: ApiBlock[];
   delay?: number; // ms before auto-advance, default 1800
   context?: ContextSnapshot;
+  workspace?: WorkspaceSnapshot;
 }
 
 export interface ScenarioIntro {
@@ -75,6 +94,28 @@ export type ScenarioTabItem = Scenario | ScenarioGroup;
 
 export function isScenarioGroup(item: ScenarioTabItem): item is ScenarioGroup {
   return "subScenarios" in item;
+}
+
+// ─── Context helpers (shared across scenario files) ───
+
+function cs(
+  id: string,
+  label: string,
+  type: ContextSectionType,
+  content: string,
+  tokenCount: number,
+  flags?: { isNew?: boolean; isRemoved?: boolean; isSummary?: boolean }
+): ContextSection {
+  return { id, label, type, content, tokenCount, ...flags };
+}
+
+function ctx(
+  tokenCount: number,
+  maxTokens: number,
+  sectionList: ContextSection[],
+  annotation?: string
+): ContextSnapshot {
+  return { tokenCount, maxTokens, payload: "", sections: sectionList, annotation };
 }
 
 // ─── Scenario 1: Simple Chat ───
@@ -111,6 +152,10 @@ const simpleChat: Scenario = {
           annotation: "Before your message, there's a system prompt — hidden instructions that shape how the model behaves. Every conversation has one, even if you never see it.",
         },
       ],
+      context: ctx(55, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a helpful, harmless, and honest assistant. Answer questions clearly and concisely.", 45),
+        cs("msg-u1", "User Message", "message-user", "What is the capital of France?", 10, { isNew: true }),
+      ], "Two pieces in the context: the system prompt and your message. ~55 tokens total."),
       delay: 2800,
     },
     {
@@ -140,6 +185,11 @@ const simpleChat: Scenario = {
           annotation: "The response comes back as structured data — not just plain text. The app that shows you the chat formats it into what you see on screen.",
         },
       ],
+      context: ctx(93, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a helpful, harmless, and honest assistant.", 45),
+        cs("msg-u1", "User Message", "message-user", "What is the capital of France?", 10),
+        cs("msg-a1", "Assistant Response", "message-assistant", "The capital of France is Paris...", 38, { isNew: true }),
+      ], "After one exchange: ~93 tokens. The next request will include all of this plus your new message."),
       delay: 3000,
     },
   ],
@@ -191,6 +241,11 @@ const toolUse: Scenario = {
           annotation: "The request includes a menu of tools the model is allowed to use. Each tool has a name, a description of what it does, and a definition of what inputs it needs.",
         },
       ],
+      context: ctx(260, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a helpful assistant.", 30),
+        cs("tools", "Tool Definitions (1 tool)", "tool-definitions", "get_weather — Get current weather for a location", 210),
+        cs("msg-u1", "User Message", "message-user", "What's the weather like in Santa Monica right now?", 20, { isNew: true }),
+      ], "System prompt + 1 tool definition + your message. Even a single tool adds ~210 tokens of schema."),
       delay: 3000,
     },
     {
@@ -220,6 +275,12 @@ const toolUse: Scenario = {
           annotation: "Instead of text, the model returns a tool_use block. stop_reason is \"tool_use\" — it's waiting for the result.",
         },
       ],
+      context: ctx(310, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a helpful assistant.", 30),
+        cs("tools", "Tool Definitions (1 tool)", "tool-definitions", "get_weather — Get current weather for a location", 210),
+        cs("msg-u1", "User Message", "message-user", "What's the weather like in Santa Monica right now?", 20),
+        cs("msg-tc1", "Tool Call: get_weather", "message-tool-call", 'get_weather({ location: "Santa Monica, CA" })', 50, { isNew: true }),
+      ], "The model's tool call is now part of the conversation. It stays in context for the next request."),
       delay: 2500,
     },
     {
@@ -244,6 +305,13 @@ const toolUse: Scenario = {
           annotation: "The model can't run tools itself — the host app executes the function, then passes the real data back for the model to use.",
         },
       ],
+      context: ctx(370, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a helpful assistant.", 30),
+        cs("tools", "Tool Definitions (1 tool)", "tool-definitions", "get_weather — Get current weather for a location", 210),
+        cs("msg-u1", "User Message", "message-user", "What's the weather like in Santa Monica right now?", 20),
+        cs("msg-tc1", "Tool Call: get_weather", "message-tool-call", 'get_weather({ location: "Santa Monica, CA" })', 50),
+        cs("msg-tr1", "Tool Result: get_weather", "message-tool-result", '{ temp_f: 72, condition: "Sunny", humidity: 65, wind_mph: 8 }', 60, { isNew: true }),
+      ], "The tool result joins the context. One tool round-trip added ~110 tokens (the call + the result)."),
       delay: 2800,
     },
     {
@@ -267,6 +335,14 @@ const toolUse: Scenario = {
           annotation: "Now the model has real data. It synthesizes a natural response from the structured tool result.",
         },
       ],
+      context: ctx(420, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a helpful assistant.", 30),
+        cs("tools", "Tool Definitions (1 tool)", "tool-definitions", "get_weather — Get current weather for a location", 210),
+        cs("msg-u1", "User Message", "message-user", "What's the weather like in Santa Monica right now?", 20),
+        cs("msg-tc1", "Tool Call: get_weather", "message-tool-call", 'get_weather({ location: "Santa Monica, CA" })', 50),
+        cs("msg-tr1", "Tool Result: get_weather", "message-tool-result", '{ temp_f: 72, condition: "Sunny" }', 60),
+        cs("msg-a1", "Assistant Response", "message-assistant", "It's a beautiful day in Santa Monica! 72°F and sunny...", 50, { isNew: true }),
+      ], "One question, one tool call: ~420 tokens total. The entire exchange stays in context for the next turn."),
       delay: 3000,
     },
   ],
@@ -444,6 +520,11 @@ const agentLoop: Scenario = {
           annotation: "The agent has 3 tools: read, edit, and run. It decides which to use and in what order.",
         },
       ],
+      context: ctx(830, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a coding assistant with access to tools for reading, writing, and running files.", 50),
+        cs("tools", "Tool Definitions (3 tools)", "tool-definitions", "read_file, edit_file, run_command", 750),
+        cs("msg-u1", "User Message", "message-user", "Add a dark mode toggle button to the navigation bar.", 30, { isNew: true }),
+      ], "System prompt + 3 tool definitions + your message. ~830 tokens to start."),
       delay: 3000,
     },
     {
@@ -471,6 +552,13 @@ const agentLoop: Scenario = {
           annotation: "The model thinks out loud, then decides to read a file. It can reason and act in a single response — thinking and doing at the same time.",
         },
       ],
+      context: ctx(920, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a coding assistant...", 50),
+        cs("tools", "Tool Definitions (3 tools)", "tool-definitions", "read_file, edit_file, run_command", 750),
+        cs("msg-u1", "User Message", "message-user", "Add a dark mode toggle button to the navigation bar.", 30),
+        cs("msg-tc1", "Tool Call: read_file", "message-tool-call", 'read_file({ path: "src/components/Nav.tsx" })', 40, { isNew: true }),
+        cs("msg-think1", "Thinking", "message-assistant", "I need to understand the current nav structure first.", 50, { isNew: true }),
+      ], "The model's reasoning and tool call are added to context. Each step accumulates."),
       delay: 2500,
     },
     {
@@ -495,6 +583,14 @@ const agentLoop: Scenario = {
           annotation: "The file contents come back. Now the agent knows the nav structure.",
         },
       ],
+      context: ctx(1120, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a coding assistant...", 50),
+        cs("tools", "Tool Definitions (3 tools)", "tool-definitions", "read_file, edit_file, run_command", 750),
+        cs("msg-u1", "User Message", "message-user", "Add a dark mode toggle button...", 30),
+        cs("msg-think1", "Thinking", "message-assistant", "I need to understand the nav structure first.", 50),
+        cs("msg-tc1", "Tool Call: read_file", "message-tool-call", 'read_file({ path: "Nav.tsx" })', 40),
+        cs("msg-tr1", "Tool Result: Nav.tsx", "message-tool-result", "export function Nav() { ... links, mobile menu, sticky panel ... }", 200, { isNew: true }),
+      ], "The file contents are now in context (~200 tokens). The agent can see the nav structure."),
       delay: 2500,
     },
     {
@@ -528,6 +624,16 @@ const agentLoop: Scenario = {
           annotation: "The agent writes a precise edit — old string to find, new string to replace it with.",
         },
       ],
+      context: ctx(1350, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a coding assistant...", 50),
+        cs("tools", "Tool Definitions (3 tools)", "tool-definitions", "read_file, edit_file, run_command", 750),
+        cs("msg-u1", "User Message", "message-user", "Add a dark mode toggle button...", 30),
+        cs("msg-think1", "Thinking", "message-assistant", "I need to understand the nav structure first.", 50),
+        cs("msg-tc1", "Tool Call: read_file", "message-tool-call", "read_file(Nav.tsx)", 40),
+        cs("msg-tr1", "Tool Result: Nav.tsx", "message-tool-result", "export function Nav() { ... }", 200),
+        cs("msg-tc2", "Tool Call: edit_file", "message-tool-call", 'edit_file({ path: "Nav.tsx", old_string: "...", new_string: "..." })', 180, { isNew: true }),
+        cs("msg-think2", "Thinking", "message-assistant", "I'll add a theme toggle button after the nav links.", 50, { isNew: true }),
+      ], "The edit command is large — it contains both the old and new code. Context growing steadily."),
       delay: 3000,
     },
     {
@@ -556,6 +662,18 @@ const agentLoop: Scenario = {
           annotation: "The agent verifies its work by running a build. Clean output — no errors.",
         },
       ],
+      context: ctx(1480, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a coding assistant...", 50),
+        cs("tools", "Tool Definitions (3 tools)", "tool-definitions", "read_file, edit_file, run_command", 750),
+        cs("msg-u1", "User Message", "message-user", "Add a dark mode toggle button...", 30),
+        cs("msg-think1", "Thinking", "message-assistant", "Understand nav structure first.", 50),
+        cs("msg-tc1", "Tool Call: read_file", "message-tool-call", "read_file(Nav.tsx)", 40),
+        cs("msg-tr1", "Tool Result: Nav.tsx", "message-tool-result", "export function Nav() { ... }", 200),
+        cs("msg-think2", "Thinking", "message-assistant", "Add toggle after nav links.", 50),
+        cs("msg-tc2", "Tool Call: edit_file", "message-tool-call", "edit_file(Nav.tsx, ...)", 180),
+        cs("msg-tc3", "Tool Call: run_command", "message-tool-call", 'run_command({ command: "npm run build" })', 30, { isNew: true }),
+        cs("msg-tr3", "Tool Result: build", "message-tool-result", "Compiled successfully. No errors.", 50, { isNew: true }),
+      ], "Build check added. 4 tool round-trips: read → edit → build → verify. Context at ~1,480 tokens."),
       delay: 2500,
     },
     {
@@ -580,9 +698,22 @@ const agentLoop: Scenario = {
     "output_tokens": 156
   }
 }`,
-          annotation: "The agent loop is complete. 4 tool calls, 1 final response. Total: ~2K tokens.",
+          annotation: "The agent loop is complete. 4 tool calls, 1 final response. Total: ~1,600 tokens.",
         },
       ],
+      context: ctx(1630, 200000, [
+        cs("sys", "System Prompt", "system-prompt", "You are a coding assistant...", 50),
+        cs("tools", "Tool Definitions (3 tools)", "tool-definitions", "read_file, edit_file, run_command", 750),
+        cs("msg-u1", "User Message", "message-user", "Add a dark mode toggle button...", 30),
+        cs("msg-think1", "Thinking", "message-assistant", "Understand nav structure first.", 50),
+        cs("msg-tc1", "Tool Call: read_file", "message-tool-call", "read_file(Nav.tsx)", 40),
+        cs("msg-tr1", "Tool Result: Nav.tsx", "message-tool-result", "export function Nav() { ... }", 200),
+        cs("msg-think2", "Thinking", "message-assistant", "Add toggle after nav links.", 50),
+        cs("msg-tc2", "Tool Call: edit_file", "message-tool-call", "edit_file(Nav.tsx, ...)", 180),
+        cs("msg-tc3", "Tool Call: run_command", "message-tool-call", "npm run build", 30),
+        cs("msg-tr3", "Tool Result: build", "message-tool-result", "Compiled successfully.", 50),
+        cs("msg-a1", "Final Response", "message-assistant", "Done! Added dark mode toggle to nav bar...", 150, { isNew: true }),
+      ], "Complete agent loop: ~1,630 tokens. One task generated 11 context sections. Imagine a 50-task session."),
       delay: 3000,
     },
   ],

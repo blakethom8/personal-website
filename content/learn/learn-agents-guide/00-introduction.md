@@ -1,44 +1,54 @@
 # How AI Agents Actually Work
 
-**A practical guide to the systems, tools, and architecture that turn a language model into an autonomous agent.**
+## Why This Guide Exists
+
+*A practical guide for understanding agents and peeking under the hood.*
+
+By the end of this guide, I hope you'll understand how to think about agents — whether you're interacting with them in your browser with ChatGPT or using a tool like Claude Code. The best outcome would be for you to understand how these systems function so you can ask the right questions to learn about any agent you're interacting with.
 
 ---
 
-## Who This Is For
+## Who This Is For and a Note on Learning
 
-Colleagues, clients, family — anyone who wants to understand what an "AI agent" actually is and how it works. No programming experience required.
+This guide is for anyone who wants to understand what an AI agent actually is and how it works. While there is technical content, my goal is for the concepts to be accessible by everybody.
 
-## What This Guide Is NOT About
+If there's anything to take away from this article, it's that you can use these LLM agents to learn anything you want. I highly recommend that while you're going through these writings, if there are topics you're curious about — or topics I don't explain well enough — you copy and paste that text and share it with any of your browser agents. I've found, through developing agentic applications, that these tools are the best teachers. You can ask them any question, and they will help — as long as you know how to ask it the right way.
 
-You might expect a guide about AI to start with how models are trained — neural networks, transformer architecture, billions of parameters, deep learning math. We're skipping all of that.
+---
 
-Here's why: **the model is the engine, but an agent is the entire car.**
+## What This Guide IS About
 
-When you drive a car, you don't need to understand combustion engineering. You need to understand steering, brakes, GPS, and how they work together to get you somewhere. The engine matters — but it's one component in a much larger system.
+This guide is how I think about LLMs from an application perspective. The key concepts you should be able to more deeply understand are:
 
-The same is true for AI agents. The language model (the "engine") is impressive, but it's just a prediction machine. By itself, it can't read your files, search the web, query a database, or send an email. It takes text in and produces text out. That's it.
+- **The difference between the LLM model and an agent**
+- **The structure of an API call** and what's included in the request-response cycle
+- **System context, user messages, and context management**
+- **Tools** — what they do, how an agent decides to use them
+- **Multi-turn interactions** — ReACT patterns
+- **How the full agentic harness** gives an agent its capability and character
 
-What makes an agent powerful is everything *around* the model — the system that gives it memory, tools, and the ability to take action in the real world. That system is what we're here to learn.
+## What This Guide IS NOT About
 
-### A Quick Word on the Engine
+We will not do a deep dive into LLM models themselves. The concepts around transformers, neural networks, etc. are out of scope. To be frank, I do not believe you need to understand those details to apply agents today.
 
-We won't deep-dive into model training, but here's the one-sentence version: **a large language model (LLM) is the world's best autocomplete.** It was trained on enormous amounts of text and learned to predict what word comes next, given all the words before it. When you ask it a question, it's not "thinking" or "understanding" — it's generating the most likely sequence of words that should follow your input.
+From an application standpoint, you should be able to understand the differences between models like Claude Opus versus Haiku or Sonnet, understand the context window, and learn a little more about how they operate — but the internals of model training are not something we'll cover here.
 
-That's genuinely all it does. And somehow, that's enough to power the systems we're about to explore.
+---
 
-### What We Will Cover
+## What We Will Cover
 
-This guide walks through the five core layers that turn a prediction engine into an autonomous agent:
+**1. The Big Picture** — What an AI agent actually is: the engine vs. the car
 
-| Module | What You'll Learn |
-|--------|-------------------|
-| **1. The Big Picture** | What an AI agent actually is — the engine vs. the car. How all the pieces fit together. |
-| **2. How AI Communicates** | The structured messages that flow between you and the model. What actually gets sent over the internet. |
-| **3. Context & Memory** | Why AI "forgets" everything between messages — and how we solve that. The most surprising part for most people. |
-| **4. Tools & Actions** | How agents interact with the real world. This is what gives AI its "claws." |
-| **5. Agentic Patterns** | How all the pieces compose into strategies. The difference between a chatbot and a true agent. |
-| **Epilogue: Same Engine, Different Cars** | Why Claude Code, Claude Desktop, and ChatGPT behave so differently — even when they use the same model. |
+**2. How AI Communicates** — The structured messages that flow between you and the model
 
-By the end, you'll understand exactly what's happening when an AI assistant writes code, searches the web, or manages your calendar. No magic. No mystery. Just systems.
+**3. Context & Memory** — Why AI "forgets" everything between messages, and how we solve that
+
+**4. Tools & Actions** — How agents interact with the real world
+
+**5. Agentic Patterns** — The difference between a chatbot and a true agent
+
+**Epilogue** — Why Claude Code, Claude Desktop, and ChatGPT behave so differently
+
+---
 
 Let's start with the big picture.

@@ -4,6 +4,38 @@
 
 ---
 
+## The Invisible Instructions: System Context
+
+Before we talk about memory, there's something fundamental most people don't know about: **system context** — the hidden instructions that shape everything the AI does.
+
+When you open ChatGPT or Claude and type a message, you're not the first voice the model hears. Before your words ever reach it, the harness has already loaded a set of instructions called the **system prompt**. You never see it. But it's there on every single request, telling the model who it is, how to behave, and what it can do.
+
+When you type *"What's a good hike near LA?"* — the model doesn't just see your question. It first sees a hidden system prompt like *"You are Claude, made by Anthropic. You are helpful, harmless, and honest."* — and then your message after it. The system prompt shapes the model's entire personality, knowledge, and behavior. [See what this looks like →](#modal-system-context-compare)
+
+Think of the system prompt as a job description handed to someone before their first day. It might say "you are a friendly travel assistant" or "you are a strict code reviewer who only responds in bullet points." The model follows these instructions because they're literally the first thing it reads.
+
+### System Context Goes Way Beyond a Personality
+
+For simple chat apps, the system prompt might be one sentence (~20 tokens). But for real AI agents — coding assistants, business tools, custom workflows — the system context can be **massive**: system prompt (2,000 tokens) + project instructions (3,000) + memory files (1,000) + tool definitions (5,000) = **~11,000 tokens before you say a word.** [See the full breakdown →](#modal-system-context-scale)
+
+### Real-World Example: Project Instructions
+
+One powerful pattern is loading project-specific instructions into the system context. OpenClaw uses a file called `sol.md` (similar to how Claude Code uses `CLAUDE.md`) — a document that lives in your project folder and gets automatically included in the system prompt. It contains your tech stack, coding conventions, file structure, and rules. [See a real sol.md file →](#modal-sol-md)
+
+This is why an AI coding assistant can seem to "understand" your project — it's not that it learned your codebase. It's reading your project instructions from scratch on every API call. Change the `sol.md` file, and the agent's behavior changes immediately on the very next message.
+
+### Why System Context Matters
+
+Understanding system context changes how you think about AI:
+
+- **It explains why the same model behaves differently in different apps** — ChatGPT and Claude Desktop use the same underlying models, but their system prompts are completely different
+- **It's how developers customize AI** — the system prompt is the primary lever for shaping behavior
+- **It takes up space** — those 11,000 tokens of system context eat into the same context window that holds your conversation. More instructions = less room for conversation history
+
+Now that you understand what's already loaded before the conversation begins, let's talk about what happens during the conversation — and why the model seems to remember things it actually can't.
+
+---
+
 ## The Goldfish Problem
 
 Here's the most surprising thing about AI for most people: **the model has zero memory.**
@@ -275,12 +307,13 @@ The best agent harnesses solve this with a combination of strategies — keeping
 
 ## Key Takeaways
 
-1. **The model has no memory** — every request starts from a completely blank slate
-2. **Memory is an illusion** created by re-sending the full conversation transcript each time
-3. **The context window is a hard limit** — conversations that exceed it lose their earliest messages
-4. **New chat = blank transcript** — the model didn't forget; it never knew
-5. **Long-term memory requires external storage** — files, databases, or memory systems that the harness loads into context
-6. **Context management is the hard problem** — balancing completeness, relevance, speed, and cost
+1. **System context is loaded before you speak** — the system prompt, project instructions, memory files, and tool definitions are already consuming tokens before any conversation begins
+2. **The model has no memory** — every request starts from a completely blank slate
+3. **Memory is an illusion** created by re-sending the full conversation transcript each time
+4. **The context window is a hard limit** — conversations that exceed it lose their earliest messages
+5. **New chat = blank transcript** — the model didn't forget; it never knew
+6. **Long-term memory requires external storage** — files, databases, or memory systems that the harness loads into context
+7. **Context management is the hard problem** — balancing completeness, relevance, speed, and cost
 
 Understanding context transforms how you use AI. When a model seems to "forget" something, it's almost always a context issue — not a model failure. The information either wasn't in the transcript, got dropped due to window limits, or was in a different session entirely.
 

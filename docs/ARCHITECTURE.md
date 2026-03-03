@@ -122,14 +122,15 @@ Hetzner VPS
 ### Routing
 
 ```
-/                     → Home (SSG)
-/about                → About (SSG)
-/work                 → Work/Portfolio (SSG)
-/ideas                → Blog listing (SSG, regenerates on build)
-/ideas/[slug]         → Individual post (SSG from MDX)
-/learn                → Learning hub (SSG)
-/learn/[slug]         → Individual module (SSG + client interactivity)
-/contact              → Contact form (SSG + client-side form handling)
+/                          → Home (SSG)
+/about                     → About (SSG)
+/work                      → Work/Portfolio (SSG)
+/ideas                     → Blog listing (SSG, regenerates on build)
+/ideas/[slug]              → Individual post (SSG from MDX)
+/learn                     → Learning hub (SSG + client interactivity)
+/learn/agents-explained    → Flagship guide: "How AI Agents Actually Work" (SSG + client)
+/learn/simulator           → Standalone conversation simulator page
+/contact                   → Contact form (SSG + client-side form handling)
 ```
 
 All pages are statically generated at build time. Interactive elements (Learn modules, WebMCP, contact form, dark mode) hydrate as React client components.
@@ -137,10 +138,19 @@ All pages are statically generated at build time. Interactive elements (Learn mo
 ### Content System
 
 ```
-content/posts/
+content/posts/                          ← Blog posts (MDX)
 ├── bespoke-ai-model.mdx
 ├── webmcp-overview.mdx
 └── entity-resolution-healthcare.mdx
+
+content/learn/learn-agents-guide/       ← Flagship guide (Markdown → remark-html)
+├── 00-introduction.md
+├── 01-the-big-picture.md
+├── 02-how-ai-communicates.md
+├── 03-context-and-memory.md
+├── 04-tools-and-actions.md
+├── 05-agentic-patterns.md
+└── 06-same-engine-different-cars.md
 ```
 
 Each MDX file has frontmatter:

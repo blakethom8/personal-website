@@ -10,10 +10,14 @@ interface SimulatorFlowProps {
   visibleSteps: number;
   isLoading: boolean;
   intro?: ScenarioIntro;
-  onPlay: () => void;
 }
 
-export function SimulatorFlow({ steps, visibleSteps, isLoading, intro, onPlay }: SimulatorFlowProps) {
+export function SimulatorFlow({
+  steps,
+  visibleSteps,
+  isLoading,
+  intro,
+}: SimulatorFlowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -56,13 +60,9 @@ export function SimulatorFlow({ steps, visibleSteps, isLoading, intro, onPlay }:
             <span className="label-mono">{intro.label}</span>
             <h3 className="font-serif text-xl text-fg sm:text-2xl">{intro.heading}</h3>
             <p className="max-w-md text-sm leading-relaxed text-fg-muted">{intro.description}</p>
-            <button
-              onClick={onPlay}
-              className="sim-control-btn sim-control-primary sim-intro-play mt-2"
-            >
-              <span>&#9654;</span>
-              <span>start simulation</span>
-            </button>
+            <p className="font-mono text-[10px] uppercase tracking-[0.08em] text-fg-light">
+              use the controls above to step phase-by-phase or autoplay
+            </p>
           </div>
         ) : (
           <div className="flex items-center justify-center py-16">

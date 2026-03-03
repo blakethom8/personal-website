@@ -12,7 +12,7 @@ const ALL_CATEGORIES = [
 ];
 
 function getType(post: PostMeta): "article" | "podcast" {
-  return post.podcast ? "podcast" : "article";
+  return post.source ? "podcast" : "article";
 }
 
 export function CatalogueView({ posts }: { posts: PostMeta[] }) {
@@ -67,8 +67,8 @@ export function CatalogueView({ posts }: { posts: PostMeta[] }) {
         </div>
         <h1 className="mt-2 font-serif text-2xl md:text-3xl">Full Catalogue</h1>
         <p className="mt-2 font-mono text-[12px] text-fg-light">
-          {posts.length} total · {posts.filter((p) => !p.podcast).length} articles ·{" "}
-          {posts.filter((p) => p.podcast).length} podcasts
+          {posts.length} total · {posts.filter((p) => !p.source).length} articles ·{" "}
+          {posts.filter((p) => p.source).length} podcasts
         </p>
 
         {/* Search */}

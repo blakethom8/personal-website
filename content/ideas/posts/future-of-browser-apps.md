@@ -4,7 +4,7 @@ date: "2026-02-26"
 tags: ["technology", "webmcp", "ai", "building"]
 excerpt: "I gave an AI agent access to my web app. Then I rebuilt the app to actually talk back. Here's what happened — and why every web developer should be paying attention."
 readTime: "14 min"
-featured: true
+featured: false
 category: "technical-deep-dives"
 ---
 

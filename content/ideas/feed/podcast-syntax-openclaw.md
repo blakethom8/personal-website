@@ -4,7 +4,13 @@ date: 2026-02-26
 category: podcast-notes
 tags: [openclaw, pi, agents, architecture, bash, LLM]
 summary: "Pi is a while loop + 4 tools. That's it. This 'minimal by design' agent harness powers OpenClaw and proves that the most elegant agent architecture might just be bash."
-podcast: "Syntax #976 - Pi: The AI Harness That Powers OpenClaw"
+source:
+  type: podcast
+  platform: Syntax.fm
+  show: "Syntax"
+  episode: "976"
+  guest: "Armin Ronacher & Mario Zechner"
+  url: "https://syntax.fm/show/976/pi-the-ai-harness-that-powers-openclaw-w-armin-ronacher-and-mario-zechner"
 status: draft
 ---
 

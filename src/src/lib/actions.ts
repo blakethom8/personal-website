@@ -21,6 +21,8 @@ export async function getRenderedPost(slug: string) {
     readTime: post.readTime,
     category: post.category,
     tags: post.tags || [],
+    source: post.source,
+    coverImage: post.coverImage,
     contentHtml,
     headings,
   };

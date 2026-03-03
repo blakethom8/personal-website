@@ -7,6 +7,8 @@ import { CATEGORIES, CONSUMING_CATEGORY } from "@/lib/categories";
 import { getRenderedPost, getRenderedCategoryDoc } from "@/lib/actions";
 import type { Heading } from "@/lib/headings";
 
+import type { Source } from "@/lib/posts";
+
 export interface PostMeta {
   slug: string;
   title: string;
@@ -16,7 +18,8 @@ export interface PostMeta {
   category: string;
   featured: boolean;
   tags?: string[];
-  podcast?: string;
+  source?: Source;
+  coverImage?: string;
 }
 
 interface ArticlePreview {
@@ -53,7 +56,10 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
     ])
   );
 
-  const featured = articles.slice(0, 2);
+  const featuredMarked = articles.filter((p) => p.featured);
+  const featured = featuredMarked.length >= 2
+    ? featuredMarked.slice(0, 2)
+    : [...featuredMarked, ...articles.filter((p) => !p.featured)].slice(0, 2);
 
   const activeCat = activeCategory
     ? [...CATEGORIES, CONSUMING_CATEGORY].find((c) => c.id === activeCategory)
@@ -181,7 +187,7 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
                 <button
                   key={cat.id}
                   onClick={() => toggleCategory(cat.id)}
-                  className={`group w-full border-b border-border-light px-5 py-3.5 text-left transition-colors ${
+                  className={`group w-full border-b border-border-light px-5 py-2.5 text-left transition-colors ${
                     isActive
                       ? "border-l-2 border-l-accent bg-accent/[0.06]"
                       : "border-l-2 border-l-transparent hover:bg-accent/[0.03]"
@@ -189,7 +195,7 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className={`shrink-0 font-mono text-[10px] ${isActive ? "text-accent" : "text-accent/60"}`}>
+                      <span className={`shrink-0 font-mono text-[10px] ${isActive ? "text-accent" : "text-accent/70"}`}>
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <span className={`truncate font-sans text-[13px] font-medium transition-colors ${
@@ -202,7 +208,7 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
                       {count > 0 ? count : "—"}
                     </span>
                   </div>
-                  <p className="mt-1 line-clamp-2 pl-[1.375rem] text-[11px] leading-relaxed text-fg-light">
+                  <p className="mt-0.5 line-clamp-1 pl-[1.375rem] text-[11px] leading-relaxed text-fg-light">
                     {cat.quickDownload}
                   </p>
                 </button>
@@ -211,7 +217,7 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
 
             <button
               onClick={() => toggleCategory(CONSUMING_CATEGORY.id)}
-              className={`group w-full px-5 py-3.5 text-left transition-colors ${
+              className={`group w-full px-5 py-2.5 text-left transition-colors ${
                 activeCategory === CONSUMING_CATEGORY.id
                   ? "border-l-2 border-l-accent bg-accent/[0.06]"
                   : "border-l-2 border-l-transparent hover:bg-accent/[0.03]"
@@ -220,7 +226,7 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
               <div className="flex items-center justify-between gap-2">
                 <div className="flex min-w-0 items-center gap-2">
                   <span className={`shrink-0 font-mono text-[10px] ${
-                    activeCategory === CONSUMING_CATEGORY.id ? "text-accent" : "text-accent/60"
+                    activeCategory === CONSUMING_CATEGORY.id ? "text-accent" : "text-accent/70"
                   }`}>
                     {String(CATEGORIES.length + 1).padStart(2, "0")}
                   </span>
@@ -234,7 +240,7 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
                   {consuming.length > 0 ? consuming.length : "—"}
                 </span>
               </div>
-              <p className="mt-1 line-clamp-2 pl-[1.375rem] text-[11px] leading-relaxed text-fg-light">
+              <p className="mt-0.5 line-clamp-1 pl-[1.375rem] text-[11px] leading-relaxed text-fg-light">
                 {CONSUMING_CATEGORY.quickDownload}
               </p>
             </button>
@@ -463,23 +469,35 @@ export function IdeasView({ posts }: { posts: PostMeta[] }) {
                     <Link
                       key={post.slug}
                       href={`/ideas/${post.slug}`}
-                      className="panel group px-6 py-5 no-underline transition-colors hover:border-accent-muted"
+                      className="panel group overflow-hidden p-0 no-underline transition-colors hover:border-accent-muted"
                     >
-                      <div className="mb-2.5 flex items-center justify-between gap-4">
-                        <p className="label-mono">{cat?.shortLabel ?? "featured"}</p>
-                        <span className="shrink-0 font-mono text-[11px] text-fg-light">
-                          {post.readTime} · {post.date}
-                        </span>
-                      </div>
-                      <h2 className="font-serif text-[17px] leading-snug text-fg transition-colors group-hover:text-accent">
-                        {post.title}
-                      </h2>
-                      {post.excerpt && (
-                        <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-fg-muted">
-                          {post.excerpt}
-                        </p>
+                      {post.coverImage && (
+                        <div className="h-36 overflow-hidden">
+                          <img
+                            src={post.coverImage}
+                            alt=""
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                            loading="lazy"
+                          />
+                        </div>
                       )}
-                      <p className="mt-3 font-mono text-[11px] text-accent">read →</p>
+                      <div className="px-6 py-5">
+                        <div className="mb-2.5 flex items-center justify-between gap-4">
+                          <p className="label-mono">{cat?.shortLabel ?? "featured"}</p>
+                          <span className="shrink-0 font-mono text-[11px] text-fg-light">
+                            {post.readTime} · {post.date}
+                          </span>
+                        </div>
+                        <h2 className="font-serif text-[17px] leading-snug text-fg transition-colors group-hover:text-accent">
+                          {post.title}
+                        </h2>
+                        {post.excerpt && (
+                          <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-fg-muted">
+                            {post.excerpt}
+                          </p>
+                        )}
+                        <p className="mt-3 font-mono text-[11px] text-accent">read →</p>
+                      </div>
                     </Link>
                   );
                 })}
