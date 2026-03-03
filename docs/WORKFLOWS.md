@@ -146,3 +146,4 @@ Track important decisions so we don't revisit them:
 - Verify images are optimized
 - Check WebMCP tools on new pages
 - Update site map tool data if pages added
+- Merge or push to `main` so `.github/workflows/deploy.yml` rolls the change to Hetzner

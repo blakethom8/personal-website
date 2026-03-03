@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Personal Website App
+
+This is the Next.js application for Blake Thomson's personal site. The app lives in `src/`, but published content lives one directory up in the repo-root `content/` folder. That repo layout matters for production builds and Docker.
 
 ## Getting Started
 
-First, run the development server:
+Run the development server from this directory:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Common Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run test
+```
+
+## Production Build
+
+The app uses Next standalone output:
+
+```bash
+npm run build
+```
+
+This creates `.next/standalone/`, which is what the production Docker image runs.
+
+## Docker and Deployment
+
+Production does not build from `src/` alone because the app reads markdown from `../content`.
+
+- Dockerfile: `src/Dockerfile`
+- Compose stack: `../docker-compose.yml`
+- GitHub Actions deploy pipeline: `../.github/workflows/deploy.yml`
+- Main deployment notes: `../docs/ARCHITECTURE.md`
+
+Local image build from the repo root:
+
+```bash
+docker build -f src/Dockerfile -t personal-website-test ..
+```
+
+Local compose build from the repo root:
+
+```bash
+cd ..
+docker compose build
+```
+
+Pushes to `main` build the image, publish it to GHCR, and deploy it to the Hetzner server over SSH.
+
+## Runtime Config
+
+Development uses `src/.env.local`.
+
+Production expects server-side env in:
+
+```bash
+/opt/personal-website/.env.production
+```
+
+At minimum:
+
+```bash
+ADMIN_PASSWORD=change-me
+ADMIN_TOKEN=change-me
+```
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs) - framework reference
+- [Architecture doc](../docs/ARCHITECTURE.md) - deployment and infra choices

@@ -12,3 +12,13 @@ The prompts are numbered and sequential:
 5. `05-ideas-blog.md` — Blog listing + individual post reading experience
 6. `06-learn-section.md` — Interactive education modules
 7. `07-contact-page.md` — Contact form + links
+8. `08-admin-notion-sync-center.md` — Admin editor + Notion sync workflow
+9. `09-docker-hetzner-deployment.md` — Docker, GHCR, GitHub Actions, Hetzner deploy path
+
+## Deployment Docs
+
+- Main deployment reference: `docs/ARCHITECTURE.md`
+- CI/CD pipeline: `.github/workflows/deploy.yml`
+- Server bootstrap: `scripts/hetzner-setup.sh`
+- Docker image: `src/Dockerfile`
+- Compose stack: `docker-compose.yml`

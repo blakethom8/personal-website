@@ -1,10 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "admin123";
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? "dev-admin-token";
+const isProduction = process.env.NODE_ENV === "production";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? (isProduction ? "" : "admin123");
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? (isProduction ? "" : "dev-admin-token");
 
 export async function POST(req: NextRequest) {
   let body: { password?: unknown };
+
+  if (isProduction && (!ADMIN_PASSWORD || !ADMIN_TOKEN)) {
+    return NextResponse.json(
+      { error: "Admin auth is not configured" },
+      { status: 503 },
+    );
+  }
 
   try {
     body = await req.json();
@@ -27,4 +35,3 @@ export async function POST(req: NextRequest) {
 
   return response;
 }
-

@@ -1,0 +1,6 @@
+/.env.local
+/.env.production
+nginx/certs/*
+!nginx/certs/.gitkeep
+src/.env.local
+src/.env.production

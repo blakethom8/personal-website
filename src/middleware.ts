@@ -1,12 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? "dev-admin-token";
+const isProduction = process.env.NODE_ENV === "production";
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? (isProduction ? "" : "dev-admin-token");
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname === "/admin/login" || pathname === "/api/admin/auth") {
     return NextResponse.next();
+  }
+
+  if (isProduction && !ADMIN_TOKEN) {
+    return pathname.startsWith("/api/admin")
+      ? NextResponse.json({ error: "Admin auth is not configured" }, { status: 503 })
+      : new NextResponse("Admin auth is not configured", { status: 503 });
   }
 
   const token = req.cookies.get("admin_token")?.value;

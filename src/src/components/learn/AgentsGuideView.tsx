@@ -7,6 +7,8 @@ import { Module0Content } from "./Module0Content";
 import { Module1Content } from "./Module1Content";
 import { Module2Content } from "./Module2Content";
 import { Module3Content } from "./Module3Content";
+import { Module4Content } from "./Module4Content";
+import { Module5Content } from "./Module5Content";
 
 // ─── Modal content for inline guide links ───
 // Links in markdown like [text →](#modal-system-context-compare) are intercepted
@@ -310,6 +312,10 @@ export function AgentsGuideView({ steps, closing }: AgentsGuideViewProps) {
                 <Module2Content />
               ) : currentStep.number === 3 ? (
                 <Module3Content />
+              ) : currentStep.number === 4 ? (
+                <Module4Content />
+              ) : currentStep.number === 5 ? (
+                <Module5Content />
               ) : (
                 <div
                   className="post-content"

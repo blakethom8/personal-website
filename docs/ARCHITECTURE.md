@@ -1,6 +1,6 @@
 # Architecture — Blake Thomson Personal Website
 
-*Last updated: 2026-02-25*
+*Last updated: 2026-03-03*
 
 ---
 
@@ -18,7 +18,7 @@
 
 | Layer | Choice | Why |
 |-------|--------|-----|
-| **Framework** | Next.js 15 (App Router) | SSG + React islands for interactivity. MDX native. Huge ecosystem. |
+| **Framework** | Next.js 16 (App Router) | SSG + React islands for interactivity. MDX native. Huge ecosystem. |
 | **Styling** | Tailwind CSS 4 | Utility-first, fast iteration, good dark mode support |
 | **Content** | MDX files in repo | No external CMS dependency. Version controlled. Easy to write. |
 | **Interactivity** | React client components | For Learn modules, WebMCP hooks, dark mode toggle |
@@ -51,12 +51,17 @@ Hetzner VPS (existing or new)
 # docker-compose.yml
 services:
   website:
-    build: ./src
+    image: ${WEBSITE_IMAGE:-personal-website:latest}
+    build:
+      context: .
+      dockerfile: src/Dockerfile
     restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
     environment:
       - NODE_ENV=production
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-}
 
   nginx:
     image: nginx:alpine
@@ -75,21 +80,29 @@ services:
 
 ```dockerfile
 FROM node:22-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
+WORKDIR /app/src
+COPY src/package*.json ./
 RUN npm ci
-COPY . .
+
+WORKDIR /app
+COPY content ./content
+COPY src ./src
+
+WORKDIR /app/src
 RUN npm run build
 
 FROM node:22-alpine AS runner
-WORKDIR /app
+WORKDIR /app/src
 ENV NODE_ENV=production
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+COPY --from=builder /app/src/.next/standalone ./
+COPY --from=builder /app/src/.next/static ./.next/static
+COPY --from=builder /app/src/public ./public
+COPY --from=builder /app/content ../content
 EXPOSE 3000
 CMD ["node", "server.js"]
 ```
+
+Because the site content lives in the repo-root `content/` directory while the Next.js app lives in `src/`, the Docker build context must be the repo root. The Dockerfile still lives in `src/`.
 
 ### Deployment Flow
 
@@ -110,10 +123,61 @@ GitHub Actions
     │
     ▼
 Hetzner VPS
+    ├── Load `.env.production` (admin credentials, any runtime secrets)
     ├── Pull new image
     ├── docker compose up -d
     └── Live at blakethomson.com (or whatever domain)
 ```
+
+### GitHub Actions Pipeline
+
+The production deploy pipeline lives in `.github/workflows/deploy.yml`.
+
+On every push to `main` it does this:
+
+1. Check out the repo
+2. Build the production image from the repo root using `src/Dockerfile`
+3. Push `ghcr.io/<repo-owner>/personal-website:latest`
+4. SSH into the Hetzner box
+5. Load `/opt/personal-website/.env.production` if it exists
+6. Pull the new `website` image and restart the stack with `docker compose up -d`
+
+### Required GitHub Secrets
+
+The workflow expects these repository secrets:
+
+- `HETZNER_HOST`
+- `HETZNER_USER`
+- `HETZNER_SSH_KEY`
+
+No separate container-registry secret is needed. The workflow uses the repository `GITHUB_TOKEN` for GHCR authentication.
+
+### Server Runtime Config
+
+The Hetzner server should keep runtime secrets in:
+
+```bash
+/opt/personal-website/.env.production
+```
+
+Current required values:
+
+```bash
+ADMIN_PASSWORD=change-me
+ADMIN_TOKEN=change-me
+```
+
+The app now fails closed in production if those admin credentials are missing. It will not fall back to development defaults.
+
+### First Deploy Checklist
+
+1. Run `scripts/hetzner-setup.sh` on the fresh Hetzner server
+2. Clone the repo into `/opt/personal-website`
+3. Copy `nginx/conf.d/blakethomson-pre-ssl.conf.example` into place for the first HTTP-only boot
+4. Run certbot and provision the real certificates
+5. Swap to `nginx/conf.d/blakethomson.conf`
+6. Create `/opt/personal-website/.env.production`
+7. Push to `main` to trigger the GitHub Actions deploy
 
 ---
 
@@ -216,6 +280,7 @@ WebMCP tools are registered via `useEffect` in page-level components. They unreg
 
 - HTTPS everywhere (Let's Encrypt via certbot)
 - CSP headers configured in nginx
+- Admin auth requires explicit production env vars (`ADMIN_PASSWORD`, `ADMIN_TOKEN`)
 - Contact form: rate limiting + honeypot (no CAPTCHA)
 - No database — no SQL injection surface
 - WebMCP tools only read/navigate — no destructive actions exposed

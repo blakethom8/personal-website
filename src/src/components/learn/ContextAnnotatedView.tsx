@@ -23,6 +23,8 @@ export function ContextAnnotatedView({
   sections,
   totalTokens: _totalTokens,
 }: ContextAnnotatedViewProps) {
+  void _totalTokens;
+
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleExpand = (id: string) => {

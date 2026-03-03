@@ -20,7 +20,7 @@ Notion is a **staging area**, not the source of truth. Edits in Notion don't go 
 
 ### 2. Admin Editor (`/admin`)
 
-**URL:** `https://blakethomson.dev/admin`
+**URL:** `/admin`
 
 Best for: quick markdown fixes, previewing how a post renders, editing frontmatter in-place.
 
@@ -28,7 +28,7 @@ The admin editor reads and writes directly to `content/posts/*.md` files on disk
 - `GET /api/admin/content/load?slug=...` → reads the file
 - `POST /api/admin/content/save` → writes to the file
 
-Changes are **immediate on disk** but require a rebuild/redeploy to go live on the production site.
+Changes are **immediate on disk** but require a production deploy to go live on the public site. In the current setup that usually means committing and pushing to `main`, which triggers the GitHub Actions deploy workflow.
 
 ### 3. Claude (code-level editing)
 
@@ -65,14 +65,14 @@ Claude can:
 **Quick fix (typo, small rewrite):**
 1. Go to `/admin`, select the post, edit in the markdown editor
 2. Save → writes to disk immediately
-3. Redeploy to go live
+3. Commit and push to `main` to trigger the production deploy
 
 **Major rewrite:**
 1. Edit the full post in Notion (Ideas database → open the post)
 2. Tell Claude: "sync [post name] from Notion"
 3. Claude reads the Notion page, updates `content/posts/[slug].md`
 4. Verify in admin editor or local dev
-5. Redeploy to go live
+5. Commit and push to `main` to trigger the production deploy
 
 ### Workflow B: Edit page copy (headlines, descriptions, bios)
 
@@ -80,7 +80,7 @@ Claude can:
 2. Tell Claude: "sync the About page from Notion" (or whichever page)
 3. Claude reads Notion, updates the TSX component
 4. Review in local dev
-5. Redeploy to go live
+5. Commit and push to `main` to trigger the production deploy
 
 ### Workflow C: Create a new blog post
 
@@ -125,7 +125,7 @@ Notion (write/rewrite)
   → tell Claude to sync
     → Claude updates files on disk
       → verify in admin editor or local dev
-        → commit + deploy
+        → commit + push to `main` → GitHub Actions deploy
 ```
 
 ### Keeping Notion current
