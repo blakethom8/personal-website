@@ -6,6 +6,7 @@ excerpt: "Why the SaaS model you grew up on is already obsolete — and what rep
 readTime: "10 min"
 featured: true
 category: "product-business"
+coverImage: "/images/posts/death-of-multi-tenant.jpg"
 ---
 
 # The Death of Multi-Tenant

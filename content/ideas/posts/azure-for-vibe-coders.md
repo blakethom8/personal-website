@@ -6,6 +6,7 @@ readTime: "15 min"
 category: "technical-deep-dives"
 tags: ["azure", "deployment", "docker", "cloud", "ai"]
 featured: false
+coverImage: "/images/posts/azure-for-vibe-coders.jpg"
 ---
 
 # Azure for Vibe Coders: A Practical Guide to Deploying AI Apps
