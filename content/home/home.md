@@ -39,10 +39,10 @@ These rows pull from hardcoded data in the page. Update titles, categories, read
 
 | Title | Category | Read Time | Date | Slug |
 |---|---|---|---|---|
+| 90M Records, One Eval Script: Building a Medicare Fraud Detector Overnight | healthcare-data | 12 min | Mar 10 | healthcare-fraud-autoresearch |
 | The Bespoke AI Model: Why We Build Inside Your Walls | business | 10 min | Feb 25 | bespoke-ai-model |
 | WebMCP: Making Websites AI-Native | technology | 8 min | Feb 20 | webmcp-overview |
 | Entity Resolution in Healthcare | healthcare | 12 min | Feb 15 | entity-resolution-healthcare |
-| Old Model vs. New Model | business | 6 min | Feb 10 | ai-is-the-glue |
 
 ---
 

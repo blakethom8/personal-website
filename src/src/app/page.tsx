@@ -92,10 +92,10 @@ export default function Home() {
               cta="open simulator"
             />
             <FeaturedCard
-              href="/ideas/death-of-multi-tenant"
+              href="/ideas/healthcare-fraud-autoresearch"
               type="essay"
-              title="The Death of Multi-Tenant"
-              description="Why bespoke, single-tenant AI deployments are replacing shared infrastructure — and what that means for how software gets built."
+              title="90M Records, One Eval Script"
+              description="Karpathy's autoresearch pattern applied to Medicare fraud detection. An AI agent iterated overnight on 90M CMS claims records — AUC 0.556 to 0.810 in 18 iterations."
               cta="read essay"
             />
           </div>
