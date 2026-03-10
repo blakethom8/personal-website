@@ -1,7 +1,7 @@
 ---
 title: "Services: The New Software"
 date: 2026-03-10
-category: in-my-feed
+category: podcast-notes
 tags: [AI-services, business-model, autopilot, copilot, healthcare, sequoia, venture]
 summary: "Sequoia partner Julien Bek argues the next $1T company will be a software company masquerading as a services firm. If you sell the work instead of the tool, every model improvement makes you faster and cheaper — not obsolete."
 source:
