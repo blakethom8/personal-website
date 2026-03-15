@@ -69,6 +69,49 @@ This is a smart move. It gives the whole benchmark a more believable operating r
 
 ---
 
+## The Actual Test Structure
+
+This is the part I should have emphasized more clearly.
+
+What makes the study interesting is not just the conclusion — it's the way the experiments are structured.
+
+He is not simply asking "which model is best?"
+He is testing a sequence of **system-design hypotheses** by holding some variables constant and changing others.
+
+The core dimensions being manipulated are:
+- **memory substrate** — scratchpad blob vs explicit thread state
+- **model strength** — stronger model vs smaller / weaker model
+- **worker topology** — single agent vs multiple agents
+- **coordination substrate** — no shared board vs shared board
+- **identity structure** — task state only vs task state + explicit actor identity
+
+So the benchmark is really a set of **A/B or controlled structural comparisons** around the same general inbox-management task.
+
+### What that means methodologically
+
+Instead of only producing a leaderboard, the study asks:
+- if performance improves, **what changed?**
+- was it the model?
+- the memory format?
+- the coordination layer?
+- the presence of role fields?
+
+That is much more useful than a generic eval because it points to product decisions.
+
+### The comparison logic across experiments
+
+| Experiment | Main comparison | What is being held roughly constant | What is being changed | What the result is supposed to isolate |
+|-----------|-----------------|--------------------------------------|-----------------------|----------------------------------------|
+| 1 | Scratchpad vs thread state | Same scenario, same model family, same judge | Memory/state representation | Whether the model mainly fails from weak memory organization |
+| 2 | Stronger model vs smaller model with better state | Similar task structure + evaluation setup | Model capability / control reliability | Whether architecture can compensate for weaker model quality |
+| 3 | Single vs multi-agent, with and without shared board | Same org-simulation setting | Agent count + coordination substrate | Whether scaling comes from more workers or from shared coordination state |
+| 4 | Board without actor identity vs board with actor identity | Same coordination setup | Role / actor fields | Whether tasks alone are enough, or identity must also be explicit |
+
+That structure is the real contribution.
+It turns the repo into a set of architectural ablations, not just a model bakeoff.
+
+---
+
 ## The Four Study Structures / Experiments
 
 ## 1) Explicit Thread State vs Giant Scratchpad
@@ -113,7 +156,24 @@ If the model has to infer task identity from a giant blob of memory every turn, 
 
 ## 2) Better State vs Smaller Model
 
-The next question was whether better architecture could let a weaker model compete with a stronger one.
+This is the cleanest direct **model-configuration comparison** in the study.
+
+The question here is not just "did thread state help?" That was already shown in Experiment 1.
+The next question is:
+
+> if architecture improves, can you swap in a smaller / cheaper model and get similar performance?
+
+That is exactly the kind of practical question product teams care about.
+
+### Configuration being compared
+
+At a high level, the comparison is:
+- **stronger model + better structure**
+vs
+- **smaller / weaker model + better structure**
+
+So this is not scratchpad-vs-state anymore.
+This is more like a **structure-vs-scale** test.
 
 ### Result
 
@@ -146,11 +206,27 @@ Both matter.
 
 ## 3) Shared Board vs More Agents
 
-This is the part I found especially interesting from a systems perspective.
+This is the systems-comparison part of the study.
 
-They tested whether scaling agent systems is mostly about:
+The setup is no longer just about one model handling memory well or poorly.
+Now the question becomes:
+
+> when you move from one worker to many, what actually improves performance?
+
+They test whether scaling agent systems is mostly about:
 - adding more worker agents in parallel
 - or creating better shared coordination state
+
+### Configuration logic
+
+The interesting part here is that the study appears to compare combinations like:
+- single agent, no board
+- multi-agent, no board
+- single agent, shared board
+- multi-agent, shared board
+
+That makes it a much better test than simply saying "we tried a swarm and it felt better/worse."
+It lets you isolate whether the gain comes from **parallelism** or from **shared state**.
 
 ### Result
 
@@ -236,6 +312,7 @@ A lot of model evals are weak because they are either:
 - too toy-like
 - too benchmark-y
 - too disconnected from actual workflow structure
+- too entangled (many variables change at once)
 - or too dependent on the researcher's qualitative impression
 
 This study structure is stronger because it has a few good properties:
@@ -247,9 +324,13 @@ Using Enron to estimate thread load gives the experiments a believable baseline.
 They are not changing everything at once.
 They compare one system structure against another:
 - scratchpad vs thread state
-- bigger model vs smaller model with structure
-- more agents vs shared board
-- task state vs task + actor state
+- stronger model vs smaller model under improved state structure
+- single vs multi-agent with and without shared board
+- task state vs task + actor identity
+
+This is the part that matters most to me: the experiments are designed less like a generic benchmark and more like **architectural ablations**.
+That means the result is interpretable.
+When one condition wins, you can say more confidently *why* it won.
 
 ### 3. Architecture-first framing
 The tests are about how the **system** around the model changes outcomes, which is actually where most product leverage is.
