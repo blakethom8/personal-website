@@ -3,6 +3,7 @@ import { PageBackground } from "@/components/PageBackground";
 import { backgrounds } from "@/lib/backgrounds";
 import { getAllPosts } from "@/lib/posts";
 import { IdeasView } from "@/components/ideas/IdeasView";
+import { ChiefShowcaseSection } from "@/components/ideas/ChiefShowcaseSection";
 
 export const metadata: Metadata = {
   title: "Ideas",
@@ -15,7 +16,10 @@ export default function IdeasPage() {
   return (
     <>
       <PageBackground src={backgrounds.ideas} alt="Coastal fog over the ocean" />
-      <IdeasView posts={posts} />
+      <div className="flex flex-col gap-4 pb-5 pt-5">
+        <ChiefShowcaseSection />
+        <IdeasView posts={posts} />
+      </div>
     </>
   );
 }
